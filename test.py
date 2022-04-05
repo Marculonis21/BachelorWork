@@ -31,19 +31,17 @@ def tournament_selection(population, fitness_values, k=5): # TOURNAMENT
 
     return new_population
 
-def crossover(population,cross_prob=1):
+def crossover_single_point(population):
     new_population = []
 
     for i in range(0,len(population)//2):
-        indiv1 = population[2*i]
-        indiv2 = population[2*i+1]
+        indiv1 = copy.deepcopy(population[2*i])
+        indiv2 = copy.deepcopy(population[2*i+1])
 
-        if random.random()<cross_prob:
-            # zvolime index krizeni nahodne
-            crossover_point = random.randint(0, len(indiv1))
-            end2 =  copy.deepcopy(indiv2[:crossover_point])
-            indiv2[:crossover_point] = indiv1[:crossover_point]
-            indiv1[:crossover_point] = end2
+        crossover_point = random.randint(1, len(indiv1))
+        end2 = copy.deepcopy(indiv2[:crossover_point])
+        indiv2[:crossover_point] = indiv1[:crossover_point]
+        indiv1[:crossover_point] = end2
 
         new_population.append(indiv1)
         new_population.append(indiv2)
@@ -53,34 +51,38 @@ def crossover(population,cross_prob=1):
 def crossover_uniform(population):
     new_population = []
 
-    for i in range(0,len(population)//2):
-        indiv1 = np.copy(population[2*i])
-        indiv2 = np.copy(population[2*i+1])
-        for x in range(len(indiv1)):
+    for i in range(len(population)//2):
+        child1 = copy.deepcopy(population[2*i])
+        child2 = copy.deepcopy(population[2*i+1])
+        for x in range(len(child1)):
             if random.random() <= 0.5:
-                indiv1[x], indiv2[x] = indiv2[x], indiv1[x]
+                child1[x] = population[2*i+1][x]
+                child2[x] = population[2*i][x]
 
-        new_population.append(indiv1)
-        new_population.append(indiv2)
+        new_population.append(child1)
+        new_population.append(child2)
 
     return new_population
 
-def mutation(population,indiv_mutation_prob=0.3,action_mutation_prob=0.05):
+def mutation(population,indiv_mutation_prob=0.25,action_mutation_prob=0.05):
     new_population = []
 
-    for i in range(0,len(population)):
+    for i in range(len(population)):
         individual = population[i]
         if random.random() < indiv_mutation_prob:
-            for j in range(0,len(individual)):
+            for j in range(len(individual)):
                 if random.random() < action_mutation_prob:
-                    individual[i] = 2*np.random.random(size=(8,)) - 1
+                    individual[j] = 2*np.random.random(size=(8,)) - 1
 
         new_population.append(individual)
 
     return new_population
 
-env = gym.make('Ant-v3', reset_noise_scale=0.0)
-env._max_episode_steps = 500
+env = gym.make('Ant-v3',
+               exclude_current_positions_from_observation=False,
+               reset_noise_scale=0.0)
+
+env._max_episode_steps = 1000
 
 # defaults for rewards
 # "forward_reward_weight = 1" - missing
@@ -89,12 +91,16 @@ env._max_episode_steps = 500
 # healthy_reward = 1.0,
 
 # Sim steps = 5*max_episode_steps 
-def evolution():
-    population = random_population(50, 8, env._max_episode_steps)
+def evolution(population_size):
+    population = random_population(population_size, 8, env._max_episode_steps)
 
-    for generations in range(10):
+    max_fitnesses = []
+    mean_fitnesses = []
+    min_fitnesses = []
+
+    for generations in range(250):
         if generations % 25 == 0:
-            print(generations)
+            print("Generation: ",generations)
 
         # Get fitness values
         fitness_values = []
@@ -111,18 +117,36 @@ def evolution():
                 if ID == 0 and generations % 10 == 0:
                     env.render()
 
-                individual_reward += reward
+                if done:
+                    # sim end
+                    individual_reward = observation[0] # x-distance
 
             fitness_values.append(individual_reward)
 
         if generations % 10 == 0:
-            print(max(fitness_values))
+            print("Best fitness: ", max(fitness_values))
+
+            mean_fitnesses.append(np.mean(fitness_values))
+            min_fitnesses.append(min(fitness_values))
+            max_fitnesses.append(max(fitness_values))
+
+            plt.cla()
+            plt.title('Training')
+            plt.xlabel('Episode')
+            plt.ylabel('Fitness')
+            plt.plot(mean_fitnesses, label='Mean')
+            plt.plot(min_fitnesses, label='Min')
+            plt.plot(max_fitnesses, label='Max')
+            plt.legend(loc='upper left', fontsize=9)
+            plt.tight_layout()
+            plt.pause(0.1)
+
 
         best_individual = population[np.argmax(fitness_values)]
 
         # selection, crossover, mutation
         parents = tournament_selection(population,fitness_values)
-        children = crossover_uniform(parents)
+        children = crossover_single_point(parents)
         mutated_children = mutation(children)
         population = mutated_children
 
@@ -131,9 +155,9 @@ def evolution():
 
     return best_individual
 
-best = evolution()
+best = evolution(100)
 
-env = gym.wrappers.Monitor(env, 'video/test', force=True)
+# env = gym.wrappers.Monitor(env, 'video/test', force=True)
 
 print("LAST RUN")
 

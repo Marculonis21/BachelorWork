@@ -64,14 +64,15 @@ def crossover_uniform(population):
 
     return new_population
 
-def mutation(population,indiv_mutation_prob=0.25,action_mutation_prob=0.05):
+def mutation(population,indiv_mutation_prob=0.5,action_mutation_prob=0.1):
     new_population = []
 
     for i in range(len(population)):
         individual = population[i]
         if random.random() < indiv_mutation_prob:
-            for j in range(len(individual)):
+            for j in range(1,len(individual)-1):
                 if random.random() < action_mutation_prob:
+                    # individual[j] = (individual[j-1]+individual[j+1])/2
                     individual[j] = 2*np.random.random(size=(8,)) - 1
 
         new_population.append(individual)
@@ -82,7 +83,7 @@ env = gym.make('Ant-v3',
                exclude_current_positions_from_observation=False,
                reset_noise_scale=0.0)
 
-env._max_episode_steps = 1000
+env._max_episode_steps = 500
 
 # defaults for rewards
 # "forward_reward_weight = 1" - missing
@@ -119,7 +120,9 @@ def evolution(population_size):
 
                 if done:
                     # sim end
-                    individual_reward = observation[0] # x-distance
+                    individual_reward = info["x_position"] # x-distance
+                    if info["is_flipped"]:
+                        individual_reward = 0
 
             fitness_values.append(individual_reward)
 
@@ -155,7 +158,7 @@ def evolution(population_size):
 
     return best_individual
 
-best = evolution(100)
+best = evolution(50)
 
 # env = gym.wrappers.Monitor(env, 'video/test', force=True)
 

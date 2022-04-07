@@ -6,12 +6,24 @@ import numpy as np
 import random
 import copy
 import time
+import os
+
+# out = []
+# starter = ""
+# for i in range(50):
+#     starter += "./run.py "+ str(i) + " & "
+
+
+# for item in os.popen(starter):
+#     print(item, end="")
+#     pass
 
 def random_population(population_size, action_size, action_count):
     population = []
 
     for i in range(population_size):
-        individual = 2*np.random.random(size=(action_count, action_size,)) - 1
+        individual = 2*np.random.random(size=(action_count, action_size//2,)) - 1
+
         population.append(individual)
 
     return population
@@ -64,23 +76,20 @@ def crossover_uniform(population):
 
     return new_population
 
-def mutation(population,indiv_mutation_prob=0.5,action_mutation_prob=0.1):
+def mutation(population,indiv_mutation_prob=0.5,action_mutation_prob=0.05):
     new_population = []
 
-    for i in range(len(population)):
-        individual = population[i]
+    for individual in population:
         if random.random() < indiv_mutation_prob:
-            for j in range(1,len(individual)-1):
+            for j in range(len(individual)):
                 if random.random() < action_mutation_prob:
-                    # individual[j] = (individual[j-1]+individual[j+1])/2
-                    individual[j] = 2*np.random.random(size=(8,)) - 1
+                    individual[j] = 2*np.random.random(size=(4,)) - 1
 
         new_population.append(individual)
 
     return new_population
 
 env = gym.make('Ant-v3',
-               exclude_current_positions_from_observation=False,
                reset_noise_scale=0.0)
 
 env._max_episode_steps = 500
@@ -93,7 +102,11 @@ env._max_episode_steps = 500
 
 # Sim steps = 5*max_episode_steps 
 def evolution(population_size):
-    population = random_population(population_size, 8, env._max_episode_steps)
+    # population = random_population(population_size, 8, env._max_episode_steps)
+
+    # try to make n step cycles
+    step_cycle = 20
+    population = random_population(population_size, 8, step_cycle)
 
     max_fitnesses = []
     mean_fitnesses = []
@@ -114,7 +127,13 @@ def evolution(population_size):
                 steps += 1
 
                 # INFO contains useful reward info
-                observation, reward, done, info = env.step(individual[steps])
+
+
+                action = individual[steps % step_cycle]
+                full_action = np.array([ action[0], action[1], action[2], action[3],
+                                        -action[0],-action[1],-action[2],-action[3]])
+
+                observation, reward, done, info = env.step(full_action)
                 if ID == 0 and generations % 10 == 0:
                     env.render()
 
@@ -149,7 +168,7 @@ def evolution(population_size):
 
         # selection, crossover, mutation
         parents = tournament_selection(population,fitness_values)
-        children = crossover_single_point(parents)
+        children = crossover_uniform(parents)
         mutated_children = mutation(children)
         population = mutated_children
 
@@ -170,9 +189,18 @@ done = False
 observation = env.reset()
 while not done:
     steps += 1
-    observation, reward, done, _ = env.step(best[steps])
+
+    action = best[steps]
+    full_action = np.array([ action[0], action[1], action[2], action[3],
+                            -action[0],-action[1],-action[2],-action[3]])
+
+    observation, reward, done, info = env.step(full_action)
     env.render()
 
-    individual_reward += reward
+    if done:
+        # sim end
+        individual_reward = info["x_position"] # x-distance
+        if info["is_flipped"]:
+            individual_reward = 0
 
 print("Last run - Best reward: ", individual_reward)

@@ -76,7 +76,7 @@ def crossover_uniform(population):
 
     return new_population
 
-def mutation(population,indiv_mutation_prob=0.5,action_mutation_prob=0.05):
+def mutation(population,indiv_mutation_prob=0.3,action_mutation_prob=0.05):
     new_population = []
 
     for individual in population:
@@ -105,7 +105,7 @@ def evolution(population_size):
     # population = random_population(population_size, 8, env._max_episode_steps)
 
     # try to make n step cycles
-    step_cycle = 20
+    step_cycle = 25
     population = random_population(population_size, 8, step_cycle)
 
     max_fitnesses = []

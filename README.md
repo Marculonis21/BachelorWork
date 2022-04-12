@@ -17,3 +17,10 @@ Work done under supervision of *RNDr. František Mrázek, CSc.* - Faculty MFF CU
 
 Sodarace
 DASK knihovna
+
+### Custom Env Changes
+#### Ant_v3
+* `healthy_z_range` - (0.2,1.0) -> (0.3,1.0) - eliminate flip over cases
+* added `is_flipped` property 
+* added `is_healthy` and `is_flipped` properties to the info output for checks
+* added new camera to *ant.xml* - enables better tracking

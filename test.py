@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import gym
+from gym.wrappers import RecordVideo
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -91,6 +92,7 @@ def mutation(population,indiv_mutation_prob=0.3,action_mutation_prob=0.05):
 
 env = gym.make('Ant-v3',
                reset_noise_scale=0.0)
+# env = RecordVideo(env, "/tmp/video.mp4")
 
 env._max_episode_steps = 500
 
@@ -134,8 +136,8 @@ def evolution(population_size):
                                         -action[0],-action[1],-action[2],-action[3]])
 
                 observation, reward, done, info = env.step(full_action)
-                if ID == 0 and generations % 10 == 0:
-                    env.render()
+                # if ID == 0 and generations % 10 == 0:
+                env.render()
 
                 if done:
                     # sim end
@@ -178,8 +180,6 @@ def evolution(population_size):
     return best_individual
 
 best = evolution(50)
-
-# env = gym.wrappers.Monitor(env, 'video/test', force=True)
 
 print("LAST RUN")
 

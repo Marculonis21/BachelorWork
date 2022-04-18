@@ -15,8 +15,6 @@ Work done under supervision of *RNDr. František Mrázek, CSc.* - Faculty MFF CU
 - [ ] Graph dependency of variables on possible fitness (time/genom size).
 - [ ] Try different genome types (interpolation, sinus functions).
 
-Sodarace
-DASK knihovna
 
 ### Custom Env Changes
 #### Ant_v3

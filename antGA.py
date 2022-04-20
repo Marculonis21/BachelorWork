@@ -8,7 +8,7 @@ import random
 import copy
 import time
 import os
-import dask
+from dask.distributed import Client
 
 def random_population(population_size, action_size, action_count):
     population = []
@@ -81,61 +81,53 @@ def mutation(population,indiv_mutation_prob=0.3,action_mutation_prob=0.05):
 
     return new_population
 
-env = gym.make('Ant-v3',
-               reset_noise_scale=0.0)
-# env = RecordVideo(env, "/tmp/video.mp4")
+def simulationRun(id,actions,render=False):
+    global step_cycle
 
-env._max_episode_steps = 500
+    steps = -1
+    individual_reward = 0
+    done = False
+    observation = env.reset()
+    while not done:
+        steps += 1
 
-# defaults for rewards
-# "forward_reward_weight = 1" - missing
-# ctrl_cost_weight = 0.5,
-# contact_cost_weight = 5e-4,
-# healthy_reward = 1.0,
+        action = actions[steps % step_cycle]
+        full_action = np.array([ action[0], action[1], action[2], action[3],
+                                -action[0],-action[1],-action[2],-action[3]])
 
-# Sim steps = 5*max_episode_steps 
-def evolution(population_size, step_cycle):
-    # population = random_population(population_size, 8, env._max_episode_steps)
+        observation, reward, done, info = env.step(full_action)
+        if render:
+            env.render()
 
-    # try to make n step cycles
+        if done:
+            # sim end
+            individual_reward = info["x_position"] # x-distance
+            if info["is_flipped"]:
+                individual_reward = 0
+
+    return individual_reward
+
+def evolution(client, population_size, step_cycle):
     population = random_population(population_size, 8, step_cycle)
 
     max_fitnesses = []
     mean_fitnesses = []
     min_fitnesses = []
 
-    for generations in range(250):
+    for generations in range(50):
+
         if generations % 25 == 0:
             print("Generation: ",generations)
 
         # Get fitness values
         fitness_values = []
-        for ID,individual in enumerate(population):
-            steps = -1
-            individual_reward = 0
-            done = False
-            observation = env.reset()
-            while not done:
-                steps += 1
+        futures = []
+        for ID, individual in enumerate(population):
+            futures.append(client.submit(simulationRun, ID,individual))
+            # individual_reward = simulationRun(ID, individual, False)
+            # fitness_values.append(individual_reward)
 
-                # INFO contains useful reward info
-
-
-                action = individual[steps % step_cycle]
-                full_action = np.array([ action[0], action[1], action[2], action[3],
-                                        -action[0],-action[1],-action[2],-action[3]])
-
-                observation, reward, done, info = env.step(full_action)
-                # if ID == 0 and generations % 10 == 0:
-                env.render()
-
-                if done:
-                    # sim end
-                    individual_reward = info["x_position"] # x-distance
-                    if info["is_flipped"]:
-                        individual_reward = 0
-
-            fitness_values.append(individual_reward)
+        fitness_values = client.gather(futures)
 
         if generations % 10 == 0:
             print("Best fitness: ", max(fitness_values))
@@ -155,8 +147,8 @@ def evolution(population_size, step_cycle):
             plt.tight_layout()
             plt.pause(0.1)
 
-
-        best_individual = population[np.argmax(fitness_values)]
+        # need copy so it doesn't get changed by other genetic ops
+        best_individual = copy.deepcopy(population[np.argmax(fitness_values)])
 
         # selection, crossover, mutation
         parents = tournament_selection(population,fitness_values)
@@ -169,29 +161,30 @@ def evolution(population_size, step_cycle):
 
     return best_individual
 
-step_cycle = 25
-best = evolution(50, step_cycle)
+###################################################
+###################################################
 
-print("LAST RUN")
+if __name__ == "__main__":
+    client = Client(n_workers=12,threads_per_worker=1,scheduler_port=0)
+    print(client)
 
-steps = -1
-individual_reward = 0
-done = False
-observation = env.reset()
-while not done:
-    steps += 1
+    env = gym.make('Ant-v3',
+                reset_noise_scale=0.0)
 
-    action = best[steps % step_cycle]
-    full_action = np.array([ action[0], action[1], action[2], action[3],
-                            -action[0],-action[1],-action[2],-action[3]])
+    env._max_episode_steps = 500
 
-    observation, reward, done, info = env.step(full_action)
-    env.render()
+    # defaults for rewards
+    # "forward_reward_weight = 1" - missing
+    # ctrl_cost_weight = 0.5,
+    # contact_cost_weight = 5e-4,
+    # healthy_reward = 1.0,
 
-    if done:
-        # sim end
-        individual_reward = info["x_position"] # x-distance
-        if info["is_flipped"]:
-            individual_reward = 0
+    # Sim steps = 5*max_episode_steps 
+    step_cycle = 25
+    best = evolution(client, population_size=50, step_cycle=step_cycle)
 
-print("Last run - Best reward: ", individual_reward)
+    print("LAST RUN")
+
+    best_reward = simulationRun(0, best, render=True)
+    print("Last run - Best reward: ", best_reward)
+    client.shutdown()

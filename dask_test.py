@@ -8,14 +8,6 @@ from dask.distributed import Client
 
 import gym
 
-print("making env")
-env = gym.make('Ant-v3',
-               terminate_when_unhealthy=False,
-               reset_noise_scale=0.0)
-
-env._max_episode_steps = 1000
-print("done")
-
 def simCycle(id,actions):
     steps = -1
     individual_reward = 0
@@ -37,12 +29,20 @@ def simCycle(id,actions):
     return (id,individual_reward)
 
 if __name__ == "__main__":
-    # client = Client(n_workers=12,threads_per_worker=1,scheduler_port=0)
+    client = Client(n_workers=12,threads_per_worker=1,scheduler_port=0)
     # print(client)
 
+    print("making env")
+    env = gym.make('Ant-v3',
+                terminate_when_unhealthy=False,
+                reset_noise_scale=0.0)
+
+    env._max_episode_steps = 1000
+    print("done")
+
     np.random.seed(100)
-    actionsList = [(2*np.random.random(size=(25, 8//2,)) - 1) for _ in
-                   range(10)]
+    actionsList = [[(2*np.random.random(size=(25, 8//2,)) - 1) for _ in
+                   range(25)] for _ in range(4)]
 
     start = time.time()
     results = []
@@ -50,12 +50,13 @@ if __name__ == "__main__":
     lazy = []
 
     print("sim")
-    for id, actions in enumerate(actionsList):
-        results.append(simCycle(id,actions))
-        # future = client.submit(simCycle, id,actions)
-        # futures.append(future)
+    for _actionsList in actionsList:
+        for id, actions in enumerate(_actionsList):
+            # results.append(simCycle(id,actions))
+            future = client.submit(simCycle, id,actions)
+            futures.append(future)
 
-    # results = client.gather(futures)
+    results = client.gather(futures)
     print(results)
     print("elapsed: ",time.time()-start)
     client.shutdown()

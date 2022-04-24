@@ -10,10 +10,10 @@ Work done under supervision of *RNDr. František Mrázek, CSc.* - Faculty MFF CU
 - [x] Genetic algorithm working in mujoco.
 - [x] Play around with fitness functions.
 - [x] Adjust the TAB mode camera angle (multiple camera modes).
-- [ ] Try [DASK](https://dask.org/) library for multiprocessing
+- [x] Try [DASK](https://dask.org/) library for multiprocessing
 - [ ] Possible - evolution of algorithm variables.
 - [ ] Graph dependency of variables on possible fitness (time/genom size).
-- [ ] Try different genome types (interpolation, sinus functions).
+- [x] Try different genome types (interpolation, sinus functions).
 
 
 ### Custom Env Changes

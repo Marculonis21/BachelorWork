@@ -1,87 +1,15 @@
 #!/usr/bin/env python
 
 import gym
-from gym.wrappers import RecordVideo
 import matplotlib.pyplot as plt
 import numpy as np
-import random
 import copy
-import time
-import os
 from dask.distributed import Client
+import time
 
-def random_population(population_size, action_size, action_count):
-    population = []
+import gaAgent
 
-    for i in range(population_size):
-        individual = 2*np.random.random(size=(action_count, action_size//2,)) - 1
-
-        population.append(individual)
-
-    return population
-
-def tournament_selection(population, fitness_values, k=5): # TOURNAMENT
-    new_population = []
-    for i in range(0,len(population)):
-        individuals = []
-        fitnesses = []
-
-        for _ in range(0,k):
-            idx = random.randint(0,len(population)-1)
-            individuals.append(population[idx])
-            fitnesses.append(fitness_values[idx])
-
-        new_population.append(individuals[np.argmax(fitnesses)])
-
-    return new_population
-
-def crossover_single_point(population):
-    new_population = []
-
-    for i in range(0,len(population)//2):
-        indiv1 = copy.deepcopy(population[2*i])
-        indiv2 = copy.deepcopy(population[2*i+1])
-
-        crossover_point = random.randint(1, len(indiv1))
-        end2 = copy.deepcopy(indiv2[:crossover_point])
-        indiv2[:crossover_point] = indiv1[:crossover_point]
-        indiv1[:crossover_point] = end2
-
-        new_population.append(indiv1)
-        new_population.append(indiv2)
-
-    return new_population
-
-def crossover_uniform(population):
-    new_population = []
-
-    for i in range(len(population)//2):
-        child1 = copy.deepcopy(population[2*i])
-        child2 = copy.deepcopy(population[2*i+1])
-        for x in range(len(child1)):
-            if random.random() <= 0.5:
-                child1[x] = population[2*i+1][x]
-                child2[x] = population[2*i][x]
-
-        new_population.append(child1)
-        new_population.append(child2)
-
-    return new_population
-
-def mutation(population,indiv_mutation_prob=0.3,action_mutation_prob=0.05):
-    new_population = []
-
-    for individual in population:
-        if random.random() < indiv_mutation_prob:
-            for j in range(len(individual)):
-                if random.random() < action_mutation_prob:
-                    individual[j] = 2*np.random.random(size=(4,)) - 1
-
-        new_population.append(individual)
-
-    return new_population
-
-def simulationRun(id,actions,render=False):
+def simulationRun(agent, actions, render=False):
     global step_cycle
 
     steps = -1
@@ -91,11 +19,9 @@ def simulationRun(id,actions,render=False):
     while not done:
         steps += 1
 
-        action = actions[steps % step_cycle]
-        full_action = np.array([ action[0], action[1], action[2], action[3],
-                                -action[0],-action[1],-action[2],-action[3]])
+        action = agent.get_action(actions, steps)
 
-        observation, reward, done, info = env.step(full_action)
+        observation, reward, done, info = env.step(action)
         if render:
             env.render()
 
@@ -107,25 +33,24 @@ def simulationRun(id,actions,render=False):
 
     return individual_reward
 
-def evolution(client, population_size, step_cycle):
-    population = random_population(population_size, 8, step_cycle)
+def evolution(agentType, client, population_size, step_cycle):
+    agent = agentType
+    population = agent.generate_population(population_size)
 
     max_fitnesses = []
     mean_fitnesses = []
     min_fitnesses = []
 
-    for generations in range(50):
-
+    best_individual = None
+    for generations in range(250):
         if generations % 25 == 0:
             print("Generation: ",generations)
 
         # Get fitness values
         fitness_values = []
         futures = []
-        for ID, individual in enumerate(population):
-            futures.append(client.submit(simulationRun, ID,individual))
-            # individual_reward = simulationRun(ID, individual, False)
-            # fitness_values.append(individual_reward)
+        for individual in population:
+            futures.append(client.submit(simulationRun, agent,individual))
 
         fitness_values = client.gather(futures)
 
@@ -151,9 +76,9 @@ def evolution(client, population_size, step_cycle):
         best_individual = copy.deepcopy(population[np.argmax(fitness_values)])
 
         # selection, crossover, mutation
-        parents = tournament_selection(population,fitness_values)
-        children = crossover_uniform(parents)
-        mutated_children = mutation(children)
+        parents = agent.selection(population,fitness_values)
+        children = agent.crossover(parents)
+        mutated_children = agent.mutation(children)
         population = mutated_children
 
         # elitism
@@ -165,7 +90,7 @@ def evolution(client, population_size, step_cycle):
 ###################################################
 
 if __name__ == "__main__":
-    client = Client(n_workers=12,threads_per_worker=1,scheduler_port=0)
+    client = Client(n_workers=4,threads_per_worker=1,scheduler_port=0)
     print(client)
 
     env = gym.make('Ant-v3',
@@ -173,18 +98,11 @@ if __name__ == "__main__":
 
     env._max_episode_steps = 500
 
-    # defaults for rewards
-    # "forward_reward_weight = 1" - missing
-    # ctrl_cost_weight = 0.5,
-    # contact_cost_weight = 5e-4,
-    # healthy_reward = 1.0,
-
-    # Sim steps = 5*max_episode_steps 
     step_cycle = 25
-    best = evolution(client, population_size=50, step_cycle=step_cycle)
+    best = evolution(gaAgent.StepCycleHalfAgent(step_cycle, 8), client, population_size=50, step_cycle=step_cycle)
 
     print("LAST RUN")
-
+    time.sleep
     best_reward = simulationRun(0, best, render=True)
     print("Last run - Best reward: ", best_reward)
     client.shutdown()

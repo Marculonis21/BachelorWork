@@ -15,6 +15,7 @@ def simulationRun(agent, actions, render=False):
     steps = -1
     individual_reward = 0
     done = False
+    finishline_bonus = False
     observation = env.reset()
     while not done:
         steps += 1
@@ -25,6 +26,10 @@ def simulationRun(agent, actions, render=False):
         if render:
             env.render()
 
+        if info["x_position"] > 39.5 and finishline_bonus: # if able to get to the end of the map 
+            finishline_bonus = True
+            individual_reward += (env._max_episode_steps - steps)
+
         if done:
             # sim end
             individual_reward = info["x_position"] # x-distance
@@ -33,7 +38,7 @@ def simulationRun(agent, actions, render=False):
 
     return individual_reward
 
-def evolution(agentType, client, population_size, step_cycle):
+def evolution(agentType, client, population_size, step_cycle=0, debug=False):
     agent = agentType
     population = agent.generate_population(population_size)
 
@@ -49,10 +54,14 @@ def evolution(agentType, client, population_size, step_cycle):
         # Get fitness values
         fitness_values = []
         futures = []
-        for individual in population:
-            futures.append(client.submit(simulationRun, agent,individual))
+        if debug:
+            for individual in population:
+                fitness_values.append(simulationRun(agent, individual, generations % 25 == 0))
+        else:
+            for individual in population:
+                futures.append(client.submit(simulationRun, agent,individual))
 
-        fitness_values = client.gather(futures)
+            fitness_values = client.gather(futures)
 
         if generations % 10 == 0:
             print("Best fitness: ", max(fitness_values))
@@ -90,7 +99,7 @@ def evolution(agentType, client, population_size, step_cycle):
 ###################################################
 
 if __name__ == "__main__":
-    client = Client(n_workers=4,threads_per_worker=1,scheduler_port=0)
+    client = Client(n_workers=12,threads_per_worker=1,scheduler_port=0)
     print(client)
 
     env = gym.make('Ant-v3',
@@ -98,11 +107,13 @@ if __name__ == "__main__":
 
     env._max_episode_steps = 500
 
-    step_cycle = 25
-    best = evolution(gaAgent.StepCycleHalfAgent(step_cycle, 8), client, population_size=50, step_cycle=step_cycle)
+    # step_cycle = 25
+    agent = gaAgent.SineFuncHalfAgent()
+    # best = evolution(gaAgent.StepCycleHalfAgent(step_cycle, 8), client, population_size=50, step_cycle=step_cycle)
+    best = evolution(agent, client, population_size=50, debug=False)
 
     print("LAST RUN")
     time.sleep
-    best_reward = simulationRun(0, best, render=True)
+    best_reward = simulationRun(agent, best, render=True)
     print("Last run - Best reward: ", best_reward)
     client.shutdown()

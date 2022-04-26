@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import gym
+from gym.wrappers import RecordVideo
 import matplotlib.pyplot as plt
 import numpy as np
 import copy
@@ -101,19 +102,19 @@ def evolution(agentType, client, population_size, step_cycle=0, debug=False):
 if __name__ == "__main__":
     client = Client(n_workers=12,threads_per_worker=1,scheduler_port=0)
     print(client)
-
     env = gym.make('Ant-v3',
-                reset_noise_scale=0.0)
+                   reset_noise_scale=0.0)
 
     env._max_episode_steps = 500
 
     # step_cycle = 25
     agent = gaAgent.SineFuncHalfAgent()
     # best = evolution(gaAgent.StepCycleHalfAgent(step_cycle, 8), client, population_size=50, step_cycle=step_cycle)
-    best = evolution(agent, client, population_size=50, debug=False)
+    best = evolution(agent, client, population_size=50, debug=True)
 
     print("LAST RUN")
-    time.sleep
     best_reward = simulationRun(agent, best, render=True)
     print("Last run - Best reward: ", best_reward)
+
+    agent.save(best, f"./saves/individuals/individual_{best_reward}")
     client.shutdown()

@@ -23,6 +23,12 @@ class AgentType(ABC):
     @abstractmethod
     def mutation(self, population): pass
 
+    def save(self, individual, path):
+        np.save(path, individual)
+
+    def load(self, path):
+        return np.load(path)
+
 class StepCycleHalfAgent(AgentType):
     def __init__(self, action_count, true_action_size):
         self.action_count = action_count
@@ -53,7 +59,6 @@ class StepCycleHalfAgent(AgentType):
 
     def mutation(self, population):
         return GA.mutation(population, self.action_size//2, indiv_mutation_prob=0.25, action_mutation_prob=0.03)
-
 
 class SineFuncHalfAgent(AgentType):
     # individual = amplitude, frequency, shift-x, shift-y for each leg
@@ -135,4 +140,6 @@ if __name__ == "__main__":
     print(indiv)
     for i in range(10):
         print(i, agent.get_action(indiv, i))
+
+    agent.save(indiv, "./saves/individuals/test")
 

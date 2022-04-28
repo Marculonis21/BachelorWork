@@ -13,5 +13,5 @@ Work done under supervision of *RNDr. František Mrázek, CSc.* - Faculty MFF CU
 - [x] Try [DASK](https://dask.org/) library for multiprocessing
 - [x] Modular GA agents
 - [x] Try different genome types (interpolation, sinus functions).
-- [ ] Graph dependency of variables on possible fitness (time/genom size).
+- [x] Graph dependency of variables on possible fitness (time/genom size).
 - [ ] Possible - evolution of algorithm variables.

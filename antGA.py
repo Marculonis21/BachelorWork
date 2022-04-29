@@ -7,8 +7,9 @@ import numpy as np
 import copy
 from dask.distributed import Client
 import time
-
 import gaAgent
+
+import sys
 
 def simulationRun(agent, actions, render=False):
     global step_cycle
@@ -98,14 +99,35 @@ def evolution(agentType, client, population_size, step_cycle=0, debug=False):
 
 ###################################################
 ###################################################
+def printHelp():
+    print("-h --help       ... Print help")
+    print("-o <individual> ... Select input file to play")
 
 if __name__ == "__main__":
-    client = Client(n_workers=12,threads_per_worker=1,scheduler_port=0)
-    print(client)
     env = gym.make('Ant-v3',
                    reset_noise_scale=0.0)
 
     env._max_episode_steps = 500
+
+    if ("-h" in sys.argv or "--help" in sys.argv):
+        printHelp()
+        quit()
+
+    if ("-o" in sys.argv):
+        agent, individual = (None, None)
+        try:
+            agent = gaAgent.SineFuncHalfAgent()
+            individual = np.load(sys.argv[sys.argv.index("-o") + 1])
+        except Exception as e:
+            print("Problem occured - loading file\n")
+            printHelp()
+
+        reward = simulationRun(agent, individual, render=True)
+        print("Run reward: ", reward)
+        quit()
+
+    client = Client(n_workers=12,threads_per_worker=1,scheduler_port=0)
+    print(client)
 
     # step_cycle = 25
     agent = gaAgent.SineFuncHalfAgent()

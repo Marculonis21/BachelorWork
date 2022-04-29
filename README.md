@@ -15,3 +15,5 @@ Work done under supervision of *RNDr. František Mrázek, CSc.* - Faculty MFF CU
 - [x] Try different genome types (interpolation, sinus functions).
 - [x] Graph dependency of variables on possible fitness (time/genom size).
 - [ ] Possible - evolution of algorithm variables.
+
+mayavi 4.7.4 

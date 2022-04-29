@@ -80,8 +80,6 @@ class SineFuncHalfAgent(AgentType):
 
         full_action = np.array([ actions[0], actions[1], actions[2], actions[3],
                                 -actions[0],-actions[1],-actions[2],-actions[3]])
-        # full_action = np.array([ actions[0], actions[1], actions[2], actions[3],
-        #                          actions[4], actions[5], actions[6], actions[7]])
 
         return np.array(full_action)
 
@@ -91,11 +89,10 @@ class SineFuncHalfAgent(AgentType):
         for _ in range(population_size):
             individual = []
             for i in range(4):
-                # individual = [[random.uniform(0,1), random.uniform(0,10), random.uniform(0, 2*math.pi)] for _ in range(4)]
                 individual.append(random.uniform(0.2,1))         # amplitude
                 individual.append(random.uniform(0.5,10))        # frequency
-                individual.append(random.uniform(0,2*math.pi)) # shift-x
-                individual.append(random.uniform(-0.5,0.5))        # shift-y
+                individual.append(random.uniform(0,2*math.pi))   # shift-x
+                individual.append(random.uniform(-0.5,0.5))      # shift-y
 
             population.append(individual)
 
@@ -142,4 +139,3 @@ if __name__ == "__main__":
         print(i, agent.get_action(indiv, i))
 
     agent.save(indiv, "./saves/individuals/test")
-

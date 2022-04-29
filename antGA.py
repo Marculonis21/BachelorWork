@@ -110,10 +110,11 @@ if __name__ == "__main__":
     # step_cycle = 25
     agent = gaAgent.SineFuncHalfAgent()
     # best = evolution(gaAgent.StepCycleHalfAgent(step_cycle, 8), client, population_size=50, step_cycle=step_cycle)
-    best = evolution(agent, client, population_size=50, debug=True)
+    best = evolution(agent, client, population_size=50, debug=False)
 
     print("LAST RUN")
     best_reward = simulationRun(agent, best, render=True)
+
     print("Last run - Best reward: ", best_reward)
 
     agent.save(best, f"./saves/individuals/individual_{best_reward}")

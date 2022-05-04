@@ -9,6 +9,9 @@ GA = GAMethods.GA()
 
 class AgentType(ABC):
     @abstractmethod
+    def get_info(self): pass
+
+    @abstractmethod
     def get_action(self, individual, step): pass
 
     @abstractmethod
@@ -33,6 +36,9 @@ class StepCycleHalfAgent(AgentType):
     def __init__(self, action_count, true_action_size):
         self.action_count = action_count
         self.action_size = true_action_size
+
+    def info(self):
+        return f"StepCycleHalfAgent_{self.action_count}_{self.action_size}"
 
     def get_action(self, individual, step):
         action = individual[step % self.action_count]
@@ -62,6 +68,10 @@ class StepCycleHalfAgent(AgentType):
 
 class SineFuncHalfAgent(AgentType):
     # individual = amplitude, frequency, shift-x, shift-y for each leg
+
+    def get_info(self):
+        return f"SineFuncHalfAgent"
+
     def get_action(self, individual, step):
         actions = []
         for i in range(len(individual)//4):
@@ -125,10 +135,10 @@ class SineFuncHalfAgent(AgentType):
                         if category == 3:
                             individual[i] = random.uniform(-0.5,0.5)
 
-
             new_population.append(individual)
 
         return new_population
+
 
 if __name__ == "__main__":
     agent = SineFuncHalfAgent()

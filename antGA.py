@@ -24,9 +24,9 @@ def simulationRun(agent, actions, render=False, render_start_paused=False):
 
         action = agent.get_action(actions, steps)
 
-        observation, reward, done, info = env.step(action[:-2])
+        observation, reward, done, info = env.step(action)
         if render:
-            env.render(start_paused=True)
+            env.render(start_paused=render_start_paused)
 
         if info["x_position"] > 39.5 and finishline_bonus: # if able to get to the end of the map 
             finishline_bonus = True
@@ -104,8 +104,8 @@ def printHelp():
     print("-o <individual> ... Select input file to play")
 
 if __name__ == "__main__":
-    env = gym.make('CustomAntLike-v1',
-    # env = gym.make('Ant-v3',
+    # env = gym.make('CustomAntLike-v1',
+    env = gym.make('Ant-v3',
                    reset_noise_scale=0.0)
 
     env._max_episode_steps = 500
@@ -123,7 +123,7 @@ if __name__ == "__main__":
             print("Problem occured - loading file\n")
             printHelp()
 
-        reward = simulationRun(agent, individual, render=True)
+        reward = simulationRun(agent, individual, render=True, render_start_paused=True)
         print("Run reward: ", reward)
         quit()
 
@@ -132,13 +132,13 @@ if __name__ == "__main__":
 
     # step_cycle = 25
     agent = gaAgent.SineFuncHalfAgent()
-    # best = evolution(gaAgent.StepCycleHalfAgent(step_cycle, 8), client, population_size=50, step_cycle=step_cycle)
-    best = evolution(agent, client, population_size=50, debug=True)
+    best = evolution(agent, client, population_size=50, debug=False)
 
     print("LAST RUN")
     best_reward = simulationRun(agent, best, render=True)
 
     print("Last run - Best reward: ", best_reward)
 
-    agent.save(best, f"./saves/individuals/individual_{best_reward}")
+    agent.save(best, f"./saves/individuals/individual_run{time.time()}_rew{best_reward}")
     client.shutdown()
+    print("DONE")

@@ -7,6 +7,7 @@
 
 #### ant.xml - *gym/envs/mujoco/assets*
 * added new camera to *ant.xml* - enables better tracking
+* changed dimensions of main plane
 
 #### mujoco_env.py - *gym/envs/mujoco*
 * changed MujocoEnv render function for *human mode* - able to pass `start_paused` param

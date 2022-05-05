@@ -35,8 +35,8 @@ def simulationRun(agent, actions, render=False, render_start_paused=False):
         if done:
             # sim end
             individual_reward = info["x_position"] # x-distance
-            if info["is_flipped"]:
-                individual_reward = 0
+            # if info["is_flipped"]:
+            #     individual_reward = 0
 
     return individual_reward
 
@@ -117,7 +117,8 @@ if __name__ == "__main__":
     if ("-o" in sys.argv):
         agent, individual = (None, None)
         try:
-            agent = gaAgent.SineFuncHalfAgent()
+            # agent = gaAgent.SineFuncFullAgent(4)
+            agent = gaAgent.SineFuncHalfAgent(4)
             individual = np.load(sys.argv[sys.argv.index("-o") + 1])
         except Exception as e:
             print("Problem occured - loading file\n")
@@ -131,11 +132,13 @@ if __name__ == "__main__":
     print(client)
 
     # step_cycle = 25
-    agent = gaAgent.SineFuncHalfAgent()
+    # agent = gaAgent.SineFuncFullAgent(4)
+    agent = gaAgent.SineFuncHalfAgent(4)
     best = evolution(agent, client, population_size=50, debug=False)
 
     print("LAST RUN")
     best_reward = simulationRun(agent, best, render=True)
+    print("last best\n",best)
 
     print("Last run - Best reward: ", best_reward)
 

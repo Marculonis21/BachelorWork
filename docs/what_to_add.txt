@@ -1,0 +1,37 @@
+# pro řešerši
+
+Coppelia Robotics
+3D, složitější vytváření vlastních agentů, předem kompilované scripty c++, ale
+python api
+https://www.coppeliarobotics.com/helpFiles/index.html
+
+
+Webots
+- není možnost paralelizovat, simulace běží v GUI
+- vypadá to, že roboti jsou importované modely (nebyla by možnost rozšíření pro
+  vývoj i tvaru a vlastností těla robota)
+- složitá počáteční konfigurace, potřeba řady dalších čáští pro potřebné GUI
+- složitá úprava vlastních robotů
+- https://cyberbotics.com/doc/guide/modeling#how-to-make-replicabledeterministic-simulations
+    - simulace nemusí být vždy deterministické, přenos aplikace by mohl pokazit
+      determinističnost
+- možnost přístuppu přes Python API podobná Gym API, se složitějším ovládáním
+samotného agenta (funkcionalita skrytá v Gym API)
+
+Player/Stage
+Propojení dvou software aplikací Player a Stage využívané dohromady, kdy Stage
+dodává virtuální roboty pro Player. 
+
+Gazebo
+3D sim používaný s Player/Stage, Mujoco rychlejší, možné paralelizovat
+
+Mujoco skrz XML config soubory nabízí jednodušší způsob pro upravení
+simulačního prostředí i robotů samotných. Navíc propojení skrz Python api
+OpenAI nabízí možnost vlastních úprav prakticky všech částí prostředí.
+Konfigurace robotů skrz XML soubory využívaných při běhu programu umožňuje v budoucích částech projektu
+pracovat i s úpravou vlastního těla robotů ze skritpu hned při vývoji, kde
+ostatní simulační prostředí potřebují k úpravě robotů složitějších procesů (3D
+modelování, interní GUI prostředí aj.)
+
+--------------------
+https://arxiv.org/pdf/2103.04616.pdf

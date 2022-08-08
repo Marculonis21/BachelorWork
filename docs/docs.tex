@@ -1,0 +1,157 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{booktabs}
+\usepackage{titling}
+\usepackage{titlesec}
+\usepackage{amssymb}
+\usepackage{pifont}
+\usepackage{graphicx}
+\graphicspath{ {../../} }
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=cyan,
+}
+\urlstyle{same}
+
+\renewcommand{\contentsname}{Obsah}
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\roman{subsection}}
+
+\titleformat{\section}
+{\Large\bfseries}
+{\thesection}
+{0.5em}
+{}
+
+
+\titleformat{\subsection}
+{\large\bfseries}
+{\thesubsection.}
+{0.5em}
+{}
+
+\title{
+        \vspace{1in}
+        \rule{\linewidth}{0.5pt}
+		\usefont{OT1}{bch}{b}{n}
+        \huge Dokumentace ročníkového projektu \\\vspace{20pt}Vývoj řízení
+        simulovaných robotů ve 3D prostředí
+        \vspace{-10pt}
+        \rule{\linewidth}{1pt}
+}
+\author{
+		\normalfont\normalsize
+        Marek Bečvář\\\normalsize
+        MFF UK 2022
+}
+\date{}
+
+\begin{document}
+\maketitle 
+\newpage
+
+\tableofcontents
+\newpage
+
+\section{Popis a cíl projektu} 
+\paragraph{}
+Projekt je zaměřen na využití genetických algoritmů pro vývoj řízení simulovaných 
+robotů ve fyzikálním prostředí. Řízení se má vyvíjet směrem k předem
+specifikovanému cíli. 
+
+Cílem projektu je seznámení se s různými možnostmi zvoleného fyzikálního
+prostředí, vývoj základního genetického algoritmu a jeho aplikace na sadu
+výchozích a vlastních simulovaných robotů a vytvoření další sady \\aplikací
+umožňující statistické zpracování výsledků. 
+
+\section{Dostupné technologie}
+\subsection{Fyzikální simulátory}
+\paragraph {MuJoCo} (\emph{Multi-Joint Dynamics with Contact}) je free a open 
+source robustní fyzikální engine pro vývoj v oblasti robotiky, biomechaniky a dalších.
+
+MuJoCo umožňuje velký nárůst v rychlosti běhu simulace za pomoci plné podpory
+paralelizace na všech dostupných jádrech a stabilitě simulace i při využití
+větších simulačních časových kroků. Zároveň nabízí jednoduchý styl,
+jakým si může uživatel upravit všechny detaily simulace i robotů samotných
+pomocí C++ API nebo jednoduchých XML konfiguračních souborů. 
+
+\paragraph{Webots}
+Webots 
+% \section{Použité technologie}
+% \begin{itemize}
+%     \item MuJoCo (Fyzikální engine, nadstavba pro Gym pro robotické simulace ve
+%         3D prostředí)
+%     \item OpenAI - Gym (Python API pro vývoj AI v různých prostředích)
+%     \item Python (Programovací jazyk)
+%     \item XML
+% \end{itemize}
+
+
+\paragraph{Odkazy} 
+\begin{itemize}
+    \item \href{https://mujoco.org/}{MuJoCo.org}
+    \item \href{https://openai.com/blog/faster-robot-simulation-in-python}{OpenAI MuJoCo} 
+    \item \href{https://neptune.ai/blog/installing-mujoco-to-work-with-openai-gym-environments}{MuJoCo - Instalace} 
+    \item \href{https://mujoco.readthedocs.io/en/latest/overview.html}{MuJoCo - Docs} 
+    \item \href{https://mujoco.readthedocs.io/en/latest/XMLreference.html}{MuJoCo - XML reference} 
+\end{itemize}
+
+\newpage
+
+\subsection{OpenAI - Gym}
+\paragraph{OpenAI} je firma zaměřená na vývoj a praktické využití umělé inteligence.  
+\paragraph{Gym} je open source Python API firmy OpenAI. Je to platforma pro vývoj převážně
+Reinforcement learning metod. Umožňuje využít řadu prostředí, ve kterých
+uživatelé mohou jednoduše spouštět a testovat své agenty. Tato prostředí mohou
+být různé Atari hry, textové hry, jednoduché 2D i plně fyzikálně simulované 3D
+prostředí (\textbf {MuJoCo}).
+
+Gym nabízí jednoduchý přístup do všech těchto prostředí kde vstupy (akce agenta
+v prostředí) i výstupu (stav prostředí, pozorování agenta) jsou standardizované
+napříč všemi prostředími. Navíc open source vlastnost \\tohoto API umožňuje
+vlastní doprogramování pokročilých pomocných nástrojů pro vývoj a práci s 
+prostředími.
+
+I když je Gym primárně vytvořené pro vývoj Reinforcement learning agentů, je
+velmi jednoduché použít namísto toho například agenta, který je v našem případě
+vyvíjen pomocí genetických algoritmů.
+
+\paragraph{Odkazy} 
+\begin{itemize}
+    \item \href{https://www.gymlibrary.ml/}{Oficiální Gym library docs}
+    \item \href{https://github.com/openai/gym}{Gym Github} 
+    \item \href{https://blog.paperspace.com/getting-started-with-openai-gym/}{Getting started with OpenAI Gym} 
+    \item \href{https://medium.com/velotio-perspectives/exploring-openai-gym-a-platform-for-reinforcement-learning-algorithms-380beef446dc}{Medium článek - Exploring OpenAI Gym}
+\end{itemize}
+
+\subsection{Další odkazy}
+\begin{itemize}
+    \item \href{https://www.python.org/}{Python.org}
+    \item \href{https://en.wikipedia.org/wiki/Python_(programming_language)}{Python - Wikipedia} 
+    \item \href{https://developer.mozilla.org/en-US/docs/Web/XML/XML_introduction}{ XML Introduction - Mozilla Developer} 
+    \item \href{https://en.wikipedia.org/wiki/XML}{XML - Wikipedia}
+\end{itemize}
+
+\section{Popis softwarového díla}
+\subsection{Rozdělení}
+\paragraph{}Projekt je rozdělený do více Python skriptů. Pro rychlejší iteraci při vývoji
+je potřeba jemné rozdělení všech možných částí a různých typů operací
+\\genetických algoritmů (s otestovanou správností) tak, aby bylo později jednoduché
+poskládat agenty z těchto předdefinovaných částí. 
+
+Dále je třeba mít skripty, které umožňují spouštění genetického algoritmu za
+určitým cílem (fitness funkce), ve specifikovaném prostředí, s vybraným typem
+robota a za použití specifického typu agenta a jeho parametrů a později mít možnost 
+výsledky z běhu algoritmu ukládat pro pozdější zpracování. Zároveň pro
+snadnější zpracování a vývoj je užitečné mít uložené i celého nejlepšího výsledného 
+agenta pro vizuální rozbor a kontrolu jeho finálního výsledku.
+
+Poslední částí je statistický skript, který zpracuje výsledky z jednoho nebo
+více běhů genetického algoritmu a podle uložených informací z jednotlivých běhů
+zanese jejich výsledky dle potřeby do tabulky, nebo grafu.
+
+\end{document}

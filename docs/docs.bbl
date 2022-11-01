@@ -1,0 +1,61 @@
+\begin{thebibliography}{10}
+
+\bibitem{salimans2017evolution}
+Tim Salimans, Jonathan Ho, Xi~Chen, Szymon Sidor, and Ilya Sutskever.
+\newblock Evolution strategies as a scalable alternative to reinforcement
+  learning.
+\newblock {\em arXiv preprint arXiv:1703.03864}, 2017.
+
+\bibitem{todorov2012mujoco}
+Emanuel Todorov, Tom Erez, and Yuval Tassa.
+\newblock Mujoco: A physics engine for model-based control.
+\newblock In {\em 2012 IEEE/RSJ international conference on intelligent robots
+  and systems}, pages 5026--5033. IEEE, 2012.
+
+\bibitem{Webots}
+Webots.
+\newblock http://www.cyberbotics.com.
+\newblock Open-source Mobile Robot Simulation Software.
+
+\bibitem{michel1998webots}
+Olivier Michel.
+\newblock Webots: Symbiosis between virtual and real mobile robots.
+\newblock In {\em International Conference on Virtual Worlds}, pages 254--263.
+  Springer, 1998.
+
+\bibitem{playerproject}
+The player project.
+\newblock http://playerstage.sourceforge.net/.
+
+\bibitem{gazebo1389727}
+N.~Koenig and A.~Howard.
+\newblock Design and use paradigms for gazebo, an open-source multi-robot
+  simulator.
+\newblock In {\em 2004 IEEE/RSJ International Conference on Intelligent Robots
+  and Systems (IROS) (IEEE Cat. No.04CH37566)}, volume~3, pages 2149--2154
+  vol.3, 2004.
+
+\bibitem{gazebo}
+Gazebo.
+\newblock https://gazebosim.org/.
+
+\bibitem{fortin2012deap}
+F{\'e}lix-Antoine Fortin, Fran{\c{c}}ois-Michel De~Rainville,
+  Marc-Andr{\'e}~Gardner Gardner, Marc Parizeau, and Christian Gagn{\'e}.
+\newblock Deap: Evolutionary algorithms made easy.
+\newblock {\em The Journal of Machine Learning Research}, 13(1):2171--2175,
+  2012.
+
+\bibitem{tonda2020inspyred}
+Alberto Tonda.
+\newblock Inspyred: Bio-inspired algorithms in python.
+\newblock {\em Genetic Programming and Evolvable Machines}, 21(1):269--272,
+  2020.
+
+\bibitem{brockman2016openai}
+Greg Brockman, Vicki Cheung, Ludwig Pettersson, Jonas Schneider, John Schulman,
+  Jie Tang, and Wojciech Zaremba.
+\newblock Openai gym.
+\newblock {\em arXiv preprint arXiv:1606.01540}, 2016.
+
+\end{thebibliography}

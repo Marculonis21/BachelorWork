@@ -61,64 +61,143 @@
 \paragraph{}
 Projekt je zaměřen na využití genetických algoritmů pro vývoj řízení simulovaných 
 robotů ve fyzikálním prostředí. Řízení se má vyvíjet směrem k předem
-specifikovanému cíli. 
-
+specifikovanému cíli. Tímto cílem může být mimo jiné například uražená vzdálenost nebo
+maximální rychlost pohybu.
 Cílem projektu je seznámení se s různými možnostmi zvoleného fyzikálního
 prostředí, vývoj základního genetického algoritmu a jeho aplikace na sadu
-výchozích a vlastních simulovaných robotů a vytvoření další sady \\aplikací
+výchozích a vlastních simulovaných robotů a vytvoření další sady aplikací
 umožňující statistické zpracování výsledků. 
 
 \section{Dostupné technologie}
 \subsection{Fyzikální simulátory}
-\paragraph {MuJoCo} (\emph{Multi-Joint Dynamics with Contact}) je free a open 
+\paragraph {MuJoCo} (\emph{Multi-Joint Dynamics with Contact}) je zdarma a open 
 source robustní fyzikální engine pro vývoj v oblasti robotiky, biomechaniky a dalších.
+MuJoCo se dále často využívá pro testování a porovnávání různých metod
+navrhování robotických systémů jako jsou třeba evoluční algoritmy nebo reinforcement
+learning \cite{salimans2017evolution}.
 
 MuJoCo umožňuje velký nárůst v rychlosti běhu simulace za pomoci plné podpory
 paralelizace na všech dostupných jádrech a stabilitě simulace i při využití
-větších simulačních časových kroků. Zároveň nabízí jednoduchý styl,
+větších simulačních časových kroků \cite{todorov2012mujoco}. Zároveň nabízí jednoduchý styl,
 jakým si může uživatel upravit všechny detaily simulace i robotů samotných
 pomocí C++ API nebo jednoduchých XML konfiguračních souborů. 
 
 \paragraph{Webots}
-Webots 
-% \section{Použité technologie}
-% \begin{itemize}
-%     \item MuJoCo (Fyzikální engine, nadstavba pro Gym pro robotické simulace ve
-%         3D prostředí)
-%     \item OpenAI - Gym (Python API pro vývoj AI v různých prostředích)
-%     \item Python (Programovací jazyk)
-%     \item XML
-% \end{itemize}
+Webots je open source multiplatformní robotický simulátor s \\využitím v
+průmyslu, výuce i výzkumu \cite{Webots}. Webots umožňuje programování a
+testování jak jednoduchých virtuálních robotů, tak následné aplikace softwaru na 
+reálné roboty, obojí využívající programovacího jazyka C a stejných \emph{Khepera}
+API\cite{michel1998webots}. 
 
+Prostředí nabízí využití řady předpřipravených modelů robotů všech druhů 
+a dále umožňuje import vlastní robotů z 3D modelovacích softwarů v CAD formátu.
 
-\paragraph{Odkazy} 
-\begin{itemize}
-    \item \href{https://mujoco.org/}{MuJoCo.org}
-    \item \href{https://openai.com/blog/faster-robot-simulation-in-python}{OpenAI MuJoCo} 
-    \item \href{https://neptune.ai/blog/installing-mujoco-to-work-with-openai-gym-environments}{MuJoCo - Instalace} 
-    \item \href{https://mujoco.readthedocs.io/en/latest/overview.html}{MuJoCo - Docs} 
-    \item \href{https://mujoco.readthedocs.io/en/latest/XMLreference.html}{MuJoCo - XML reference} 
-\end{itemize}
+\paragraph{Player/Stage}
+Player/Stage je výsledkem projektu \emph{The Player Project}
+\cite{playerproject} vytvořeným za účelem usnadnit vývoj v oblasti robotiky 
+a senzorů. Player/Stage je spojení dvou projektů. 
+
+\textbf{Player} je síťový jazykově a na platformě nezávislý 
+server pro ovládání robota s jednoducým přístupem k senzorům a motorům robota
+skrz IP síť. Klientský program může být vytvořený a spuštěný na libovolném PC s
+připojením k síti robota a v libovolném jazyce podporujícím TCP sokety. 
+
+\textbf{Stage} je rychlý a rozšířitelný 2D simulátor prostředí s objekty a roboty 
+s jejich senzory, kam roboti a jejich ovladače mohou být načítány za běhu
+simulace.
+
+\textbf{Player/Stage} Často jsou tyto dva programy využívané dohromady tak, že
+uživatel vyvine populaci robotů (ovladačů, senzorů) a poskytne ji jako klienty
+pro Player server.
+
+\paragraph{Gazebo}
+Gazebo je sada open source knihoven pro vývoj, výzkum a aplikaci robotů. 
+Umožňuje simulaci dynamického 3D prostředí s více agenty, generování reálných
+dat ze simulovaných senzorů a fyzikálně korektní interakce robotů s
+prostředím \cite{gazebo1389727}. Pro simulace umožňuje výběr z více fyzikálních
+enginů. 
+
+Uživatel pracuje a nastavuje prostředí v interním grafickém prostředí s určitou možností 
+spouštět simulace i bez GUI.
+
+Gazebo bylo součástí projektu \emph{Player Project} od roku 2004, ale od roku 2012
+je nezávislým projektem \emph{Open Robotics} \cite{gazebo}
+\cite{playerproject}.
+
+\subsection{Evoluční algoritmy}
+\paragraph{DEAP}
+DEAP (\emph{Distributed Evolutionary Algorithms in Python}) je Python framework
+pro tvorbu evolučních algoritmů, který se snaží jejich tvorbu zjednodušit pomocí
+přímočarého postupu (podobného pseudokódu), který je jednoduchý na porozumění.
+\cite{fortin2012deap}
+
+Framework je tvořený ze dvou hlavních struktur \emph{creator}, který pomáhá s
+vytvářením genetických informací z jedinců z libovolných datových struktur a
+\emph{toolbox}, který je seznamem nástrojů (genetických operátorů), které mohou
+být použité při tvorbě algoritmu. 
+
+\paragraph{Inspyred}
+Inspyred poskytuje implementaci většiny z nejpoužívanějších evolučních
+algoritmů a dalších přírodou inspirovaných algoritmů v jazyce Python. \cite{tonda2020inspyred}
+
+Knihovna již přichází s funkčním řešením, ve formě jednotlivých komponentů
+(python funkcí), které ale uživatel může sám přepsat, nebo nahradit za jiné již
+vytvořené funkce.
 
 \newpage
 
-\subsection{OpenAI - Gym}
-\paragraph{OpenAI} je firma zaměřená na vývoj a praktické využití umělé inteligence.  
-\paragraph{Gym} je open source Python API firmy OpenAI. Je to platforma pro vývoj převážně
-Reinforcement learning metod. Umožňuje využít řadu prostředí, ve kterých
-uživatelé mohou jednoduše spouštět a testovat své agenty. Tato prostředí mohou
-být různé Atari hry, textové hry, jednoduché 2D i plně fyzikálně simulované 3D
-prostředí (\textbf {MuJoCo}).
+\section{Použité technologie}
+\begin{itemize}
+    \item MuJoCo 
+    \item Vlastní evoluční algoritmus
+    \item OpenAI - Gym (Python API pro vývoj AI v různých prostředích)
+    \item Python (Programovací jazyk)
+    \item XML
+\end{itemize}
+
+
+\paragraph{OpenAI - Gym} OpenAI je firma zaměřená na výzkum, vývoj a praktické využití umělé inteligence.
+\textbf{Gym} je open source Python API firmy OpenAI. Je to platforma pro vývoj převážně
+reinforcement learning metod \cite{brockman2016openai}. Umožňuje využít řadu prostředí, 
+ve kterých uživatelé mohou jednoduše spouštět a testovat své agenty \cite{brockman2016openai}.
+Tato prostředí mohou být \\ku příkladu Atari hry, textové hry, jednoduché 2D i plně fyzikálně simulované 3D
+prostředí (s fyzikálně enginem \textbf {MuJoCo}).
 
 Gym nabízí jednoduchý přístup do všech těchto prostředí kde vstupy (akce agenta
 v prostředí) i výstupu (stav prostředí, pozorování agenta) jsou standardizované
 napříč všemi prostředími. Navíc open source vlastnost \\tohoto API umožňuje
 vlastní doprogramování pokročilých pomocných nástrojů pro vývoj a práci s 
-prostředími.
+prostředím.
 
-I když je Gym primárně vytvořené pro vývoj Reinforcement learning agentů, je
-velmi jednoduché použít namísto toho například agenta, který je v našem případě
-vyvíjen pomocí genetických algoritmů.
+I když je Gym primárně vytvořené pro vývoj reinforcement learning agentů, je
+velmi jednoduché použít namísto toho agenta, který je v našem případě
+vyvíjen pomocí evolučních algoritmů.
+
+\subsection{Odůvodnění vybraných technologií}
+\paragraph{Fyzikální simulátor - MuJoCo} MuJoCo bylo oproti ostatním
+simulátorům zvoleno, kvůli jednoduchosti konfigurace celého prostředí. \\Dále
+spojení s prostředím skrz open source API od OpenAI umožňuje přímočaré
+upravování všech částí prostředí, což velmi pomáhá při vývoji vlastních
+evolučních agentů. Dále, jelikož evoluční algoritmy jsou zdlouhavým procesem,
+rychlost a možná paralelizace běhu prostředí byla při výběru \\pozitivní
+vlastností. S ohledem na možné budoucí experimenty zároveň bylo žádoucí mít
+možnost jednoduché úpravy všech aspektů simulovaných robotů a jejich prostředí.
+Zde XML konfigurační soubory, které MuJoCo používá, pomocí kterých může uživatel 
+postavit celého robota a zároveň skrz ně \\nastavit kompletní vlastnosti prostředí 
+byly přínosem pro rychlejší experimentování a vývoj.
+
+\paragraph{Využití vlastního evolučního algoritmu} Pro jednoduchost
+implementace a snížení nároků na znalosti mnohdy velmi složitých externích
+knihoven pro evoluční algoritmy, které krom zkrácení zápisu často nepřináší
+více dalších pozitivních vlastností, bylo rozhodnuto o využití vlastní
+jednoduché implementace všech základních operátorů evolučních algoritmů, které
+je \\možné poté v implementaci vlastních experimentálních agentů jednoduše
+\\aplikovat a používat bez potřeby znalostí externích knihoven.
+
+\paragraph{Programovací jazyk - Python} Pro implementaci všeho je využitý 
+programovací jazyk Python. Důvodem byla potřeba nějakého jednoduchého, nejlépe
+interpretovaného jazyka, vhodného pro rychlé experimentování a dobré pro
+předvádění finálních výsledků.
 
 \paragraph{Odkazy} 
 \begin{itemize}
@@ -126,32 +205,39 @@ vyvíjen pomocí genetických algoritmů.
     \item \href{https://github.com/openai/gym}{Gym Github} 
     \item \href{https://blog.paperspace.com/getting-started-with-openai-gym/}{Getting started with OpenAI Gym} 
     \item \href{https://medium.com/velotio-perspectives/exploring-openai-gym-a-platform-for-reinforcement-learning-algorithms-380beef446dc}{Medium článek - Exploring OpenAI Gym}
-\end{itemize}
-
-\subsection{Další odkazy}
-\begin{itemize}
     \item \href{https://www.python.org/}{Python.org}
     \item \href{https://en.wikipedia.org/wiki/Python_(programming_language)}{Python - Wikipedia} 
-    \item \href{https://developer.mozilla.org/en-US/docs/Web/XML/XML_introduction}{ XML Introduction - Mozilla Developer} 
+    \item \href{https://developer.mozilla.org/en-US/docs/Web/XML/XML_introduction}{XML Introduction - Mozilla Developer} 
     \item \href{https://en.wikipedia.org/wiki/XML}{XML - Wikipedia}
 \end{itemize}
 
 \section{Popis softwarového díla}
-\subsection{Rozdělení}
-\paragraph{}Projekt je rozdělený do více Python skriptů. Pro rychlejší iteraci při vývoji
-je potřeba jemné rozdělení všech možných částí a různých typů operací
-\\genetických algoritmů (s otestovanou správností) tak, aby bylo později jednoduché
-poskládat agenty z těchto předdefinovaných částí. 
 
-Dále je třeba mít skripty, které umožňují spouštění genetického algoritmu za
-určitým cílem (fitness funkce), ve specifikovaném prostředí, s vybraným typem
-robota a za použití specifického typu agenta a jeho parametrů a později mít možnost 
-výsledky z běhu algoritmu ukládat pro pozdější zpracování. Zároveň pro
-snadnější zpracování a vývoj je užitečné mít uložené i celého nejlepšího výsledného 
-agenta pro vizuální rozbor a kontrolu jeho finálního výsledku.
+\paragraph{Průběh experimetnu} Nejprve je potřeba pomocí XML souboru zvolit určitého 
+definovaného robota pro náš experiment. Dále mu přiřadíme \\vytvořeného agenta,
+který ovlivňuje jak jsou do genetického algoritmu kódovány vstupy z prostředí
+libovolného robota. Tento agent má předem přiřazené genetické operátory, které
+ale uživatel může dle potřeb experimentu zaměňovat za jiné, buď předem
+definované, nebo zcela vlastní vytvořené \\operátory ve tvaru odpovídajících
+Python funkcí.
+Dále máme možnost takto připravenému prostředí nakonfigurovat vlastní fitness
+funkci a nastavit \\chtěnou dobu trvání experimentu (počet generací, které má
+algoritmus projít). Rozběhlé prostředí jsme pak schopni pozorovat pomocí
+aktivních statistik, které nám dávají představu o hodnotách z vývoje v 
+prostředí. Pokud uživatel chce mít větší přehled o vývoji v prostředí, má 
+možnost určité generace (jedince z generace) interaktivně sledovat skrz kamery 
+v simulovaném prostředí, ve kterém experiment probýhá. 
+Jelikož experimenty pro dosažení nějakých přínosných výsledků je potřeba pro
+kontrolu opakovat, umožňuje program opakované spouštění experimentů s předem
+zvolenými parametry (úprava parametrů možna jak pro prostředí, tak pro
+samotného agenta a jeho genetické operátory). Všechny tyto výsledky jsou pak
+podle zvolených\\ parametrů ukládány, umožňující následné externí
+zpracování, popřípadě využití jednoduchých statistických pomůcek (vytvořených v
+rámci tohoto projektu) pro rozbor dat z výsledků běhů algoritmů v grafech.
+Z každého běhu je zároveň ukládán nejlepší jedinec, pro umožnění vizuální
+kontroly a rozboru výsledného jedince finální generace.
 
-Poslední částí je statistický skript, který zpracuje výsledky z jednoho nebo
-více běhů genetického algoritmu a podle uložených informací z jednotlivých běhů
-zanese jejich výsledky dle potřeby do tabulky, nebo grafu.
+\bibliographystyle{unsrt}
+\bibliography{references}
 
 \end{document}

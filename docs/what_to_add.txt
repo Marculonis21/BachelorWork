@@ -5,7 +5,6 @@ Coppelia Robotics
 python api
 https://www.coppeliarobotics.com/helpFiles/index.html
 
-
 Webots
 - není možnost paralelizovat, simulace běží v GUI
 - vypadá to, že roboti jsou importované modely (nebyla by možnost rozšíření pro

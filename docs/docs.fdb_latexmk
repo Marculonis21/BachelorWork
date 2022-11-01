@@ -1,5 +1,12 @@
 # Fdb version 3
-["pdflatex"] 1659996017 "docs.tex" "docs.pdf" "docs" 1659996017
+["bibtex docs"] 1664097002 "docs.aux" "docs.bbl" "docs" 1664097002
+  "/usr/share/texlive/texmf-dist/bibtex/bst/base/unsrt.bst" 1292289607 18030 1376b4b231b50c66211e47e42eda2875 ""
+  "docs.aux" 1664097002 3491 2f25b291f7349ead5b43918c411249c9 "pdflatex"
+  "references.bib" 1660515643 2821 24ce35619f69a2006aee5b3619cac443 ""
+  (generated)
+  "docs.bbl"
+  "docs.blg"
+["pdflatex"] 1664097002 "docs.tex" "docs.pdf" "docs" 1664097002
   "/etc/texmf/web2c/texmf.cnf" 1613049494 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/marculonis/.texlive2019/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk" 1613158288 31928 ca05e7594d89d75012b12472a6466409 ""
   "/home/marculonis/.texlive2019/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk" 1613158289 40112 4c3c7e52140fd46ea0dd42c2bf9d02dc ""
@@ -97,13 +104,14 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1581979058 38841 ce3692aa899bb693b90b87eaa5d4d84e ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1613049500 128028 f533b797fba58d231669ea19e894e23e ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1613049505 4791332 e4ec492d7606bb9062c2e2cd9fe47cae ""
-  "docs.aux" 1659996017 2235 ae42a3e5a3b5aa66bff4004193e0494e "pdflatex"
-  "docs.out" 1659996017 447 a09843b3162d00318e59e4d8c8602dae "pdflatex"
-  "docs.tex" 1659996017 6235 6c5aafe6509bf5ed23224ac2ade2767f ""
-  "docs.toc" 1659996017 958 54510d099840a930e634b5d36e1916a2 "pdflatex"
+  "docs.aux" 1664097002 3491 2f25b291f7349ead5b43918c411249c9 "pdflatex"
+  "docs.bbl" 1664097002 2041 416f1bf50d626a45083fa127c7eb30cf "bibtex docs"
+  "docs.out" 1664097002 478 a94b18aee06954151970efebc7ae6446 "pdflatex"
+  "docs.tex" 1664097000 11761 b73e2a47f42084a7c116a163d603f020 ""
+  "docs.toc" 1664097002 1373 76143e3611a8fac01857b42efafdaf5a "pdflatex"
   (generated)
-  "docs.out"
-  "docs.toc"
   "docs.log"
-  "docs.pdf"
   "docs.aux"
+  "docs.out"
+  "docs.pdf"
+  "docs.toc"

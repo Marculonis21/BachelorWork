@@ -14,12 +14,12 @@ Work done under supervision of *RNDr. František Mrázek, CSc.* - Faculty MFF CU
 - [x] Modular GA agents
 - [x] Try different genome types (interpolation, sinus functions)
 - [x] Graph dependency of variables on possible fitness (time/genom size)
+- [x] Graphs from collected data
+- [x] Try adjusting ant model
+- [x] New models - 3/... legged ant?
+
+### TODO:
 - [ ] School Gitlab migrating (low)
 - [ ] Set up batch run possibility
 - [ ] Stats collecting from batch runs - csv/...?
-- [ ] Graphs from collected data
-- [ ] Try adjusting ant model
-- [ ] New models - 3/6/8 legged ant?
-- [ ] Possible - evolution of algorithm variables
 
-<!-- mayavi 4.7.4 --> 

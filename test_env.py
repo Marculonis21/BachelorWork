@@ -48,6 +48,7 @@ if __name__ == "__main__":
         quit()
 
     # step_cycle = 25
+    # agent = gaAgent.FullRandomAgent(100, 8) # Ant-v3
     agent = gaAgent.FullRandomAgent(100, 4)
     indiv = agent.generate_population(1)[0]
     simulationRun(agent, indiv, render=True, render_start_paused=True)

@@ -23,3 +23,5 @@ Work done under supervision of *RNDr. František Mrázek, CSc.* - Faculty MFF CU
 - [ ] Set up batch run possibility
 - [ ] Stats collecting from batch runs - csv/...?
 
+
+

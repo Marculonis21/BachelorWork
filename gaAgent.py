@@ -43,8 +43,10 @@ class StepCycleHalfAgent(AgentType):
     def get_action(self, individual, step):
         action = individual[step % self.action_count]
 
-        full_action = np.array([ action[0], action[1], action[2], action[3],
-                                -action[0],-action[1],-action[2],-action[3]])
+        # full_action = np.array([ action[0], action[1], action[2], action[3],
+        #                         -action[0],-action[1],-action[2],-action[3]])
+
+        full_action = np.concatenate([action,-action]) 
 
         return full_action
 
@@ -90,7 +92,8 @@ class SineFuncFullAgent(AgentType):
 
             actions.append(value)
 
-        full_action = actions
+        actions = np.array(actions)
+        full_action = np.concatenate([actions, -actions])
 
         return np.array(full_action)
 
@@ -164,13 +167,12 @@ class SineFuncHalfAgent(AgentType):
 
             actions.append(value)
 
+        actions = np.array(actions)
         # full_action = np.array([ actions[0], actions[1], actions[2], actions[3],
         #                         -actions[0],-actions[1],-actions[2],-actions[3]])
-        full_action = actions
-        for i in range(self.action_count):
-            full_action.append(-actions[i])
+        full_action = np.concatenate([actions,-actions]) 
 
-        return np.array(full_action)
+        return full_action
 
     def generate_population(self, population_size):
         population = []

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from multiprocessing import current_process
 import gym
 from gym.wrappers import RecordVideo
 import matplotlib.pyplot as plt
@@ -8,6 +9,7 @@ import copy
 from dask.distributed import Client
 import time
 import gaAgent
+from mujoco_py import GlfwContext
 
 import sys
 
@@ -15,6 +17,9 @@ GUIFLAG = False
 GUI_GRAPH_VALUES = [[],[],[]]
 GUI_FITNESS = []
 GUI_GEN_NUMBER = 0
+
+GUI_PREVIEW = False
+GUI_ABORT = False 
 
 def simulationRun(env, agent, actions, render=False, render_start_paused=False):
     global step_cycle
@@ -45,7 +50,7 @@ def simulationRun(env, agent, actions, render=False, render_start_paused=False):
 
     return individual_reward
 
-def evolution(env, agentType, client, population_size, step_cycle=0, debug=False):
+def evolution(env, agentType, client, generation_count, population_size, step_cycle=0, debug=False):
     agent = agentType
     population = agent.generate_population(population_size)
 
@@ -53,16 +58,23 @@ def evolution(env, agentType, client, population_size, step_cycle=0, debug=False
     mean_fitnesses = []
     min_fitnesses = []
 
-    global GUI_GRAPH_VALUES, GUI_GEN_NUMBER, GUI_FITNESS
+    global GUI_GRAPH_VALUES, GUI_GEN_NUMBER, GUI_FITNESS, GUI_PREVIEW
     if GUIFLAG:
         GUI_GRAPH_VALUES = [[],[],[]]
 
     best_individual = None
-    for generations in range(250):
+    for generations in range(generation_count+1):
+        if GUI_ABORT:
+            break
+
         GUI_GEN_NUMBER = generations
 
-        if generations % 25 == 0:
-            print("Generation: ",generations)
+        if GUI_PREVIEW:
+            simulationRun(env, agentType, best_individual, render=True, render_start_paused=True);
+            GUI_PREVIEW = False
+        else:
+            if generations % 25 == 0:
+                print("Generation: ",generations)
 
         # Get fitness values
         fitness_values = []
@@ -76,13 +88,13 @@ def evolution(env, agentType, client, population_size, step_cycle=0, debug=False
 
             fitness_values = client.gather(futures)
 
+        if GUIFLAG:
+            GUI_FITNESS = [np.mean(fitness_values), 
+                            min(fitness_values),
+                            max(fitness_values)]
+
         if generations % 10 == 0:
-
             if GUIFLAG:
-                GUI_FITNESS = [np.mean(fitness_values), 
-                               min(fitness_values),
-                               max(fitness_values)]
-
                 GUI_GRAPH_VALUES[0].append(np.mean(fitness_values))
                 GUI_GRAPH_VALUES[1].append(min(fitness_values))
                 GUI_GRAPH_VALUES[2].append(max(fitness_values))
@@ -124,7 +136,8 @@ def printHelp():
     print("-h --help       ... Print help")
     print("-o <individual> ... Select input file to play")
 
-def RunFromGui(robot='Ant-v3', max_steps=500, agent='', show_best=False, save_best=False, save_dir='./saves/individuals/'):
+def RunFromGui(robot='Ant-v3', max_steps=500, agent='', show_best=False, save_best=False, save_dir='./saves/individuals'):
+    # GlfwContext(offscreen=True)  # Create a window to init GLFW.
     global GUIFLAG
     GUIFLAG = True
 
@@ -136,28 +149,41 @@ def RunFromGui(robot='Ant-v3', max_steps=500, agent='', show_best=False, save_be
     client = Client(n_workers=10,threads_per_worker=1,scheduler_port=0)
 
     control_agent = None
-    if agent == "random":
+    if agent == "Full Random":
         # create classes for each robot - contains possible actions, ...
-        print(env.action_space.shape[0])
-        control_agent = gaAgent.FullRandomAgent(max_steps, env.action_space.shape[0])
-    elif agent == "sine_full":
+        control_agent = gaAgent.FullRandomAgent(25, env.action_space.shape[0])
+    elif agent == "Sine Function Full":
         control_agent = gaAgent.SineFuncFullAgent(env.action_space.shape[0])
-    elif agent == "sine_half":
-        control_agent = gaAgent.SineFuncHalfAgent(env.action_space.shape[0])
-    elif agent == "step_cycle":
-        # for now hard coded step count
+    elif agent == "Sine Function Half":
+        control_agent = gaAgent.SineFuncHalfAgent(env.action_space.shape[0]//2)
+    elif agent == "Step Cycle Half":
         control_agent = gaAgent.StepCycleHalfAgent(20, env.action_space.shape[0])
     else:
-        raise AttributeError("Unknown control agent type")
+        raise AttributeError("Unknown control agent type - " + agent)
 
-    best_individual = evolution(env, control_agent, client, population_size=50, debug=False)
+    best_individual = evolution(env, control_agent, client, generation_count=10, population_size=50, debug=False)
 
-    client.shutdown()
+    client.close()
+    if GUI_ABORT:
+        env.close()
+        return
 
-    best_reward = simulationRun(env, control_agent, best_individual, render=show_best)
+    best_reward = simulationRun(env, control_agent, best_individual, render=show_best, render_start_paused=True)
+    env.close()
 
     if save_best:
-         control_agent.save(best_individual, save_dir + f"individual_run{time.time()}_rew{best_reward}")
+        current_time = time.time()
+        control_agent.save(best_individual, save_dir + f"/individual_run{current_time}_rew{best_reward}")
+        graph_data = np.array(GUI_GRAPH_VALUES)
+        np.save(save_dir + f"/graph_data{current_time}", graph_data)
+
+def RaisePreview():
+    global GUI_PREVIEW
+    GUI_PREVIEW = True
+
+def RaiseAbort():
+    global GUI_ABORT
+    GUI_ABORT = True
 
 if __name__ == "__main__":
     # env = gym.make('CustomAntLike-v1',
@@ -191,14 +217,15 @@ if __name__ == "__main__":
     # step_cycle = 25
     # agent = gaAgent.SineFuncFullAgent(4)
     agent = gaAgent.SineFuncHalfAgent(4)
-    best = evolution(env, agent, client, population_size=50, debug=False)
+    best = evolution(env, agent, client, generation_count=250, population_size=50, debug=False)
 
     print("LAST RUN")
-    best_reward = simulationRun(agent, best, render=True)
+    best_reward = simulationRun(env, agent, best, render=True)
     print("last best\n",best)
+    env.close()
 
     print("Last run - Best reward: ", best_reward)
 
     agent.save(best, f"./saves/individuals/individual_run{time.time()}_rew{best_reward}")
-    client.shutdown()
+    client.close()
     print("DONE")

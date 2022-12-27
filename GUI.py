@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import PySimpleGUI as sg
-# from PIL import Image
+from PIL import Image, ImageTk
+from distributed.batched import gen
 import antGA
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -11,23 +12,28 @@ use_custom_titlebar = False
 font = ("Helvetica", 15)
 
 def main_tab():
-    frame_layout = [[sg.Text("", font=("Helvetica", 16), size=(100, 20), pad=(20,20), key="-FRAME_TEXT-")]]
+    frame_text = [[sg.Text("", font=("Helvetica", 16), size=(72, 8), pad=(20,20), key="-MAIN_FRAME_TEXT-")]]
 
-    frame = [[sg.Frame("Settings overview", frame_layout, size=(800, 400))]]
+    frame = [sg.Frame("Settings overview", frame_text, size=(800, 300), pad=(10,10))]
 
-    options_l = [[sg.Checkbox("Show final run", key="-CB_FINAL-")],
+    options_l = [[sg.Input("250", size=(5,None), enable_events=True, key="-MAIN_GEN_COUNT_IN-"), sg.Text("Generation count")],
+                 [sg.Checkbox("Show final run", key="-CB_FINAL-")],
                  [sg.Checkbox("Show progress runs", key="-CB_PROGRESS-")],
                  [sg.Sizer(0, 1)]]
 
-    options_r = [[sg.Checkbox("Save best agent", default=True, key="-CB_SAVEBEST-")],
-                 [sg.Text("Save directory:"), sg.Text(".", size=(30,None), key="-SAVE_DIR-")],
+    options_r = [[sg.Input("50", size=(5,None), enable_events=True, key="-MAIN_POP_SIZE_IN-"), sg.Text("Starting population")],
+                 [sg.Checkbox("Save best agent", default=True, key="-CB_SAVEBEST-")],
+                 [sg.Text("Save directory:"), sg.Text(".", size=(30,None), font=("Helvetica", 10), key="-SAVE_DIR-")],
                  [sg.FolderBrowse("Browse", target="-SAVE_DIR-")]]
 
-    options = [[sg.Col([[sg.Col(options_l, element_justification='l', vertical_alignment='t', expand_x=True), sg.Col(options_r, element_justification='l', vertical_alignment='t', expand_x=True)]], expand_x=True)]]
+    options = [sg.Col([[sg.Col(options_l, element_justification='l', vertical_alignment='t', expand_x=True), sg.Col(options_r, element_justification='l', vertical_alignment='t', expand_x=True)]], expand_x=True, pad=(5,10))]
 
-    start = [[sg.Col([[sg.Button("Start", key="-START-")]], expand_x=True, element_justification='r')]]
+    start = [sg.Push(), sg.Button("Start", key="-START-")]
 
-    main = frame + options + start
+    main = [frame,
+            options,
+            [sg.VPush()],
+            start]
 
     tab = sg.Tab("Main", main)
     return tab
@@ -37,30 +43,55 @@ def robot_select_callback(var, index, mode):
 def agent_select_callback(var, index, mode):
     window.write_event_value('-AGENT_SELECT-', window['-AGENT_SELECT-'].TKStringVar.get())
 
-
-robot_names = ["OpenAi Ant", "Basic Ant", "TEST"]
+robot_names = ["OpenAi Ant", "Basic Ant"]
+robot_overview = {robot_names[0]:"",
+                  robot_names[1]:""}
 robot_pics = {robot_names[0]:"Ant-v3",
-              robot_names[1]:"Basic-Ant",
-              robot_names[2]:None}
+              robot_names[1]:"Basic-Ant"}
+
+def set_robot_image(index_selected):
+    im = Image.open("./docs/UI/UIdata/"+robot_pics[robot_names[index_selected]])
+    crop = im.crop((250,50,650,445))
+    image = ImageTk.PhotoImage(image=crop)
+    window['-ROBOT_IMAGE-'].update(data=image)
                 
 def robot_select_tab():
     options_menu = [sg.Text("Select robot: "), sg.OptionMenu(robot_names, robot_names[0], pad=(0,10), key="-ROBOT_SELECT-")]
-    img = [sg.Image(filename="./docs/UI/UIdata/"+robot_pics[robot_names[0]], size=(800, 400), key="-ROBOT_IMAGE-")]
 
-    main = sg.Column([[sg.VPush()], options_menu, img, [sg.VPush()]], expand_x=True, expand_y=True)
+    img = sg.Image(source="", size=(400, 400), key="-ROBOT_IMAGE-")
+    TEXT = "TEXT TEXT TEXT"
+    overview = sg.Frame("Robot overview", [[sg.Text(TEXT,font=("Helvetica", 16),pad=(20,20), key="-ROBOT_OVERVIEW-")], 
+                                           [sg.VPush()], 
+                                           [sg.Push(), sg.Button("...", button_color=sg.theme_background_color(), border_width=0, key="-ROBOT_OVERVIEW_MORE-")]], expand_x=True, expand_y=True)
 
-    tab = sg.Tab("Robot Select", [[main]])
+    img_overview = [sg.Column([[img, overview]], expand_x=True, expand_y=True)]
+
+    main = [[sg.VPush()],
+            options_menu,
+            img_overview,
+            [sg.VPush()]]
+
+    tab = sg.Tab("Robot Select", main)
     return tab;
 
 agent_types = ["Full Random", "Sine Function Full", "Sine Function Half", "Step Cycle Half"]
-agent_overview = {"Full Random":"Full Random agent\n    Starts off as a sequence of random actions for each motor for chosen amount of steps. Behavior of the agent is then made by repeating this sequence till end state is reached periodically.",
-                  "Sine Function Full":"Sine Function Full agent\n    Each motor of the robot is controlled by sine wave. Values of these agents are made of only 4 parameters (amplitude, frequency, shiftX, shiftY) for each motor.",
-                  "Sine Function Half":"Sine Function Full agent\n    Similar to Sine Function Full agent, however only half of robot's motors are controlled by sine waves. The other half is symmetrical (point symmetry through center of the body).",
-                  "Step Cycle Half":"Step Cycle Half agent\n    Combination of random and half agent. STEPCOUNT long sequences of random actions for half of the motors are created and and then by symmetry transfered to opposing motors. During runtime, sequences of actions are repeatedly performed."}
+agent_overview = {"Full Random"        : "Full Random agent\n    Starts off as a sequence of random actions for each motor for chosen amount of steps. Behavior of the agent is then made by repeating this sequence till end state is reached periodically.",
+                  "Sine Function Full" : "Sine Function Full agent\n    Each motor of the robot is controlled by sine wave. Values of these agents are made of only 4 parameters (amplitude, frequency, shiftX, shiftY) for each motor.",
+                  "Sine Function Half" : "Sine Function Full agent\n    Similar to Sine Function Full agent, however only half of robot's motors are controlled by sine waves. The other half is symmetrical (point symmetry through center of the body).",
+                  "Step Cycle Half"    : "Step Cycle Half agent\n    Combination of random and half agent. STEPCOUNT long sequences of random actions for half of the motors are created and and then by symmetry transfered to opposing motors. During runtime, sequences of actions are repeatedly performed"}
+
+def set_agent_overview(agent_selected):
+    TEXT = agent_overview[agent_selected]
+    if len(TEXT) > 260:
+        TEXT = TEXT[:260] + " ..."
+
+    window["-AGENT_OVERVIEW_MORE-"].update(visible=len(TEXT)>260)
+    window["-AGENT_OVERVIEW-"].update(TEXT)
 
 def agent_select_tab():
     options_menu = [sg.Text("Select agent type: "), sg.OptionMenu(agent_types, agent_types[0], pad=(0,20,0,20), key="-AGENT_SELECT-")]
-    frame = [sg.Frame("Agent overview", [[sg.Text(agent_overview[agent_types[0]], font=("Helvetica", 16), size=(72, None), pad=(20,20), key="-AGENT_OVERVIEW-")]], expand_x=True)]
+    frame = [sg.Frame("Agent overview", [[sg.Text(agent_overview[agent_types[0]], font=("Helvetica", 16), size=(72, 6), pad=(20,20), key="-AGENT_OVERVIEW-")],
+                                         [sg.Push(), sg.Button("...", button_color=sg.theme_background_color(), border_width=0, key="-AGENT_OVERVIEW_MORE-")]], expand_x=True, pad=(10,0))]
 
     tab = sg.Tab("Agent config", [options_menu, frame])
     return tab;
@@ -69,50 +100,14 @@ def evolution_select_tab():
     tab = sg.Tab("Evolution config", [[]])
     return tab;
 
-def make_window(theme=None):
-    # layout_l = [[name('Text'), sg.Text('Text')],
-    #             [name('Input'), sg.Input(s=15)],
-    #             [name('Multiline'), sg.Multiline(s=(15,2))],
-    #             [name('Output'), sg.Output(s=(15,2))],
-    #             [name('Combo'), sg.Combo(sg.theme_list(), default_value=sg.theme(), s=(15,22), enable_events=True, readonly=True, k='-COMBO-')],
-    #             [name('OptionMenu'), sg.OptionMenu(['OptionMenu',],s=(15,2))],
-    #             [name('Checkbox'), sg.Checkbox('Checkbox')],
-    #             [name('Radio'), sg.Radio('Radio', 1)],
-    #             [name('Spin'), sg.Spin(['Spin',], s=(15,2))],
-    #             [name('Button'), sg.Button('Button')],
-    #             [name('ButtonMenu'), sg.ButtonMenu('ButtonMenu', sg.MENU_RIGHT_CLICK_EDITME_EXIT)],
-    #             [name('Slider'), sg.Slider((0,10), orientation='h', s=(10,15))],
-    #             [name('Listbox'), sg.Listbox(['Listbox', 'Listbox 2'], no_scrollbar=True,  s=(15,2))],
-    #             [name('Image'), sg.Image(sg.EMOJI_BASE64_HAPPY_THUMBS_UP)],
-    #             [name('Graph'), sg.Graph((125, 50), (0,0), (125,50), k='-GRAPH-')]  ]
+def make_window():
+    tabGroup = [[sg.TabGroup([[main_tab(), robot_select_tab(), agent_select_tab()]], size=(800,600))]]
 
-    # layout_r  = [[name('Canvas'), sg.Canvas(background_color=sg.theme_button_color()[1], size=(125,50))],
-    #             [name('ProgressBar'), sg.ProgressBar(100, orientation='h', s=(10,20), k='-PBAR-')],
-    #             [name('Table'), sg.Table([[1,2,3], [4,5,6]], ['Col 1','Col 2','Col 3'], num_rows=2)],
-    #             [name('Tree'), sg.Tree(treedata, ['Heading',], num_rows=3)],
-    #             [name('Horizontal Separator'), sg.HSep()],
-    #             [name('Vertical Separator'), sg.VSep()],
-    #             [name('Frame'), sg.Frame('Frame', [[sg.T(s=15)]])],
-    #             [name('Column'), sg.Column([[sg.T(s=15)]])],
-    #             [name('Tab, TabGroup'), sg.TabGroup([[sg.Tab('Tab1',[[sg.T(s=(15,2))]]), sg.Tab('Tab2', [[]])]])],
-    #             [name('Pane'), sg.Pane([sg.Col([[sg.T('Pane 1')]]), sg.Col([[sg.T('Pane 2')]])])],
-    #             [name('Push'), sg.Push(), sg.T('Pushed over')],
-    #             [name('VPush'), sg.VPush()],
-    #             [name('Sizer'), sg.Sizer(1,1)],
-    #             [name('StatusBar'), sg.StatusBar('StatusBar')],
-    #             [name('Sizegrip'), sg.Sizegrip()]  ]
-
-    # layout = [[sg.MenubarCustom([['File', ['Exit']], ['Edit', ['Edit Me', ]]],  k='-CUST MENUBAR-',p=0)] if use_custom_titlebar else [sg.Menu([['File', ['Exit']], ['Edit', ['Edit Me', ]]],  k='-CUST MENUBAR-',p=0)],
-    #           [sg.Checkbox('Use Custom Titlebar & Menubar', use_custom_titlebar, enable_events=True, k='-USE CUSTOM TITLEBAR-')],
-    #           [sg.T('PySimpleGUI Elements - Use Combo to Change Themes', font='_ 18', justification='c', expand_x=True)],
-    #           [sg.Col(layout_l), sg.Col(layout_r)]]
-    
-    
-    tabGroup = [[sg.TabGroup([[main_tab(), robot_select_tab(), agent_select_tab()]])]]
-
-    window = sg.Window('Test GUI', tabGroup, font=font, finalize=True, keep_on_top=True)
+    window = sg.Window('Test GUI', tabGroup, size=(800,600), font=font, finalize=True, keep_on_top=True)
     window['-ROBOT_SELECT-'].TKStringVar.trace("w", robot_select_callback)
     window['-AGENT_SELECT-'].TKStringVar.trace("w", agent_select_callback)
+    window['-AGENT_OVERVIEW_MORE-'].block_focus()
+    window['-ROBOT_OVERVIEW_MORE-'].block_focus()
 
     return window
 
@@ -133,7 +128,10 @@ if __name__ == "__main__":
     _, values = window.read(timeout=0)
 
     TEXT = '''- Robot selected: {}\n- Robot controlling agent: {}'''.format(values['-ROBOT_SELECT-'], values["-AGENT_SELECT-"])
-    window["-FRAME_TEXT-"].update(TEXT)
+    window["-MAIN_FRAME_TEXT-"].update(TEXT)
+
+    set_robot_image(0)
+    set_agent_overview(agent_types[0])
 
     window_values = {}
 
@@ -142,23 +140,38 @@ if __name__ == "__main__":
     RUN = True
     while SETUP:
         event, values = window.read()
-        print(event,values)
-        # print(event)
+        # print(event,values)
 
         if event == sg.WIN_CLOSED or event == 'Exit':
             quit()
             break
         
         if event == "-ROBOT_SELECT-":
-            window["-ROBOT_IMAGE-"].update(filename="./docs/UI/UIdata/"+robot_pics[values["-ROBOT_SELECT-"]], size=(800, 400))
+            set_robot_image(robot_names.index(values['-ROBOT_SELECT-']))
             window.refresh()
 
         if event == "-AGENT_SELECT-":
-            window["-AGENT_OVERVIEW-"].update(agent_overview[values["-AGENT_SELECT-"]])
+            set_agent_overview(values["-AGENT_SELECT-"])
             window.refresh()
 
+        if (event == '-MAIN_GEN_COUNT_IN-' and values['-MAIN_GEN_COUNT_IN-']) or \
+           (event == '-MAIN_POP_SIZE_IN-' and values['-MAIN_POP_SIZE_IN-']): 
+            gen_count = ""
+            pop_size = ""
+            for s in values['-MAIN_GEN_COUNT_IN-']:
+                if s in '1234567890':
+                    gen_count += s
+
+            for s in values['-MAIN_POP_SIZE_IN-']:
+                if s in '1234567890':
+                    pop_size += s
+
+            window['-MAIN_GEN_COUNT_IN-'].update(gen_count)
+            window['-MAIN_POP_SIZE_IN-'].update(pop_size)
+
+
         TEXT = '''- Robot selected: {}\n- Robot controlling agent: {}'''.format(values['-ROBOT_SELECT-'], values["-AGENT_SELECT-"])
-        window["-FRAME_TEXT-"].update(TEXT)
+        window["-MAIN_FRAME_TEXT-"].update(TEXT)
 
         if event == "-START-":
             window_values = values

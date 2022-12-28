@@ -19,3 +19,12 @@
 
 #### custom_ant.xml - *gym/envs/mujoco/assets*
 * new xml test model
+
+#### __init__.py - *gym/envs/*
+* new env must be registered in `__init__`
+
+#### 4_stick_ant.xml - *gym/envs/mujoco/assets*
+* basic test model
+
+#### __init__.py - *gym/envs/mujoco*
+* need to add import for the new robot

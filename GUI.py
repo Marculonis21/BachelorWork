@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 
+from socket import gaierror
 import PySimpleGUI as sg
 from PIL import Image, ImageTk
-from distributed.batched import gen
 import antGA
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import threading
+import numpy as np
 
 use_custom_titlebar = False
 font = ("Helvetica", 15)
 
 def main_tab():
-    frame_text = [[sg.Text("", font=("Helvetica", 16), size=(72, 8), pad=(20,20), key="-MAIN_FRAME_TEXT-")]]
+    frame_text = [[sg.Text("", font=("Helvetica", 16), size=(58, 8), pad=(20,20), key="-MAIN_FRAME_TEXT-")]]
 
     frame = [sg.Frame("Settings overview", frame_text, size=(800, 300), pad=(10,10))]
 
@@ -40,31 +41,112 @@ def main_tab():
 
 def robot_select_callback(var, index, mode):
     window.write_event_value('-ROBOT_SELECT-', window['-ROBOT_SELECT-'].TKStringVar.get())
+
 def agent_select_callback(var, index, mode):
     window.write_event_value('-AGENT_SELECT-', window['-AGENT_SELECT-'].TKStringVar.get())
 
-robot_names = ["OpenAi Ant", "Basic Ant"]
-robot_overview = {robot_names[0]:"",
-                  robot_names[1]:""}
-robot_pics = {robot_names[0]:"Ant-v3",
-              robot_names[1]:"Basic-Ant"}
+def expand_description(text):
+    frame = sg.Frame("Description", [[sg.Text(text, size=(60,None), font=("Helvetica", 14), pad=(10,10))]])
+    sg.Window("Description long", [[frame]], font=font, keep_on_top=True, modal=True).read(close=True)
 
-def set_robot_image(index_selected):
-    im = Image.open("./docs/UI/UIdata/"+robot_pics[robot_names[index_selected]])
+import robots.robots as robotsClass
+robots = {"OpenAI Ant-v3" : robotsClass.AntV3(),
+          "Basic Ant"     : robotsClass.StickAnt()}
+
+body_part_mask = []
+
+def popup_robot_parts(robot_selected):
+    global body_part_mask
+
+    robot = robots[robot_selected]
+    body_parts = np.array(list(robot.body_parts.keys()))
+
+    body_part_mask = np.array(body_part_mask)
+    neg_mask = np.logical_not(body_part_mask)
+
+    title = sg.Text("Unlock body parts to enable their changes during GA run", size=(None,2))
+
+    left   = [[sg.Text("Locked body parts")],
+              [sg.Listbox(body_parts[neg_mask], select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, font=("Helvetica", 12), expand_x=True, expand_y=True, no_scrollbar=True, pad=(10,10), key="LOCKED")]]
+    middle = [[sg.VPush()],
+              [sg.Button(">>>", key="ADD")],
+              [sg.Button("<<<", key="REMOVE")],
+              [sg.VPush()]]
+    right  = [[sg.Text("Unlocked body parts")],
+              [sg.Listbox(body_parts[body_part_mask], select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, font=("Helvetica", 12), expand_x=True, expand_y=True, no_scrollbar=True, pad=(10,10), key="UNLOCKED")]]
+
+    layout = [[title],
+              [sg.Column(left, expand_x=True, expand_y=True, element_justification='c'), 
+               sg.Column(middle, expand_y=True, element_justification='c'),
+               sg.Column(right, expand_x=True, expand_y=True, element_justification='c')]]
+
+    popup = sg.Window("Select body parts for GA", layout, size=(700,400), font=font, keep_on_top=True, modal=True)
+
+    while True:
+        event, values = popup.read()
+
+        if event == sg.WIN_CLOSED or event == 'Exit':
+            break
+
+        if event == "ADD":
+            selected = values["LOCKED"]
+            if len(selected) == 0:
+                continue
+
+            indexes = np.isin(body_parts, selected)
+
+            body_part_mask[indexes] = True
+            neg_mask = np.logical_not(body_part_mask)
+
+        if event == "REMOVE":
+            selected = values["UNLOCKED"]
+            if len(selected) == 0:
+                continue
+
+            indexes = np.isin(body_parts, selected)
+
+            body_part_mask[indexes] = False
+            neg_mask = np.logical_not(body_part_mask)
+
+        popup["LOCKED"].update(body_parts[neg_mask])
+        popup["UNLOCKED"].update(body_parts[body_part_mask])
+        popup.refresh()
+
+def set_robot(robot_selected):
+    robot = robots[robot_selected]
+
+    im = Image.open(robot.picture_path)
     crop = im.crop((250,50,650,445))
     image = ImageTk.PhotoImage(image=crop)
     window['-ROBOT_IMAGE-'].update(data=image)
+
+    # check needed range
+    cutoff = 320
+    TEXT = robot.description
+    if len(TEXT) > cutoff:
+        TEXT = TEXT[:cutoff] + " ..."
+
+    window["-ROBOT_OVERVIEW_MORE-"].update(visible=len(TEXT)>cutoff)
+    window["-ROBOT_OVERVIEW-"].update(TEXT)
+    window["-ROBOT_PARTS-"].update(disabled = not (len(robot.body_parts) > 0)) # if robot has specified vars in XML, enable button
+
+    global body_part_mask
+    # reset body part mask
+    body_part_mask = [False for _ in range(len(robots[robot_selected].body_parts))]
                 
 def robot_select_tab():
+    robot_names = list(robots.keys())
     options_menu = [sg.Text("Select robot: "), sg.OptionMenu(robot_names, robot_names[0], pad=(0,10), key="-ROBOT_SELECT-")]
 
     img = sg.Image(source="", size=(400, 400), key="-ROBOT_IMAGE-")
-    TEXT = "TEXT TEXT TEXT"
-    overview = sg.Frame("Robot overview", [[sg.Text(TEXT,font=("Helvetica", 16),pad=(20,20), key="-ROBOT_OVERVIEW-")], 
+    overview = sg.Frame("Robot overview", [[sg.Text(robots[robot_names[0]].description,font=("Helvetica", 14), size=(24, None), pad=(10,10), key="-ROBOT_OVERVIEW-")], 
                                            [sg.VPush()], 
                                            [sg.Push(), sg.Button("...", button_color=sg.theme_background_color(), border_width=0, key="-ROBOT_OVERVIEW_MORE-")]], expand_x=True, expand_y=True)
 
-    img_overview = [sg.Column([[img, overview]], expand_x=True, expand_y=True)]
+    body_changes = sg.Button("Select body parts for GA", key="-ROBOT_PARTS-")
+
+    # img_overview = [sg.Column([[img, overview,]], background_color='red', expand_x=True, expand_y=True)]
+    img_overview = [sg.Column([[img]]), sg.Column([[overview],[body_changes]], expand_x=True, expand_y=True)]
 
     main = [[sg.VPush()],
             options_menu,
@@ -74,23 +156,26 @@ def robot_select_tab():
     tab = sg.Tab("Robot Select", main)
     return tab;
 
-agent_types = ["Full Random", "Sine Function Full", "Sine Function Half", "Step Cycle Half"]
-agent_overview = {"Full Random"        : "Full Random agent\n    Starts off as a sequence of random actions for each motor for chosen amount of steps. Behavior of the agent is then made by repeating this sequence till end state is reached periodically.",
-                  "Sine Function Full" : "Sine Function Full agent\n    Each motor of the robot is controlled by sine wave. Values of these agents are made of only 4 parameters (amplitude, frequency, shiftX, shiftY) for each motor.",
-                  "Sine Function Half" : "Sine Function Full agent\n    Similar to Sine Function Full agent, however only half of robot's motors are controlled by sine waves. The other half is symmetrical (point symmetry through center of the body).",
-                  "Step Cycle Half"    : "Step Cycle Half agent\n    Combination of random and half agent. STEPCOUNT long sequences of random actions for half of the motors are created and and then by symmetry transfered to opposing motors. During runtime, sequences of actions are repeatedly performed"}
+import gaAgent
+agents : 'dict[str, gaAgent.AgentType]'
+agents = {"Full Random" : gaAgent.FullRandomAgent.ForGUI(),
+          "Sine Function Full" : gaAgent.SineFuncFullAgent.ForGUI(),
+          "Sine Funciton Half" : gaAgent.SineFuncHalfAgent.ForGUI(),
+          "Step Cycle Half" : gaAgent.StepCycleHalfAgent.ForGUI(),}
 
-def set_agent_overview(agent_selected):
-    TEXT = agent_overview[agent_selected]
-    if len(TEXT) > 260:
-        TEXT = TEXT[:260] + " ..."
+def set_agent(agent_selected):
+    TEXT = agents[agent_selected].description
+    cutoff = 260
+    if len(TEXT) > cutoff:
+        TEXT = TEXT[:cutoff] + "..."
 
-    window["-AGENT_OVERVIEW_MORE-"].update(visible=len(TEXT)>260)
+    window["-AGENT_OVERVIEW_MORE-"].update(visible=len(TEXT)>cutoff)
     window["-AGENT_OVERVIEW-"].update(TEXT)
 
 def agent_select_tab():
-    options_menu = [sg.Text("Select agent type: "), sg.OptionMenu(agent_types, agent_types[0], pad=(0,20,0,20), key="-AGENT_SELECT-")]
-    frame = [sg.Frame("Agent overview", [[sg.Text(agent_overview[agent_types[0]], font=("Helvetica", 16), size=(72, 6), pad=(20,20), key="-AGENT_OVERVIEW-")],
+    agent_names = list(agents.keys())
+    options_menu = [sg.Text("Select agent type: "), sg.OptionMenu(agent_names, agent_names[0], pad=(0,20,0,20), key="-AGENT_SELECT-")]
+    frame = [sg.Frame("Agent overview", [[sg.Text(agents[agent_names[0]].description, font=("Helvetica", 14), size=(58, 6), pad=(10,10), key="-AGENT_OVERVIEW-")],
                                          [sg.Push(), sg.Button("...", button_color=sg.theme_background_color(), border_width=0, key="-AGENT_OVERVIEW_MORE-")]], expand_x=True, pad=(10,0))]
 
     tab = sg.Tab("Agent config", [options_menu, frame])
@@ -103,7 +188,7 @@ def evolution_select_tab():
 def make_window():
     tabGroup = [[sg.TabGroup([[main_tab(), robot_select_tab(), agent_select_tab()]], size=(800,600))]]
 
-    window = sg.Window('Test GUI', tabGroup, size=(800,600), font=font, finalize=True, keep_on_top=True)
+    window = sg.Window('Test GUI', tabGroup, size=(800,600), font=font, finalize=True,  use_default_focus=False)
     window['-ROBOT_SELECT-'].TKStringVar.trace("w", robot_select_callback)
     window['-AGENT_SELECT-'].TKStringVar.trace("w", agent_select_callback)
     window['-AGENT_OVERVIEW_MORE-'].block_focus()
@@ -127,11 +212,13 @@ if __name__ == "__main__":
     window = make_window()
     _, values = window.read(timeout=0)
 
+    agent_names = list(agents.keys())
+    robot_names = list(robots.keys())
+    set_robot(robot_names[0])
+    set_agent(agent_names[0])
+
     TEXT = '''- Robot selected: {}\n- Robot controlling agent: {}'''.format(values['-ROBOT_SELECT-'], values["-AGENT_SELECT-"])
     window["-MAIN_FRAME_TEXT-"].update(TEXT)
-
-    set_robot_image(0)
-    set_agent_overview(agent_types[0])
 
     window_values = {}
 
@@ -144,15 +231,22 @@ if __name__ == "__main__":
 
         if event == sg.WIN_CLOSED or event == 'Exit':
             quit()
-            break
         
         if event == "-ROBOT_SELECT-":
-            set_robot_image(robot_names.index(values['-ROBOT_SELECT-']))
+            set_robot(values['-ROBOT_SELECT-'])
             window.refresh()
 
+        if event == "-ROBOT_PARTS-":
+            popup_robot_parts(values['-ROBOT_SELECT-'])
+            # window.refresh()
+
         if event == "-AGENT_SELECT-":
-            set_agent_overview(values["-AGENT_SELECT-"])
+            set_agent(values["-AGENT_SELECT-"])
             window.refresh()
+
+        if event == "-ROBOT_OVERVIEW_MORE-" or event == "-AGENT_OVERVIEW_MORE-":
+            if event == "-ROBOT_OVERVIEW_MORE-": expand_description(robots[values['-ROBOT_SELECT-']].description)
+            if event == "-AGENT_OVERVIEW_MORE-": expand_description(agents[values['-AGENT_SELECT-']].description)
 
         if (event == '-MAIN_GEN_COUNT_IN-' and values['-MAIN_GEN_COUNT_IN-']) or \
            (event == '-MAIN_POP_SIZE_IN-' and values['-MAIN_POP_SIZE_IN-']): 
@@ -189,7 +283,7 @@ if __name__ == "__main__":
 
     FIG = None
     FIG_AGG = None
-    def drawChart():
+    def draw_chart():
         global FIG, FIG_AGG
         FIG = plt.figure()
         plt.title('Training')
@@ -203,7 +297,7 @@ if __name__ == "__main__":
         FIG_AGG = draw_figure(
             window['-FIG-'].TKCanvas, FIG)
 
-    def updateChart():
+    def update_chart():
         global FIG, FIG_AGG
         FIG_AGG.get_tk_widget().forget()
         plt.clf()
@@ -221,29 +315,34 @@ if __name__ == "__main__":
             window['-FIG-'].TKCanvas, FIG)
 
     def GetParams():
-        robot = max_steps = agent = show_best = save_best = save_dir = None
-        if window_values["-ROBOT_SELECT-"] == "OpenAi Ant":
-            robot = "Ant-v3"
-        if window_values["-ROBOT_SELECT-"] == "Basic Ant":
-            robot = "CustomAntLike-v1"
+        robot = agent = population_size = generation_count = show_best = save_best = save_dir = None
 
-        agent = window_values["-AGENT_SELECT-"]
+        robot = robots[window_values["-ROBOT_SELECT-"]] 
+
+        agent_selected = window_values["-AGENT_SELECT-"]
+        if agent_selected == "Full Random":          agent = gaAgent.FullRandomAgent(robot, body_part_mask, 25)
+        elif agent_selected == "Sine Function Full": agent = gaAgent.SineFuncFullAgent(robot, body_part_mask)
+        elif agent_selected == "Sine Function Half": agent = gaAgent.SineFuncHalfAgent(robot, body_part_mask)
+        elif agent_selected == "Step Cycle Half":    agent = gaAgent.StepCycleHalfAgent(robot, body_part_mask, 20)
+        else: raise AttributeError("Unknown control agent type - " + agent_selected)
+
+        population_size = window_values["-MAIN_POP_SIZE_IN-"]
+        generation_count = window_values["-MAIN_GEN_COUNT_IN-"]
+
         show_best = window_values["-CB_FINAL-"]
         save_best = window_values["-CB_SAVEBEST-"]
         save_dir = window_values["Browse"]
 
-        max_steps = 500
-        return  robot, max_steps, agent, show_best, save_best, save_dir
+        return  robot, agent, population_size, generation_count, show_best, save_best, save_dir
             
-
     def startRun():
-        robot, max_steps, agent, show_best, save_best, save_dir = GetParams()
-        antGA.RunFromGui(robot, max_steps, agent, show_best, save_best, save_dir)
+        robot, agent, population_size, generation_count, show_best, save_best, save_dir = GetParams()
+        antGA.RunFromGui(robot, agent, population_size, generation_count, show_best, save_best, save_dir)
 
     working_thread = threading.Thread(target=startRun, daemon=True)
     working_thread.start()
 
-    drawChart();
+    draw_chart();
 
     while RUN:
         if working_thread.is_alive():
@@ -251,6 +350,7 @@ if __name__ == "__main__":
         else:
             window["-EXIT-"].update(button_color="green")
             event, values = window.read()
+            break
         # print(event)
 
         if event == sg.WIN_CLOSED or event == 'Exit':
@@ -264,7 +364,7 @@ if __name__ == "__main__":
             working_thread.join()
             window.close()
 
-        updateChart()
+        update_chart()
 
         window["-GENNUM-"].update(str(antGA.GUI_GEN_NUMBER))
         if len(antGA.GUI_FITNESS) > 0:

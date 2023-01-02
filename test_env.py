@@ -3,6 +3,11 @@
 import gym
 import gaAgent
 import sys
+import numpy as np
+
+import os
+import tempfile
+import re
 
 def simulationRun(agent, actions, render=False, render_start_paused=False):
     global step_cycle
@@ -15,6 +20,7 @@ def simulationRun(agent, actions, render=False, render_start_paused=False):
         steps += 1
 
         action = agent.get_action(actions, steps)
+        # action = -np.ones([len(action)])
 
         observation, reward, done, info = env.step(action)
         if render:
@@ -39,8 +45,17 @@ if __name__ == "__main__":
         print("not enough params")
         quit()
 
-    chosen_env = sys.argv[1]
-    env = gym.make(chosen_env, reset_noise_scale=0.0)
+    from robots.robots import StickAnt
+
+    sa = StickAnt()
+
+    temp_file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
+    sa.create(temp_file, adjustment=[], adjustment_mask=[0,0,0,0])
+
+    env = gym.make('CustomAntLike-v1', 
+                   xml_file=temp_file.name,
+                   reset_noise_scale=0.0)
+
     env._max_episode_steps = 10000
 
     if ("-h" in sys.argv or "--help" in sys.argv):
@@ -49,7 +64,10 @@ if __name__ == "__main__":
 
     # step_cycle = 25
     # agent = gaAgent.FullRandomAgent(100, 8) # Ant-v3
-    agent = gaAgent.FullRandomAgent(100, 4)
+    agent = gaAgent.FullRandomAgent(100, 4, [1,1,0,0])
     indiv = agent.generate_population(1)[0]
+    agent.mutation([indiv])
     simulationRun(agent, indiv, render=True, render_start_paused=True)
+    temp_file.close()
+    quit()
     print("DONE")

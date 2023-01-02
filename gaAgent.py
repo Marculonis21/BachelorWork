@@ -1,15 +1,29 @@
 #!/usr/bin/env python
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, abstractclassmethod, abstractproperty
 import numpy as np
 import random
 import math
+import gym
 
 import GAMethods
 GA = GAMethods.GA()
 
 class AgentType(ABC):
-    @abstractmethod
-    def get_info(self): pass
+    def  __init__(self, robot, body_part_mask):
+        self.use_body_parts = any(body_part_mask)
+        self.body_part_mask = np.array(body_part_mask)
+
+        file = robot.create_default()
+        default_env = gym.make('CustomAntLike-v1', xml_file=file.name)
+        file.close()
+
+        self.action_size = default_env.action_space.shape[0]
+
+    @abstractclassmethod
+    def ForGUI(cls): pass
+
+    @abstractproperty
+    def description(self): pass
 
     @abstractmethod
     def get_action(self, individual, step): pass
@@ -33,18 +47,28 @@ class AgentType(ABC):
         return np.load(path)
 
 class StepCycleHalfAgent(AgentType):
-    def __init__(self, action_count, true_action_size):
-        self.action_count = action_count
-        self.action_size = true_action_size
+    def __init__(self, robot, body_part_mask, action_repeat, GUI=False):
+        if not GUI:
+            super(StepCycleHalfAgent, self).__init__(robot, body_part_mask)
+            self.action_size = self.action_size//2
+            self.action_repeat = action_repeat 
 
-    def get_info(self):
-        return f"StepCycleHalfAgent_{self.action_count}_{self.action_size}"
+    @classmethod
+    def ForGUI(cls):
+        "Return default agent for GUI needs"
+        return cls(None, None, None, True)
+
+    @property
+    def description(self):
+        return "Step Cycle Half agent\n    Combination of random and half agent. STEPCOUNT long sequences of random actions for half of the motors are created and and then by symmetry transfered to opposing motors. During runtime, sequences of actions are repeatedly performed"
 
     def get_action(self, individual, step):
-        action = individual[step % self.action_count]
+        if self.use_body_parts:
+            actions, _ = individual
+        else:
+            actions = individual
 
-        # full_action = np.array([ action[0], action[1], action[2], action[3],
-        #                         -action[0],-action[1],-action[2],-action[3]])
+        action = actions[step % self.action_repeat]
 
         full_action = np.concatenate([action,-action]) 
 
@@ -54,7 +78,15 @@ class StepCycleHalfAgent(AgentType):
         population = []
 
         for _ in range(population_size):
-            individual = 2*np.random.random(size=(self.action_count, self.action_size//2,)) - 1
+            actions = 2*np.random.random(size=(self.action_repeat, self.action_size,)) - 1
+
+            individual = []
+            if self.use_body_parts:
+                body_parts = 1.5*np.random.random(size=(np.sum(self.body_part_mask)))
+                individual = [actions, body_parts]
+            else:
+                individual = actions
+
             population.append(individual)
 
         return population
@@ -63,34 +95,46 @@ class StepCycleHalfAgent(AgentType):
         return GA.tournament_selection(population, fitness_values, 5)
 
     def crossover(self, population):
-        return GA.crossover_uniform(population)
+        return GA.crossover_uniform(population, self.use_body_parts)
 
     def mutation(self, population):
-        return GA.mutation(population, self.action_size//2, indiv_mutation_prob=0.25, action_mutation_prob=0.03)
+        return GA.mutation(population, self.action_size, False, indiv_mutation_prob=0.25, action_mutation_prob=0.03)
 
 class SineFuncFullAgent(AgentType):
     # individual = amplitude, frequency, shift-x, shift-y for each leg
-    def __init__(self, action_count):
-        self.action_count = action_count
+    def __init__(self, robot, body_part_mask, GUI=False):
+        if not GUI:
+            super(SineFuncFullAgent, self).__init__(robot, body_part_mask)
 
-    def get_info(self):
-        return f"SineFuncHalfAgent"
+    @classmethod
+    def ForGUI(cls):
+        "Return default agent for GUI needs"
+        return cls(None, None, True)
+
+    @property
+    def description(self):
+        return "Sine Function Full agent\n    Each motor of the robot is controlled by sine wave. Values of these agents are made of only 4 parameters (amplitude, frequency, shiftX, shiftY) for each motor."
 
     def get_action(self, individual, step):
+        if self.use_body_parts:
+            values, _ = individual
+        else:
+            values = individual
+
         actions = []
-        for i in range(len(individual)//4):
-            amp    = individual[4*i]
-            freq   = individual[4*i+1]
-            shiftx = individual[4*i+2]
-            shifty = individual[4*i+3]
+        for i in range(len(values)//4):
+            amp    = values[4*i]
+            freq   = values[4*i+1]
+            shiftx = values[4*i+2]
+            shifty = values[4*i+3]
 
-            value = amp*math.sin(freq*(step/10) + shiftx) + shifty
-            if value > 1:
-                value = 1
-            if value < -1:
-                value = -1
+            result = amp*math.sin(freq*(step/10) + shiftx) + shifty
+            if result > 1:
+                result = 1
+            if result < -1:
+                result = -1
 
-            actions.append(value)
+            actions.append(result)
 
         actions = np.array(actions)
         full_action = np.concatenate([actions, -actions])
@@ -101,12 +145,19 @@ class SineFuncFullAgent(AgentType):
         population = []
 
         for _ in range(population_size):
+            actions = []
+            for i in range(self.action_size):
+                actions.append(random.uniform(0.2,1))         # amplitude
+                actions.append(random.uniform(0.5,10))        # frequency
+                actions.append(random.uniform(0,2*math.pi))   # shift-x
+                actions.append(random.uniform(-0.5,0.5))      # shift-y
+
             individual = []
-            for i in range(self.action_count):
-                individual.append(random.uniform(0.2,1))         # amplitude
-                individual.append(random.uniform(0.5,10))        # frequency
-                individual.append(random.uniform(0,2*math.pi))   # shift-x
-                individual.append(random.uniform(-0.5,0.5))      # shift-y
+            if self.use_body_parts:
+                body_parts = 1.5*np.random.random(size=(np.sum(self.body_part_mask)))
+                individual = [actions, body_parts]
+            else:
+                individual = actions
 
             population.append(individual)
 
@@ -116,28 +167,44 @@ class SineFuncFullAgent(AgentType):
         return GA.tournament_selection(population, fitness_values, 5)
 
     def crossover(self, population):
-        return GA.crossover_uniform(population)
+        return GA.crossover_uniform(population, self.use_body_parts)
 
     def mutation(self, population):
         new_population = []
 
-        individual_mutation_rate = 0.75
-        gene_mutation_rate = 0.10
+        individual_mutation_prob = 0.75
+        action_mutation_prob = 0.10
+        body_mutation_prob = 0.05
 
         for individual in population:
-            if random.random() < individual_mutation_rate:
-                category = -1
-                for i in range(len(individual)):
-                    category = (category + 1) % 4
-                    if random.random() < gene_mutation_rate:
-                        if category == 0:
-                            individual[i] = random.uniform(0.2,1)
-                        if category == 1:
-                            individual[i] = random.uniform(0.5,10)
-                        if category == 2:
-                            individual[i] = random.uniform(0, 2*math.pi)
-                        if category == 3:
-                            individual[i] = random.uniform(-0.5,0.5)
+            if random.random() < individual_mutation_prob:
+                actions = []
+                body = []
+
+                if self.use_body_parts:
+                    actions, body = individual
+                else:
+                    actions = individual
+
+                for category in range(len(actions)):
+                    if random.random() < action_mutation_prob:
+                        if category % 4 == 0:
+                            actions[category] = random.uniform(0.2,1)
+                        if category % 4 == 1:
+                            actions[category] = random.uniform(0.5,10)
+                        if category % 4 == 2:
+                            actions[category] = random.uniform(0, 2*math.pi)
+                        if category % 4 == 3:
+                            actions[category] = random.uniform(-0.5,0.5)
+
+                for i in range(len(body)):
+                    if random.random() < body_mutation_prob:
+                        body[i] = 1.5*np.random.random(size=(1))
+
+                if self.use_body_parts:
+                    individual = [actions, body]
+                else:
+                    individual = actions
 
             new_population.append(individual)
 
@@ -145,31 +212,42 @@ class SineFuncFullAgent(AgentType):
 
 class SineFuncHalfAgent(AgentType):
     # individual = amplitude, frequency, shift-x, shift-y for each leg
-    def __init__(self, action_count):
-        self.action_count = action_count
+    def __init__(self, robot, body_part_mask, GUI=False):
+        if not GUI:
+            super(SineFuncHalfAgent, self).__init__(robot, body_part_mask)
+            self.action_size = self.action_size//2
 
-    def get_info(self):
-        return f"SineFuncHalfAgent"
+    @classmethod
+    def ForGUI(cls):
+        "Return default agent for GUI needs"
+        return cls(None, None, True)
+
+    @property
+    def description(self):
+        return "Sine Function Half agent\n    Similar to Sine Function Full agent, however only half of robot's motors are controlled by sine waves. The other half is symmetrical (point symmetry through center of the body)."
 
     def get_action(self, individual, step):
+        if self.use_body_parts:
+            values, _ = individual
+        else:
+            values = individual
+
         actions = []
-        for i in range(len(individual)//4):
-            amp    = individual[4*i]
-            freq   = individual[4*i+1]
-            shiftx = individual[4*i+2]
-            shifty = individual[4*i+3]
+        for i in range(len(values)//4):
+            amp    = values[4*i]
+            freq   = values[4*i+1]
+            shiftx = values[4*i+2]
+            shifty = values[4*i+3]
 
-            value = amp*math.sin(freq*(step/10) + shiftx) + shifty
-            if value > 1:
-                value = 1
-            if value < -1:
-                value = -1
+            result = amp*math.sin(freq*(step/10) + shiftx) + shifty
+            if result > 1:
+                result = 1
+            if result < -1:
+                result = -1
 
-            actions.append(value)
+            actions.append(result)
 
         actions = np.array(actions)
-        # full_action = np.array([ actions[0], actions[1], actions[2], actions[3],
-        #                         -actions[0],-actions[1],-actions[2],-actions[3]])
         full_action = np.concatenate([actions,-actions]) 
 
         return full_action
@@ -178,12 +256,19 @@ class SineFuncHalfAgent(AgentType):
         population = []
 
         for _ in range(population_size):
+            actions = []
+            for i in range(self.action_size):
+                actions.append(random.uniform(0.2,1))         # amplitude
+                actions.append(random.uniform(0.5,10))        # frequency
+                actions.append(random.uniform(0,2*math.pi))   # shift-x
+                actions.append(random.uniform(-0.5,0.5))      # shift-y
+
             individual = []
-            for i in range(self.action_count):
-                individual.append(random.uniform(0.2,1))         # amplitude
-                individual.append(random.uniform(0.5,10))        # frequency
-                individual.append(random.uniform(0,2*math.pi))   # shift-x
-                individual.append(random.uniform(-0.5,0.5))      # shift-y
+            if self.use_body_parts:
+                body_parts = 1.5*np.random.random(size=(np.sum(self.body_part_mask)))
+                individual = [actions, body_parts]
+            else:
+                individual = actions
 
             population.append(individual)
 
@@ -193,43 +278,72 @@ class SineFuncHalfAgent(AgentType):
         return GA.tournament_selection(population, fitness_values, 5)
 
     def crossover(self, population):
-        return GA.crossover_uniform(population)
+        return GA.crossover_uniform(population, self.use_body_parts)
 
     def mutation(self, population):
         new_population = []
 
-        individual_mutation_rate = 0.75
-        gene_mutation_rate = 0.10
+        individual_mutation_prob = 0.75
+        action_mutation_prob = 0.10
+        body_mutation_prob = 0.05
 
         for individual in population:
-            if random.random() < individual_mutation_rate:
-                category = -1
-                for i in range(len(individual)):
-                    category = (category + 1) % 4
-                    if random.random() < gene_mutation_rate:
-                        if category == 0:
-                            individual[i] = random.uniform(0.2,1)
-                        if category == 1:
-                            individual[i] = random.uniform(0.5,10)
-                        if category == 2:
-                            individual[i] = random.uniform(0, 2*math.pi)
-                        if category == 3:
-                            individual[i] = random.uniform(-0.5,0.5)
+            if random.random() < individual_mutation_prob:
+                actions = []
+                body = []
+
+                if self.use_body_parts:
+                    actions, body = individual
+                else:
+                    actions = individual
+
+                for category in range(len(actions)):
+                    if random.random() < action_mutation_prob:
+                        if category % 4 == 0:
+                            actions[category] = random.uniform(0.2,1)
+                        if category % 4 == 1:
+                            actions[category] = random.uniform(0.5,10)
+                        if category % 4 == 2:
+                            actions[category] = random.uniform(0, 2*math.pi)
+                        if category % 4 == 3:
+                            actions[category] = random.uniform(-0.5,0.5)
+
+                for i in range(len(body)):
+                    if random.random() < body_mutation_prob:
+                        body[i] = 1.5*np.random.random(size=(1))
+
+                if self.use_body_parts:
+                    individual = [actions, body]
+                else:
+                    individual = actions
 
             new_population.append(individual)
 
         return new_population
 
 class FullRandomAgent(AgentType):
-    def __init__(self, action_count, action_size):
-        self.action_count = action_count
-        self.action_size = action_size
+    def __init__(self, robot, body_part_mask, action_repeat, GUI=False):
+        if not GUI:
+            super(FullRandomAgent, self).__init__(robot, body_part_mask)
+            self.action_repeat = action_repeat
 
-    def get_info(self):
-        return f"FullRandom_{self.action_count}_{self.action_size}"
+    @classmethod
+    def ForGUI(cls):
+        "Return default agent for GUI needs"
+        return cls(None,None,None,True)
+
+    @property
+    def description(self):
+        return "Full Random agent\n    Starts off as a sequence of random actions for each motor for chosen amount of steps. Behavior of the agent is then made by repeating this sequence till end state is reached periodically."
 
     def get_action(self, individual, step):
-        action = individual[step % self.action_count]
+        actions = []
+        if self.use_body_parts:
+            actions, _ = individual
+        else:
+            actions = individual
+
+        action = actions[step % self.action_repeat]
 
         return action
 
@@ -237,7 +351,16 @@ class FullRandomAgent(AgentType):
         population = []
 
         for _ in range(population_size):
-            individual = 2*np.random.random(size=(self.action_count, self.action_size,)) - 1
+            # gen actions
+            actions = 2*np.random.random(size=(self.action_repeat, self.action_size,)) - 1
+
+            individual = []
+            if self.use_body_parts:
+                body_parts = 1.5*np.random.random(size=(np.sum(self.body_part_mask)))
+                individual = [actions, body_parts]
+            else:
+                individual = actions
+
             population.append(individual)
 
         return population
@@ -246,18 +369,19 @@ class FullRandomAgent(AgentType):
         return GA.tournament_selection(population, fitness_values, 5)
 
     def crossover(self, population):
-        return GA.crossover_uniform(population)
+        return GA.crossover_uniform(population, self.use_body_parts)
 
     def mutation(self, population):
-        return GA.mutation(population, self.action_size, indiv_mutation_prob=0.25, action_mutation_prob=0.03)
+        return GA.mutation(population, self.action_size, self.use_body_parts, indiv_mutation_prob=0.25, action_mutation_prob=0.03)
 
 
 if __name__ == "__main__":
-    agent = SineFuncHalfAgent(4)
-    indiv = agent.generate_population(1)[0]
+    pass
+    # agent = SineFuncHalfAgent(4)
+    # indiv = agent.generate_population(1)[0]
 
-    print(indiv)
-    for i in range(10):
-        print(i, agent.get_action(indiv, i))
+    # print(indiv)
+    # for i in range(10):
+    #     print(i, agent.get_action(indiv, i))
 
-    agent.save(indiv, "./saves/individuals/test")
+    # agent.save(indiv, "./saves/individuals/test")

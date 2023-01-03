@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from socket import gaierror
 import PySimpleGUI as sg
 from PIL import Image, ImageTk
 import antGA
@@ -9,11 +8,10 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import threading
 import numpy as np
 
-use_custom_titlebar = False
 font = ("Helvetica", 15)
 
 def main_tab():
-    frame_text = [[sg.Text("", font=("Helvetica", 16), size=(58, 8), pad=(20,20), key="-MAIN_FRAME_TEXT-")]]
+    frame_text = [[sg.Text("", font=("Helvetica", 14), size=(58, 8), pad=(10,10), key="-MAIN_SETTINGS_OVERVIEW-")]]
 
     frame = [sg.Frame("Settings overview", frame_text, size=(800, 300), pad=(10,10))]
 
@@ -51,7 +49,8 @@ def expand_description(text):
 
 import robots.robots as robotsClass
 robots = {"OpenAI Ant-v3" : robotsClass.AntV3(),
-          "Basic Ant"     : robotsClass.StickAnt()}
+          "Basic Ant"     : robotsClass.StickAnt(),
+          "SpotLike dog" : robotsClass.SpotLike()}
 
 body_part_mask = []
 
@@ -178,15 +177,19 @@ def agent_select_tab():
     frame = [sg.Frame("Agent overview", [[sg.Text(agents[agent_names[0]].description, font=("Helvetica", 14), size=(58, 6), pad=(10,10), key="-AGENT_OVERVIEW-")],
                                          [sg.Push(), sg.Button("...", button_color=sg.theme_background_color(), border_width=0, key="-AGENT_OVERVIEW_MORE-")]], expand_x=True, pad=(10,0))]
 
-    tab = sg.Tab("Agent config", [options_menu, frame])
+
+    frame_agent_settings = [sg.Frame("Agent settings", [[]])]
+
+    tab = sg.Tab("Agent config", [options_menu, 
+                                  frame])
     return tab;
 
-def evolution_select_tab():
+def evolution_config_tab():
     tab = sg.Tab("Evolution config", [[]])
     return tab;
 
 def make_window():
-    tabGroup = [[sg.TabGroup([[main_tab(), robot_select_tab(), agent_select_tab()]], size=(800,600))]]
+    tabGroup = [[sg.TabGroup([[main_tab(), robot_select_tab(), agent_select_tab(), evolution_config_tab()]], size=(800,600))]]
 
     window = sg.Window('Test GUI', tabGroup, size=(800,600), font=font, finalize=True,  use_default_focus=False)
     window['-ROBOT_SELECT-'].TKStringVar.trace("w", robot_select_callback)
@@ -218,7 +221,7 @@ if __name__ == "__main__":
     set_agent(agent_names[0])
 
     TEXT = '''- Robot selected: {}\n- Robot controlling agent: {}'''.format(values['-ROBOT_SELECT-'], values["-AGENT_SELECT-"])
-    window["-MAIN_FRAME_TEXT-"].update(TEXT)
+    window["-MAIN_SETTINGS_OVERVIEW-"].update(TEXT)
 
     window_values = {}
 
@@ -264,8 +267,21 @@ if __name__ == "__main__":
             window['-MAIN_POP_SIZE_IN-'].update(pop_size)
 
 
-        TEXT = '''- Robot selected: {}\n- Robot controlling agent: {}'''.format(values['-ROBOT_SELECT-'], values["-AGENT_SELECT-"])
-        window["-MAIN_FRAME_TEXT-"].update(TEXT)
+        robot_selected = values['-ROBOT_SELECT-']
+        agent_selected = values['-AGENT_SELECT-']
+
+        TEXT = "" #'''- Robot selected: {}\n- Robot controlling agent: {}'''.format(values['-ROBOT_SELECT-'], values["-AGENT_SELECT-"])
+        TEXT += "- Robot selected: {}\n".format(robot_selected)
+
+        for i, part in enumerate(robots[robot_selected].body_parts):
+            if i == 0:
+                TEXT += "    - Body parts for GA:\n"
+            TEXT += "        - {} ... {}\n".format(part, "unlocked" if body_part_mask[i] else "locked")
+        TEXT += "\n"
+
+        TEXT += "- Robot controlling agent: {}\n".format(agent_selected)
+
+        window["-MAIN_SETTINGS_OVERVIEW-"].update(TEXT)
 
         if event == "-START-":
             window_values = values

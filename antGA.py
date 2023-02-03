@@ -71,6 +71,7 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
         env._max_episode_steps = 500
 
         environments.append(env)
+        break
 
     max_fitnesses = []
     mean_fitnesses = []
@@ -88,7 +89,8 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
         GUI_GEN_NUMBER = generations
 
         if GUI_PREVIEW:
-            # simulationRun(0, env, agentType, best_individual, render=True, render_start_paused=True);
+            if generations % 100 == 0:
+                simulationRun(best_individual[0], agent, best_individual[1], render=True, render_start_paused=True)
             # DO PREVIEWY STUFF
             GUI_PREVIEW = False
         else:
@@ -103,7 +105,7 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
                 fitness_values.append(simulationRun(environments[index], agent, individual, generations % 25 == 0, True))
         else:
             for index, individual in enumerate(population):
-                futures.append(client.submit(simulationRun, environments[index], agent, individual))
+                futures.append(client.submit(simulationRun, environments[0], agent, individual))
 
             fitness_values = client.gather(futures)
 
@@ -136,7 +138,7 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
                 plt.pause(0.1)
 
         # need copy so it doesn't get changed by other genetic ops
-        best_individual = (copy.deepcopy(population[np.argmax(fitness_values)]), environments[np.argmax(fitness_values)])
+        best_individual = (copy.deepcopy(population[np.argmax(fitness_values)]), environments[0])
 
         # selection, crossover, mutation
         parents = agent.selection(population,fitness_values)
@@ -159,6 +161,7 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
                            reset_noise_scale=0.0)
             env._max_episode_steps = 500
             environments[i] = env
+            break
 
     # close tmp files
     for file in robot_source_files:
@@ -172,11 +175,11 @@ def printHelp():
     print("-h --help       ... Print help")
     print("-o <individual> ... Select input file to play")
 
-def RunFromGui(robot : BaseRobot, agent : gaAgent.AgentType, population_size=50, generation_count=250, show_best=False, save_best=False, save_dir='./saves/individuals'):
+def Run(gui, robot : BaseRobot, agent : gaAgent.AgentType, population_size=50, generation_count=250, show_best=False, save_best=False, save_dir='./saves/individuals'):
     global GUIFLAG
-    GUIFLAG = True
+    GUIFLAG = gui
 
-    client = Client(n_workers=10,threads_per_worker=1,scheduler_port=0)
+    client = Client(n_workers=12,threads_per_worker=1,scheduler_port=0)
 
     try:
         print("RUNNING")
@@ -225,8 +228,9 @@ if __name__ == "__main__":
     #     print("Run reward: ", reward)
     #     quit()
 
-    robot = AntV3()
+    robot = SpotLike()
+    # agent = gaAgent.FullRandomAgent(robot, [False for _ in range(len(robot.body_parts))], 40)
     agent = gaAgent.SineFuncFullAgent(robot, [False for _ in range(len(robot.body_parts))])
-    RunFromGui(robot, agent)
+    Run(False, robot, agent, population_size=100, generation_count=300, show_best=True, save_best=True, save_dir="./saves/")
 
     print("DONE")

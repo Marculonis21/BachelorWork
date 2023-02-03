@@ -159,8 +159,33 @@ import gaAgent
 agents : 'dict[str, gaAgent.AgentType]'
 agents = {"Full Random" : gaAgent.FullRandomAgent.ForGUI(),
           "Sine Function Full" : gaAgent.SineFuncFullAgent.ForGUI(),
-          "Sine Funciton Half" : gaAgent.SineFuncHalfAgent.ForGUI(),
+          "Sine Function Half" : gaAgent.SineFuncHalfAgent.ForGUI(),
           "Step Cycle Half" : gaAgent.StepCycleHalfAgent.ForGUI(),}
+
+
+def single_value_option(key, text, default, disabled=False):
+    return [sg.Text(text,pad=(10,10)), sg.Input(default, size=(8,None), enable_events=True, key=key, disabled=disabled)]
+
+def range_value_option(key, text, default_min, default_max, disabled=False):
+    return [sg.Text(text,pad=(10,10)), sg.Text("MIN", font=("Helvetica", 12)), sg.Input(default_min, size=(8,None), enable_events=True, key=key+"_min", disabled=disabled), 
+                                       sg.Text("MAX", font=("Helvetica", 12)), sg.Input(default_max, size=(8,None), enable_events=True, key=key+"_max", disabled=disabled)]
+
+import math
+agent_argument_options = [sg.Column([single_value_option("cycle_repeat", "Step Count", 25)], 
+                                    element_justification='c', expand_x=True, visible=False, key="options_Full Random"),
+                          sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 5),
+                                     range_value_option("frequency_range", "Frequency range", 0.5, 5),
+                                     range_value_option("shift_x_range", "Shift x", 0, 2*math.pi),
+                                     range_value_option("shift_y_range", "Amplitude range", "gaAgent.py", "gaAgent.py", disabled=True)], 
+                                    element_justification='c', expand_x=True, visible=False, key="options_Sine Function Full"),
+                          sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 5),
+                                     range_value_option("frequency_range", "Frequency range", 0.5, 5),
+                                     range_value_option("shift_x_range", "Shift x", 0, 2*math.pi),
+                                     range_value_option("shift_y_range", "Amplitude range", "gaAgent.py", "gaAgent.py", disabled=True)],
+                                    element_justification='c', expand_x=True, visible=False, key="options_Sine Function Half"),
+                          sg.Column([single_value_option("cycle_repeat", "Step Count", 25)], 
+                                    element_justification='c', expand_x=True, visible=False, key="options_Step Cycle Half"),
+                          ]
 
 def set_agent(agent_selected):
     TEXT = agents[agent_selected].description
@@ -171,17 +196,24 @@ def set_agent(agent_selected):
     window["-AGENT_OVERVIEW_MORE-"].update(visible=len(TEXT)>cutoff)
     window["-AGENT_OVERVIEW-"].update(TEXT)
 
+    # Hide other options 
+    agent_names = list(agents.keys())
+    for name in agent_names:
+        window["options_"+name].update(visible=False)
+
+    window["options_"+agent_selected].update(visible=True)
+
 def agent_select_tab():
     agent_names = list(agents.keys())
     options_menu = [sg.Text("Select agent type: "), sg.OptionMenu(agent_names, agent_names[0], pad=(0,20,0,20), key="-AGENT_SELECT-")]
     frame = [sg.Frame("Agent overview", [[sg.Text(agents[agent_names[0]].description, font=("Helvetica", 14), size=(58, 6), pad=(10,10), key="-AGENT_OVERVIEW-")],
                                          [sg.Push(), sg.Button("...", button_color=sg.theme_background_color(), border_width=0, key="-AGENT_OVERVIEW_MORE-")]], expand_x=True, pad=(10,0))]
 
-
-    frame_agent_settings = [sg.Frame("Agent settings", [[]])]
-
     tab = sg.Tab("Agent config", [options_menu, 
-                                  frame])
+                                  frame,
+                                  [sg.VPush()],
+                                  agent_argument_options,
+                                  [sg.VPush()]])
     return tab;
 
 def evolution_config_tab():

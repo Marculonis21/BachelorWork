@@ -20,7 +20,35 @@ def simulationRun(agent, actions, render=False, render_start_paused=False):
         steps += 1
 
         action = agent.get_action(actions, steps)
-        # action = -np.ones([len(action)])
+
+        # https://www.youtube.com/watch?v=7Wm6vy7yBNA&ab_channel=BostonDynamics
+        action = np.zeros([len(action)])
+        # lay down
+        # action[0]  = -0.95
+        # action[3]  = -0.95
+        # action[6]  = -0.95
+        # action[9]  = -0.95
+
+        # action[1]  = 0.95
+        # action[4]  = 0.95
+        # action[7]  = 0.95
+        # action[10] = 0.95
+
+        # action[2]  = -1
+        # action[5]  = -1
+        # action[8]  = -1
+        # action[11] = -1
+
+        # stand up
+        # action[1]  = -1
+        # action[4]  = -1
+        # action[7]  = -1
+        # action[10] = -1
+
+        # action[2]  = 1
+        # action[5]  = 1
+        # action[8]  = 1
+        # action[11] = 1
 
         observation, reward, done, info = env.step(action)
         if render:
@@ -40,34 +68,32 @@ def printHelp():
     # print("-h --help       ... Print help")
     # print("-o <individual> ... Select input file to play")
 
+from robots.robots import *
+
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("not enough params")
-        quit()
-
-    from robots.robots import StickAnt
-
-    sa = StickAnt()
-
-    temp_file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
-    sa.create(temp_file, adjustment=[], adjustment_mask=[0,0,0,0])
-
-    env = gym.make('CustomAntLike-v1', 
-                   xml_file=temp_file.name,
-                   reset_noise_scale=0.0)
-
-    env._max_episode_steps = 10000
+    # if len(sys.argv) != 2:
+    #     print("not enough params")
+    #     quit()
 
     if ("-h" in sys.argv or "--help" in sys.argv):
         printHelp()
         quit()
 
-    # step_cycle = 25
-    # agent = gaAgent.FullRandomAgent(100, 8) # Ant-v3
-    agent = gaAgent.FullRandomAgent(100, 4, [1,1,0,0])
+    robot = SpotLike()
+    agent = gaAgent.TFSAgent(robot, [False for _ in range(len(robot.body_parts))])
     indiv = agent.generate_population(1)[0]
-    agent.mutation([indiv])
+
+    file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
+    if agent.use_body_parts:
+        robot.create(file, agent.body_part_mask, indiv)
+    else:
+        robot.create(file, agent.body_part_mask)
+
+    env = gym.make('CustomAntLike-v1',
+                    xml_file=file.name,
+                    reset_noise_scale=0.0)
+    env._max_episode_steps = 500
+
     simulationRun(agent, indiv, render=True, render_start_paused=True)
-    temp_file.close()
-    quit()
+    file.close()
     print("DONE")

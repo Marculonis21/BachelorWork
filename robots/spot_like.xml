@@ -12,7 +12,7 @@
     <default class="geom_def">
         <geom type="capsule"/>
         <default class="thigh">
-            <geom size="0.15" rgba="0.55 0.55 0.55 1"/>
+            <geom size="0.125" rgba="0.55 0.55 0.55 1"/>
 
             <default class="FRONT_thigh">
                 <geom fromto="0 0 0 -0.9 0 -0.8"/>
@@ -22,7 +22,7 @@
             </default>
         </default>
         <default class="calf">
-            <geom size="0.1" rgba="0.3 0.3 0.3 1"/>
+            <geom size="0.075" rgba="0.3 0.3 0.3 1"/>
 
             <default class="FRONT_calf">
                 <geom fromto="0 0 0 0.8 0 -1"/>
@@ -133,21 +133,23 @@
         </body>
       </body>
 
+      <body name="bottom" pos="0 0 -2.2">
+      </body>
     </body>
 
   </worldbody>
   <actuator>
-    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="FL_hip_X" kp="500"/>
-    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="FL_hip_Y" kp="500"/>
-    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="FL_knee"  kp="500"/>
-    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="FR_hip_X" kp="500"/>
-    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="FR_hip_Y" kp="500"/>
-    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="FR_knee"  kp="500"/>
-    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="BL_hip_X" kp="500"/>
-    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="BL_hip_Y" kp="500"/>
-    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="BL_knee"  kp="500"/>
-    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="BR_hip_X" kp="500"/>
-    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="BR_hip_Y" kp="500"/>
-    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="BR_knee"  kp="500"/>
+    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="FL_hip_X" kp="100"/>
+    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="FL_hip_Y" kp="100"/>
+    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="FL_knee"  kp="100"/>
+    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="FR_hip_X" kp="100"/>
+    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="FR_hip_Y" kp="100"/>
+    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="FR_knee"  kp="100"/>
+    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="BL_hip_X" kp="100"/>
+    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="BL_hip_Y" kp="100"/>
+    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="BL_knee"  kp="100"/>
+    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="BR_hip_X" kp="100"/>
+    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="BR_hip_Y" kp="100"/>
+    <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="BR_knee"  kp="100"/>
   </actuator>
 </mujoco>

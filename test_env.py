@@ -22,7 +22,7 @@ def simulationRun(agent, actions, render=False, render_start_paused=False):
         action = agent.get_action(actions, steps)
 
         # https://www.youtube.com/watch?v=7Wm6vy7yBNA&ab_channel=BostonDynamics
-        action = np.zeros([len(action)])
+        # action = np.zeros([len(action)])
         # lay down
         # action[0]  = -0.95
         # action[3]  = -0.95
@@ -91,9 +91,12 @@ if __name__ == "__main__":
 
     env = gym.make('CustomAntLike-v1',
                     xml_file=file.name,
-                    reset_noise_scale=0.0)
+                    reset_noise_scale=0.0,
+                    terminate_when_unhealthy=False)
     env._max_episode_steps = 500
 
     simulationRun(agent, indiv, render=True, render_start_paused=True)
     file.close()
+    env.close()
+    input()
     print("DONE")

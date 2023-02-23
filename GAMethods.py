@@ -6,9 +6,16 @@ import random
 class GA:
     @staticmethod
     def roulette_selection(population, fitness_values): # TOURNAMENT
-        raise NotImplementedError()
+        fitness_values = [x if x > 0 else 0 for x in fitness_values]
+        sum = np.sum(fitness_values)
+        if sum == 0:
+            return tournament_selection(population, fitness_values, 5)
+        selection_probability = fitness_values/sum
 
-        return new_population
+        new_population_indexes = np.random.choice(len(population), size=len(population), p=selection_probability)
+        population = np.array(population, dtype=object)
+
+        return population[new_population_indexes]
 
     @staticmethod
     def tournament_selection(population, fitness_values, k=5): # TOURNAMENT

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from distributed.nanny import silence_logging
+from numpy.typing import NDArray
 import gaAgent
 from robots.robots import *
 
@@ -9,52 +11,77 @@ import numpy as np
 import copy
 from dask.distributed import Client
 import time
-from mujoco_py import GlfwContext
+# from mujoco_py import GlfwContext
 import tempfile
 
 import sys
 
-GUIFLAG = False
-GUI_GRAPH_VALUES = [[],[],[]]
+GUI_FLAG = False
 GUI_FITNESS = []
 GUI_GEN_NUMBER = 0
 
 GUI_PREVIEW = False
 GUI_ABORT = False 
 
-def simulationRun(env, agent, actions, render=False, render_start_paused=False):
+GRAPH_VALUES = [[],[],[]]
+
+def RaisePreview():
+    global GUI_PREVIEW
+    GUI_PREVIEW = True
+
+def RaiseAbort():
+    global GUI_ABORT
+    GUI_ABORT = True
+
+def simulationRun(env, agent, actions, render=False):
     steps = -1
     individual_reward = 0
     done = False
     finishline_bonus_reached = False
 
-    observation = env.reset()
+    body_heights = []
+    facing_directions = []
+
+    _ = env.reset()
     while not done:
         steps += 1
         action = agent.get_action(actions, steps)
 
-        observation, reward, done, info = env.step(action)
+        _, _, done, info = env.step(action)
+        body_heights.append(info["y_position"])
+        facing_directions.append(info["facing_direction"])
 
         if render:
-            env.render(start_paused=render_start_paused)
-
+            env.render(start_paused=True)
         if info["x_position"] > 39.5 and finishline_bonus_reached: # if able to get to the end of the map 
             finishline_bonus_reached = True
             individual_reward += (env._max_episode_steps - steps)
 
         if done:
             # sim end
-            individual_reward = info["x_position"] # = x distance from start
+            # individual_reward = 0
+            # individual_reward -= np.var(body_heights)*10
+
+            desired_directions = np.array([np.array([1,0]) for _ in range(steps+1)])
+            facing_directions =  np.array(facing_directions)
+             
+            dir_diff = np.linalg.norm(desired_directions - facing_directions, axis=1)
+            max_diff = np.max(dir_diff)
+            # individual_reward -= 10*max_diff
+
+            individual_reward = (info["x_position"]-0.5*abs(info["y_position"]))*(2-max_diff) # = x distance from start
 
     return individual_reward
 
 def evolution(robot, agent, client, generation_count, population_size, debug=False):
+    global GRAPH_VALUES, GUI_GEN_NUMBER, GUI_FITNESS, GUI_PREVIEW
+
     population = agent.generate_population(population_size)
-
     robot_source_files = []
-
+        
     environments = []
 
+    # create individual source files for different bodies
     for i in range(len(population)):
         file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
 
@@ -71,15 +98,8 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
         env._max_episode_steps = 500
 
         environments.append(env)
-        break
-
-    max_fitnesses = []
-    mean_fitnesses = []
-    min_fitnesses = []
-
-    global GUI_GRAPH_VALUES, GUI_GEN_NUMBER, GUI_FITNESS, GUI_PREVIEW
-    if GUIFLAG:
-        GUI_GRAPH_VALUES = [[],[],[]]
+        if not agent.use_body_parts:
+            break
 
     best_individual = tuple()
     for generations in range(generation_count+1):
@@ -88,61 +108,57 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
 
         GUI_GEN_NUMBER = generations
 
-        if GUI_PREVIEW:
-            if generations % 100 == 0:
-                simulationRun(best_individual[0], agent, best_individual[1], render=True, render_start_paused=True)
-            # DO PREVIEWY STUFF
+        if GUI_PREVIEW: # GUI FORCED PREVIEW
+            simulationRun(best_individual[1], agent, best_individual[0], render=True)
             GUI_PREVIEW = False
-        else:
-            if generations % 25 == 0:
+        else: # ITERATION FORCED PREVIEW
+            if generations != 0 and generations % 50 == 0:
                 print("Generation: ", generations)
+                simulationRun(best_individual[1], agent, best_individual[0], render=True)
 
         # Get fitness values
         fitness_values = []
         futures = []
         if debug:
             for index, individual in enumerate(population):
-                fitness_values.append(simulationRun(environments[index], agent, individual, generations % 25 == 0, True))
+                fitness_values.append(simulationRun(environments[index if agent.use_body_parts else 0], agent, individual, generations % 25 == 0))
         else:
             for index, individual in enumerate(population):
-                futures.append(client.submit(simulationRun, environments[0], agent, individual))
+                futures.append(client.submit(simulationRun, environments[index if agent.use_body_parts else 0], agent, individual))
 
             fitness_values = client.gather(futures)
 
-        if GUIFLAG:
+        if GUI_FLAG:
             GUI_FITNESS = [np.mean(fitness_values), 
                            min(fitness_values),
                            max(fitness_values)]
 
-        if generations % 5 == 0: # frequency of GUI graph update
-            if GUIFLAG:
-                GUI_GRAPH_VALUES[0].append(np.mean(fitness_values))
-                GUI_GRAPH_VALUES[1].append(min(fitness_values))
-                GUI_GRAPH_VALUES[2].append(max(fitness_values))
-            else:
-                print("Best fitness: ", max(fitness_values))
+        if generations % 5 == 0: # frequency of info update
+            GRAPH_VALUES[0].append(np.mean(fitness_values))
+            GRAPH_VALUES[1].append(min(fitness_values))
+            GRAPH_VALUES[2].append(max(fitness_values))
 
-                mean_fitnesses.append(np.mean(fitness_values))
-                min_fitnesses.append(min(fitness_values))
-                max_fitnesses.append(max(fitness_values))
+            if not GUI_FLAG:
+                print("Best fitness: ", max(fitness_values))
 
                 plt.cla()
                 plt.title('Training')
-                plt.xlabel('Episode')
+                plt.xlabel('5 Generations')
                 plt.ylabel('Fitness')
-                plt.plot(mean_fitnesses, label='Mean')
-                plt.plot(min_fitnesses, label='Min')
-                plt.plot(max_fitnesses, label='Max')
+                plt.plot(GRAPH_VALUES[0], label='Mean')
+                plt.plot(GRAPH_VALUES[1], label='Min')
+                plt.plot(GRAPH_VALUES[2], label='Max')
                 plt.legend(loc='upper left', fontsize=9)
                 plt.tight_layout()
                 plt.pause(0.1)
 
-        # need copy so it doesn't get changed by other genetic ops
-        best_individual = (copy.deepcopy(population[np.argmax(fitness_values)]), environments[0])
+        # copy needed
+        best_index = np.argmax(fitness_values)
+        best_individual = (copy.deepcopy(population[best_index]), environments[best_index if agent.use_body_parts else 0])
 
         # selection, crossover, mutation
-        parents = agent.selection(population,fitness_values)
-        children = agent.crossover(parents)
+        parents          = agent.selection(population,fitness_values)
+        children         = agent.crossover(parents)
         mutated_children = agent.mutation(children)
         population = mutated_children
 
@@ -151,6 +167,7 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
 
         # change environments based on possible robot body changes
         for i in range(len(population)):
+            environments[i].close()
             if agent.use_body_parts:
                 robot.create(robot_source_files[i], agent.body_part_mask, population[i][1])
             else:
@@ -161,7 +178,9 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
                            reset_noise_scale=0.0)
             env._max_episode_steps = 500
             environments[i] = env
-            break
+
+            if not agent.use_body_parts:
+                break
 
     # close tmp files
     for file in robot_source_files:
@@ -175,37 +194,57 @@ def printHelp():
     print("-h --help       ... Print help")
     print("-o <individual> ... Select input file to play")
 
-def Run(gui, robot : BaseRobot, agent : gaAgent.AgentType, population_size=50, generation_count=250, show_best=False, save_best=False, save_dir='./saves/individuals'):
-    global GUIFLAG
-    GUIFLAG = gui
+class RunParams:
+    def __init__(self, 
+                 robot:BaseRobot, 
+                 agent:gaAgent.AgentType,
+                 ga_population_size=500,
+                 ga_generation_count=100,
+                 show_best=False,
+                 save_best=False,
+                 save_dir='./saves/individuals',
+                 note=""):
 
-    client = Client(n_workers=12,threads_per_worker=1,scheduler_port=0)
+        self.robot               = robot
+        self.agent               = agent
+        self.ga_population_size  = ga_population_size
+        self.ga_generation_count = ga_generation_count
+        self.show_best           = show_best
+        self.save_best           = save_best
+        self.save_dir            = save_dir
+        self.note                = note
+
+        
+
+def Run(gui, params:RunParams):
+    global GUI_FLAG
+    GUI_FLAG = gui
+
+    import logging
+    client = Client(n_workers=12,threads_per_worker=1,scheduler_port=0,
+                    silence_logs=logging.ERROR)
 
     try:
         print("RUNNING")
-        best_individual_actions, best_individual_env = evolution(robot, agent, client, generation_count=generation_count, population_size=population_size, debug=False)
+        best_individual_actions, best_individual_env = evolution(params.robot, 
+                                                                 params.agent,
+                                                                 client,
+                                                                 generation_count=params.ga_generation_count, 
+                                                                 population_size=params.ga_population_size, 
+                                                                 debug=False)
         print("DONE")
     finally:
         client.close()
 
-    if GUI_ABORT:
-        return
+    print("HEY")
 
-    best_reward = simulationRun(best_individual_env, agent, best_individual_actions, show_best, render_start_paused=True)
+    best_reward = simulationRun(best_individual_env, agent, best_individual_actions, params.show_best)
 
-    if save_best:
+    if params.save_best:
         current_time = time.time()
-        agent.save(best_individual_actions, save_dir + f"/individual_run{current_time}_rew{best_reward}")
-        graph_data = np.array(GUI_GRAPH_VALUES)
-        np.save(save_dir + f"/graph_data{current_time}", graph_data)
-
-def RaisePreview():
-    global GUI_PREVIEW
-    GUI_PREVIEW = True
-
-def RaiseAbort():
-    global GUI_ABORT
-    GUI_ABORT = True
+        agent.save(best_individual_actions, params.save_dir + f"/{params.note}_individual_run{current_time}_rew{best_reward}")
+        graph_data = np.array(GRAPH_VALUES)
+        np.save(params.save_dir + f"/{params.note}_graph_data{current_time}", graph_data)
 
 if __name__ == "__main__":
 
@@ -224,13 +263,23 @@ if __name__ == "__main__":
     #         print("Problem occured - loading file\n")
     #         printHelp()
 
-    #     reward = simulationRun(0, envs, agent, individual, render=True, render_start_paused=True)
+    #     reward = simulationRun(0, envs, agent, individual, render=True)
     #     print("Run reward: ", reward)
     #     quit()
 
     robot = SpotLike()
     # agent = gaAgent.FullRandomAgent(robot, [False for _ in range(len(robot.body_parts))], 40)
-    agent = gaAgent.SineFuncFullAgent(robot, [False for _ in range(len(robot.body_parts))])
-    Run(False, robot, agent, population_size=100, generation_count=300, show_best=True, save_best=True, save_dir="./saves/")
+    # agent = gaAgent.SineFuncFullAgent(robot, [False for _ in range(len(robot.body_parts))])
+    agent = gaAgent.TFSAgent(robot, [False for _ in range(len(robot.body_parts))])
+    Run(False, RunParams(robot, 
+                         agent, 
+                         ga_population_size=200,
+                         ga_generation_count=200, 
+                         show_best=True, 
+                         save_best=True,
+                         save_dir="./saves/individuals",
+                         note="TFS_p3_s3_cr4"))
 
     print("DONE")
+    # LAST CHAGNE - actuator kp from 150 to 100
+    # LAST IDEA - pls change env so it can find if it's flipped or not

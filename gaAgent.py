@@ -381,8 +381,8 @@ class TFSAgent(AgentType):
         if not GUI:
             super(TFSAgent, self).__init__(robot, body_part_mask)
 
-        self.arguments = {"period":2,
-                          "series_length":4,
+        self.arguments = {"period":3,
+                          "series_length":3,
                           "coeficient_range":4}
 
     @classmethod
@@ -400,7 +400,7 @@ class TFSAgent(AgentType):
         def remap(x, in_min, in_max, out_min, out_max):
             return (((x - in_min)*(out_max-out_min))/(in_max-in_min)) + out_min
 
-        step = step/10
+        step = step/5
 
         action = []
 
@@ -409,20 +409,23 @@ class TFSAgent(AgentType):
             a = values[i][:self.arguments["series_length"]]
             b = values[i][-self.arguments["series_length"]:]
 
-            _out           = np.sum(a*np.cos((N*np.pi* step)/self.arguments["period"]) + b*np.sin((N*np.pi* step)/self.arguments["period"]))
+            _out = np.sum(a*np.cos((N*np.pi* step)/self.arguments["period"]) + b*np.sin((N*np.pi* step)/self.arguments["period"]))
 
-            _step = np.linspace(0, 2*np.pi, 500).reshape(-1,1)
-            min_max_search = np.sum(a*np.cos(((N*np.pi)*_step)/self.arguments["period"]) + b*np.sin(((N*np.pi)*_step)/self.arguments["period"]), axis=1)
-
-            max = np.max(min_max_search)
-            min = np.min(min_max_search)
-
-            action.append(remap(_out, min, max, -1, 1))
+            action.append(remap(_out, self.min, self.max, -1, 1))
 
         return action
 
     def generate_population(self, population_size):
         population = []
+
+        N = np.arange(self.arguments["series_length"]) + 1
+
+        _a = np.ones([self.arguments["series_length"]]) * self.arguments["coeficient_range"]
+        _b = np.ones([self.arguments["series_length"]]) * self.arguments["coeficient_range"]
+        _step = np.linspace(0, 2*self.arguments["period"], 100000).reshape(-1,1)
+        _min_max_search = np.sum(_a*np.cos(((N*np.pi)*_step)/self.arguments["period"]) + _b*np.sin(((N*np.pi)*_step)/self.arguments["period"]), axis=1)
+        self.max = np.array([np.max(_min_max_search)])
+        self.min = -self.max
 
         for _ in range(population_size):
             values = []
@@ -431,11 +434,8 @@ class TFSAgent(AgentType):
             for _ in range(self.action_size):
 
                 # don't get a_0 ... only shifts
-                a = []
-                b = []
-                for _ in range(self.arguments["series_length"]):
-                    a.append(np.random.uniform(-self.arguments["coeficient_range"], self.arguments["coeficient_range"]))
-                    b.append(np.random.uniform(-self.arguments["coeficient_range"], self.arguments["coeficient_range"]))
+                a = np.random.uniform(-self.arguments["coeficient_range"], self.arguments["coeficient_range"], size=self.arguments["series_length"])
+                b = np.random.uniform(-self.arguments["coeficient_range"], self.arguments["coeficient_range"], size=self.arguments["series_length"])
 
                 values.append(np.concatenate([a,b]))
 
@@ -452,10 +452,39 @@ class TFSAgent(AgentType):
         return population
 
     def selection(self, population, fitness_values):
-        return GA.tournament_selection(population, fitness_values, 5)
+        # return GA.tournament_selection(population, fitness_values, 5)
+        return GA.roulette_selection(population, fitness_values)
 
     def crossover(self, population):
         return GA.crossover_uniform(population, self.use_body_parts)
 
     def mutation(self, population):
-        return GA.mutation(population, self.action_size, self.use_body_parts, indiv_mutation_prob=0.3, action_mutation_prob=0.1)
+        new_population = []
+
+        individual_mutation_prob = 0.5
+        action_mutation_prob = 0.2
+        body_mutation_prob = 0.05
+
+        for individual in population:
+            if np.random.random() < individual_mutation_prob:
+                actions = []
+                body = []
+
+                actions, body = individual
+
+                for i in range(len(actions)):
+                    if np.random.random() < action_mutation_prob:
+                        a = np.random.uniform(-self.arguments["coeficient_range"], self.arguments["coeficient_range"], size=self.arguments["series_length"])
+                        b = np.random.uniform(-self.arguments["coeficient_range"], self.arguments["coeficient_range"], size=self.arguments["series_length"])
+                        actions[i] = np.concatenate([a,b])
+
+                if self.use_body_parts:
+                    for i in range(len(body)):
+                        if np.random.random() < body_mutation_prob:
+                            body[i] = 1.5*np.random.random(size=(1))
+
+                individual = [actions, body]
+
+            new_population.append(individual)
+
+        return new_population

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-from distributed.nanny import silence_logging
-from numpy.typing import NDArray
+import argparse
 import gaAgent
 from robots.robots import *
 
@@ -11,10 +10,12 @@ import numpy as np
 import copy
 from dask.distributed import Client
 import time
-# from mujoco_py import GlfwContext
 import tempfile
+import logging
 
-import sys
+parser = argparse.ArgumentParser()
+parser.add_argument("--open", default=False, const=True, nargs='?', type=str, help="Open saved individual")
+parser.add_argument("--debug", default=False, action="store_true", help="Run env in debug mode")
 
 GUI_FLAG = False
 GUI_FITNESS = []
@@ -24,6 +25,7 @@ GUI_PREVIEW = False
 GUI_ABORT = False 
 
 GRAPH_VALUES = [[],[],[]]
+EPISODE_HISTORY = []
 
 def RaisePreview():
     global GUI_PREVIEW
@@ -59,6 +61,7 @@ def simulationRun(env, agent, actions, render=False):
 
         if done:
             # sim end
+
             # individual_reward = 0
             # individual_reward -= np.var(body_heights)*10
 
@@ -69,12 +72,17 @@ def simulationRun(env, agent, actions, render=False):
             max_diff = np.max(dir_diff)
             # individual_reward -= 10*max_diff
 
-            individual_reward = (info["x_position"]-0.5*abs(info["y_position"]))*(2-max_diff) # = x distance from start
+            # individual_reward = (info["x_position"]-0.5*abs(info["y_position"]))*(2-max_diff) # = x distance from start
 
+            # distance in reward=(desired_dir - 0.5*distance_offaxis) - 10*body_height_variance
+            individual_reward = (info["x_position"]-0.5*abs(info["y_position"])) - np.var(body_heights)*10  
+
+    # REWARD + INFO
+    # return individual_reward, (body_heights, facing_directions)
     return individual_reward
 
 def evolution(robot, agent, client, generation_count, population_size, debug=False):
-    global GRAPH_VALUES, GUI_GEN_NUMBER, GUI_FITNESS, GUI_PREVIEW
+    global GRAPH_VALUES, EPISODE_HISTORY, GUI_GEN_NUMBER, GUI_FITNESS, GUI_PREVIEW
 
     population = agent.generate_population(population_size)
     robot_source_files = []
@@ -85,10 +93,7 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
     for i in range(len(population)):
         file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
 
-        if agent.use_body_parts:
-            robot.create(file, agent.body_part_mask, population[i][1])
-        else:
-            robot.create(file, agent.body_part_mask)
+        robot.create(file, agent.body_part_mask, population[i][1])
 
         robot_source_files.append(file)
 
@@ -137,6 +142,8 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
             GRAPH_VALUES[0].append(np.mean(fitness_values))
             GRAPH_VALUES[1].append(min(fitness_values))
             GRAPH_VALUES[2].append(max(fitness_values))
+            # for later statistical reconstruction
+            EPISODE_HISTORY.append(fitness_values)
 
             if not GUI_FLAG:
                 print("Best fitness: ", max(fitness_values))
@@ -168,10 +175,7 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
         # change environments based on possible robot body changes
         for i in range(len(population)):
             environments[i].close()
-            if agent.use_body_parts:
-                robot.create(robot_source_files[i], agent.body_part_mask, population[i][1])
-            else:
-                robot.create(robot_source_files[i], agent.body_part_mask)
+            robot.create(robot_source_files[i], agent.body_part_mask, population[i][1])
 
             env = gym.make('CustomAntLike-v1',
                            xml_file=robot_source_files[i].name,
@@ -190,10 +194,6 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
 
 ###################################################
 ###################################################
-def printHelp():
-    print("-h --help       ... Print help")
-    print("-o <individual> ... Select input file to play")
-
 class RunParams:
     def __init__(self, 
                  robot:BaseRobot, 
@@ -214,15 +214,13 @@ class RunParams:
         self.save_dir            = save_dir
         self.note                = note
 
-        
 
-def Run(gui, params:RunParams):
+def Run(gui, params:RunParams, args=None):
     global GUI_FLAG
     GUI_FLAG = gui
 
-    import logging
-    client = Client(n_workers=12,threads_per_worker=1,scheduler_port=0,
-                    silence_logs=logging.ERROR)
+    # RUN multithreaded
+    client = Client(n_workers=12,threads_per_worker=1,scheduler_port=0, silence_logs=logging.ERROR)
 
     try:
         print("RUNNING")
@@ -231,41 +229,49 @@ def Run(gui, params:RunParams):
                                                                  client,
                                                                  generation_count=params.ga_generation_count, 
                                                                  population_size=params.ga_population_size, 
-                                                                 debug=False)
+                                                                 debug=args.debug if args != None else False)
         print("DONE")
     finally:
         client.close()
-
-    print("HEY")
 
     best_reward = simulationRun(best_individual_env, agent, best_individual_actions, params.show_best)
 
     if params.save_best:
         current_time = time.time()
-        agent.save(best_individual_actions, params.save_dir + f"/{params.note}_individual_run{current_time}_rew{best_reward}")
-        graph_data = np.array(GRAPH_VALUES)
-        np.save(params.save_dir + f"/{params.note}_graph_data{current_time}", graph_data)
+        gaAgent.AgentType.save(agent, robot, best_individual_actions, params.save_dir + f"/{params.note}_individual_run{current_time}_rew{best_reward}.save")
+        # graph_data = np.array(GRAPH_VALUES)
+        # np.save(params.save_dir + f"/{params.note}_graph_data{current_time}", graph_data)
+        episode_history = np.array(EPISODE_HISTORY)
+        np.save(params.save_dir + f"/{params.note}_episode_history{current_time}", episode_history)
 
 if __name__ == "__main__":
+    args = parser.parse_args([] if "__file__" not in globals() else None)
 
-    if ("-h" in sys.argv or "--help" in sys.argv):
-        printHelp()
+    # Run selected saved individual
+    if args.open:
+        agent, individual = (None, None)
+        file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
+        try:
+            agent, robot, individual = gaAgent.AgentType.load(args.open)
+
+            robot.create(file, agent.body_part_mask, individual[1])
+
+            env = gym.make('CustomAntLike-v1',
+                           xml_file=file.name,
+                           reset_noise_scale=0.0)
+            env._max_episode_steps = 500
+            reward = simulationRun(env, agent, individual, render=True)
+            env.close()
+
+            print("Run reward: ", reward)
+
+        except Exception as e:
+            print("Problem occured while loading save file\n")
+
+        finally:
+            file.close()
+
         quit()
-
-    # if ("-o" in sys.argv):
-    #     agent, individual = (None, None)
-    #     try:
-    #         # agent = gaAgent.SineFuncFullAgent(4)
-    #         # agent = gaAgent.FullRandomAgent(500, 8)
-    #         # agent = gaAgent.SineFuncHalfAgent(4)
-    #         individual = np.load(sys.argv[sys.argv.index("-o") + 1])
-    #     except Exception as e:
-    #         print("Problem occured - loading file\n")
-    #         printHelp()
-
-    #     reward = simulationRun(0, envs, agent, individual, render=True)
-    #     print("Run reward: ", reward)
-    #     quit()
 
     robot = SpotLike()
     # agent = gaAgent.FullRandomAgent(robot, [False for _ in range(len(robot.body_parts))], 40)
@@ -281,5 +287,3 @@ if __name__ == "__main__":
                          note="TFS_p3_s3_cr4"))
 
     print("DONE")
-    # LAST CHAGNE - actuator kp from 150 to 100
-    # LAST IDEA - pls change env so it can find if it's flipped or not

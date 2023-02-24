@@ -10,6 +10,49 @@ import numpy as np
 
 font = ("Helvetica", 15)
 
+import robots.robots as robotsClass
+robots = {"OpenAI Ant-v3" : robotsClass.AntV3(),
+          "Basic Ant"     : robotsClass.StickAnt(),
+          "SpotLike dog"  : robotsClass.SpotLike()}
+
+
+import math
+import gaAgent
+agents : 'dict[str, gaAgent.AgentType]'
+agents = {"Full Random"        : gaAgent.FullRandomAgent.ForGUI(),
+          "Sine Function Full" : gaAgent.SineFuncFullAgent.ForGUI(),
+          "Sine Function Half" : gaAgent.SineFuncHalfAgent.ForGUI(),
+          "Step Cycle Half"    : gaAgent.StepCycleHalfAgent.ForGUI(),
+          "Truncated Fourier Series" : gaAgent.TFSAgent.ForGUI()}
+
+
+def single_value_option(key, text, default, disabled=False):
+    return [sg.Text(text,pad=(10,10)), sg.Input(default, size=(8,None), enable_events=True, key=key, disabled=disabled)]
+
+def range_value_option(key, text, default_min, default_max, disabled=False):
+    return [sg.Text(text,pad=(10,10)), sg.Text("MIN", font=("Helvetica", 12)), sg.Input(default_min, size=(8,None), enable_events=True, key=key+"_min", disabled=disabled), 
+                                       sg.Text("MAX", font=("Helvetica", 12)), sg.Input(default_max, size=(8,None), enable_events=True, key=key+"_max", disabled=disabled)]
+
+agent_argument_options = [sg.Column([single_value_option("cycle_repeat", "Step Count", 25)], 
+                                    element_justification='c', expand_x=True, visible=False, key="options_Full Random"),
+                          sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 5),
+                                     range_value_option("frequency_range", "Frequency range", 0.5, 5),
+                                     range_value_option("shift_x_range", "Shift x", 0, 2*math.pi),
+                                     range_value_option("shift_y_range", "Amplitude range", "gaAgent.py", "gaAgent.py", disabled=True)], 
+                                    element_justification='c', expand_x=True, visible=False, key="options_Sine Function Full"),
+                          sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 5),
+                                     range_value_option("frequency_range", "Frequency range", 0.5, 5),
+                                     range_value_option("shift_x_range", "Shift x", 0, 2*math.pi),
+                                     range_value_option("shift_y_range", "Amplitude range", "gaAgent.py", "gaAgent.py", disabled=True)],
+                                    element_justification='c', expand_x=True, visible=False, key="options_Sine Function Half"),
+                          sg.Column([single_value_option("cycle_repeat", "Step Count", 25)], 
+                                    element_justification='c', expand_x=True, visible=False, key="options_Step Cycle Half"),
+                          sg.Column([single_value_option("period", "Period", 3),
+                                     single_value_option("series_length", "Truncated series length", 3),
+                                     single_value_option("coeficient_range", "Coeficient range", 4)], 
+                                    element_justification='c', expand_x=True, visible=False, key="options_Truncated Fourier Series"),
+                          ]
+
 def main_tab():
     frame_text = [[sg.Text("", font=("Helvetica", 14), size=(58, 8), pad=(10,10), key="-MAIN_SETTINGS_OVERVIEW-")]]
 
@@ -46,11 +89,6 @@ def agent_select_callback(var, index, mode):
 def expand_description(text):
     frame = sg.Frame("Description", [[sg.Text(text, size=(60,None), font=("Helvetica", 14), pad=(10,10))]])
     sg.Window("Description long", [[frame]], font=font, keep_on_top=True, modal=True).read(close=True)
-
-import robots.robots as robotsClass
-robots = {"OpenAI Ant-v3" : robotsClass.AntV3(),
-          "Basic Ant"     : robotsClass.StickAnt(),
-          "SpotLike dog" : robotsClass.SpotLike()}
 
 body_part_mask = []
 
@@ -155,37 +193,6 @@ def robot_select_tab():
     tab = sg.Tab("Robot Select", main)
     return tab;
 
-import gaAgent
-agents : 'dict[str, gaAgent.AgentType]'
-agents = {"Full Random" : gaAgent.FullRandomAgent.ForGUI(),
-          "Sine Function Full" : gaAgent.SineFuncFullAgent.ForGUI(),
-          "Sine Function Half" : gaAgent.SineFuncHalfAgent.ForGUI(),
-          "Step Cycle Half" : gaAgent.StepCycleHalfAgent.ForGUI(),}
-
-
-def single_value_option(key, text, default, disabled=False):
-    return [sg.Text(text,pad=(10,10)), sg.Input(default, size=(8,None), enable_events=True, key=key, disabled=disabled)]
-
-def range_value_option(key, text, default_min, default_max, disabled=False):
-    return [sg.Text(text,pad=(10,10)), sg.Text("MIN", font=("Helvetica", 12)), sg.Input(default_min, size=(8,None), enable_events=True, key=key+"_min", disabled=disabled), 
-                                       sg.Text("MAX", font=("Helvetica", 12)), sg.Input(default_max, size=(8,None), enable_events=True, key=key+"_max", disabled=disabled)]
-
-import math
-agent_argument_options = [sg.Column([single_value_option("cycle_repeat", "Step Count", 25)], 
-                                    element_justification='c', expand_x=True, visible=False, key="options_Full Random"),
-                          sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 5),
-                                     range_value_option("frequency_range", "Frequency range", 0.5, 5),
-                                     range_value_option("shift_x_range", "Shift x", 0, 2*math.pi),
-                                     range_value_option("shift_y_range", "Amplitude range", "gaAgent.py", "gaAgent.py", disabled=True)], 
-                                    element_justification='c', expand_x=True, visible=False, key="options_Sine Function Full"),
-                          sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 5),
-                                     range_value_option("frequency_range", "Frequency range", 0.5, 5),
-                                     range_value_option("shift_x_range", "Shift x", 0, 2*math.pi),
-                                     range_value_option("shift_y_range", "Amplitude range", "gaAgent.py", "gaAgent.py", disabled=True)],
-                                    element_justification='c', expand_x=True, visible=False, key="options_Sine Function Half"),
-                          sg.Column([single_value_option("cycle_repeat", "Step Count", 25)], 
-                                    element_justification='c', expand_x=True, visible=False, key="options_Step Cycle Half"),
-                          ]
 
 def set_agent(agent_selected):
     TEXT = agents[agent_selected].description
@@ -368,10 +375,11 @@ if __name__ == "__main__":
         robot = robots[window_values["-ROBOT_SELECT-"]] 
 
         agent_selected = window_values["-AGENT_SELECT-"]
-        if agent_selected == "Full Random":          agent = gaAgent.FullRandomAgent(robot, body_part_mask, 25)
-        elif agent_selected == "Sine Function Full": agent = gaAgent.SineFuncFullAgent(robot, body_part_mask)
-        elif agent_selected == "Sine Function Half": agent = gaAgent.SineFuncHalfAgent(robot, body_part_mask)
-        elif agent_selected == "Step Cycle Half":    agent = gaAgent.StepCycleHalfAgent(robot, body_part_mask, 20)
+        if agent_selected == "Full Random":                agent = gaAgent.FullRandomAgent(robot, body_part_mask, 25)
+        elif agent_selected == "Sine Function Full":       agent = gaAgent.SineFuncFullAgent(robot, body_part_mask)
+        elif agent_selected == "Sine Function Half":       agent = gaAgent.SineFuncHalfAgent(robot, body_part_mask)
+        elif agent_selected == "Step Cycle Half":          agent = gaAgent.StepCycleHalfAgent(robot, body_part_mask, 20)
+        elif agent_selected == "Truncated Fourier Series": agent = gaAgent.TFSAgent(robot, body_part_mask)
         else: raise AttributeError("Unknown control agent type - " + agent_selected)
 
         population_size = window_values["-MAIN_POP_SIZE_IN-"]
@@ -385,7 +393,7 @@ if __name__ == "__main__":
             
     def startRun():
         robot, agent, population_size, generation_count, show_best, save_best, save_dir = GetParams()
-        antGA.RunFromGui(robot, agent, population_size, generation_count, show_best, save_best, save_dir)
+        antGA.Run(robot, agent, population_size, generation_count, show_best, save_best, save_dir)
 
     working_thread = threading.Thread(target=startRun, daemon=True)
     working_thread.start()

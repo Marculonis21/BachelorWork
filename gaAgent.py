@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod, abstractclassmethod, abstractproperty
 import numpy as np
 import math
 import gym
+import pickle
+import lzma
 
 import GAMethods
 GA = GAMethods.GA()
@@ -17,6 +19,7 @@ class AgentType(ABC):
         file.close()
 
         self.action_size = default_env.action_space.shape[0]
+        default_env.close()
 
         self.arguments = {}
 
@@ -41,11 +44,22 @@ class AgentType(ABC):
     @abstractmethod
     def mutation(self, population): pass
 
-    def save(self, individual, path):
+    def save_old(self, individual, path):
         np.save(path, individual)
 
-    def load(self, path):
+    def load_old(self, path):
         return np.load(path)
+
+    @staticmethod
+    def save(agent, robot, individual, path):
+        with lzma.open(path, "wb") as save_file:
+            pickle.dump((agent, robot, individual), save_file)
+
+    @staticmethod
+    def load(path):
+        with lzma.open(path, "rb") as save_file:
+            agent, robot, individual = pickle.load(save_file)
+        return agent, robot, individual
 
 class StepCycleHalfAgent(AgentType):
     def __init__(self, robot, body_part_mask, cycle_repeat, GUI=False):
@@ -54,8 +68,6 @@ class StepCycleHalfAgent(AgentType):
             self.action_size = self.action_size//2
 
             self.arguments = {"cycle_repeat":cycle_repeat}
-
-
 
     @classmethod
     def ForGUI(cls):

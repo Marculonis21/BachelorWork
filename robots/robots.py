@@ -27,17 +27,18 @@ class BaseRobot(ABC):
 
         return regex
 
-    def create(self, file, adjustment_mask=[], adjustment=[]):
+    def create(self, file, body_part_mask, adjustment=[]):
         """
             Writes XML file (in place) - robot specific XML string with changed body part variables
         """
 
         text = copy.deepcopy(self.source_text)
         
-        # set body variable values
+        # adjust body variables
         for i, key in enumerate(self.body_parts):
             regex = self._key_to_regex(key)
-            text = re.sub(regex, str(adjustment[i] if adjustment_mask[i] else self.body_parts[key]), text)
+            # set to desired body part length if True in mask ELSE set to a default value given by xml source file
+            text = re.sub(regex, str(adjustment[i] if body_part_mask[i] else self.body_parts[key]), text)
 
         # clear and change file in place
         file.seek(0)
@@ -48,7 +49,7 @@ class BaseRobot(ABC):
     def create_default(self):
         tmp_file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
 
-        self.create(tmp_file, adjustment_mask=np.zeros([len(self.body_parts)]))
+        self.create(tmp_file, body_part_mask=np.zeros([len(self.body_parts)]))
 
         return tmp_file
 

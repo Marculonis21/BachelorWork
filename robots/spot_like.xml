@@ -34,7 +34,6 @@
         <default class="foot">
             <geom pos="0.8 0 -1" size="0.15" type="sphere" rgba="0 1 0 1"/>
         </default>
-
     </default>
 
     <default class="knee">

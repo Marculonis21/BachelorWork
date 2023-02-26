@@ -393,9 +393,9 @@ class TFSAgent(AgentType):
         if not GUI:
             super(TFSAgent, self).__init__(robot, body_part_mask)
 
-        self.arguments = {"period":3,
+        self.arguments = {"period":4,
                           "series_length":3,
-                          "coeficient_range":4}
+                          "coeficient_range":1}
 
     @classmethod
     def ForGUI(cls):
@@ -418,10 +418,11 @@ class TFSAgent(AgentType):
 
         N = np.arange(self.arguments["series_length"]) + 1
         for i in range(self.action_size):
-            a = values[i][:self.arguments["series_length"]]
-            b = values[i][-self.arguments["series_length"]:]
+            amps   = values[i][:self.arguments["series_length"]]
+            shifts = values[i][-self.arguments["series_length"]:]
 
-            _out = np.sum(a*np.cos((N*np.pi* step)/self.arguments["period"]) + b*np.sin((N*np.pi* step)/self.arguments["period"]))
+            # _out = np.sum(a*np.cos((N*np.pi* step)/self.arguments["period"]) + b*np.sin((N*np.pi* step)/self.arguments["period"]))
+            _out = np.sum(amps*np.sin((N*2*np.pi*step)/self.arguments["period"] + shifts))
 
             action.append(remap(_out, self.min, self.max, -1, 1))
 
@@ -432,10 +433,16 @@ class TFSAgent(AgentType):
 
         N = np.arange(self.arguments["series_length"]) + 1
 
-        _a = np.ones([self.arguments["series_length"]]) * self.arguments["coeficient_range"]
-        _b = np.ones([self.arguments["series_length"]]) * self.arguments["coeficient_range"]
+        # _a = np.ones([self.arguments["series_length"]]) * self.arguments["coeficient_range"]
+        # _b = np.ones([self.arguments["series_length"]]) * self.arguments["coeficient_range"]
+
+        _amps   = np.ones([self.arguments["series_length"]]) * self.arguments["coeficient_range"]
+        _shifts = np.zeros([self.arguments["series_length"]])
+
         _step = np.linspace(0, 2*self.arguments["period"], 100000).reshape(-1,1)
-        _min_max_search = np.sum(_a*np.cos(((N*np.pi)*_step)/self.arguments["period"]) + _b*np.sin(((N*np.pi)*_step)/self.arguments["period"]), axis=1)
+
+        _min_max_search = np.sum(_amps*np.sin(((N*2*np.pi)*_step)/self.arguments["period"] + _shifts), axis=1)
+
         self.max = np.array([np.max(_min_max_search)])
         self.min = -self.max
 
@@ -446,10 +453,13 @@ class TFSAgent(AgentType):
             for _ in range(self.action_size):
 
                 # don't get a_0 ... only shifts
-                a = np.random.uniform(-self.arguments["coeficient_range"], self.arguments["coeficient_range"], size=self.arguments["series_length"])
-                b = np.random.uniform(-self.arguments["coeficient_range"], self.arguments["coeficient_range"], size=self.arguments["series_length"])
+                # a = np.random.uniform(-self.arguments["coeficient_range"], self.arguments["coeficient_range"], size=self.arguments["series_length"])
+                # b = np.random.uniform(-self.arguments["coeficient_range"], self.arguments["coeficient_range"], size=self.arguments["series_length"])
 
-                values.append(np.concatenate([a,b]))
+                amps = np.random.uniform(-self.arguments["coeficient_range"], self.arguments["coeficient_range"], size=self.arguments["series_length"])
+                shifts = np.random.uniform(0, 2*np.pi, size=self.arguments["series_length"])
+
+                values.append(np.concatenate([amps,shifts]))
 
             individual = []
 
@@ -464,7 +474,8 @@ class TFSAgent(AgentType):
         return population
 
     def selection(self, population, fitness_values):
-        # return GA.tournament_selection(population, fitness_values, 5)
+        # return GA.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
+        # return GA.tournament_selection(population, fitness_values, int(len(population)*0.2))
         return GA.roulette_selection(population, fitness_values)
 
     def crossover(self, population):
@@ -473,8 +484,8 @@ class TFSAgent(AgentType):
     def mutation(self, population):
         new_population = []
 
-        individual_mutation_prob = 0.5
-        action_mutation_prob = 0.2
+        individual_mutation_prob = 0.75
+        action_mutation_prob = 0.1
         body_mutation_prob = 0.05
 
         for individual in population:
@@ -486,9 +497,15 @@ class TFSAgent(AgentType):
 
                 for i in range(len(actions)):
                     if np.random.random() < action_mutation_prob:
-                        a = np.random.uniform(-self.arguments["coeficient_range"], self.arguments["coeficient_range"], size=self.arguments["series_length"])
-                        b = np.random.uniform(-self.arguments["coeficient_range"], self.arguments["coeficient_range"], size=self.arguments["series_length"])
-                        actions[i] = np.concatenate([a,b])
+                        amps   = actions[i][:self.arguments["series_length"]]
+                        shifts = actions[i][-self.arguments["series_length"]:]
+
+                        amps_change   = np.random.uniform(-self.arguments["coeficient_range"]*0.05, self.arguments["coeficient_range"]*0.05, size=self.arguments["series_length"])
+                        shifts_change = np.random.uniform(                           -2*np.pi*0.05,                            2*np.pi*0.05, size=self.arguments["series_length"])
+                        amps += amps_change
+                        shifts += shifts_change
+ 
+                        actions[i] = np.concatenate([amps, shifts])
 
                 if self.use_body_parts:
                     for i in range(len(body)):

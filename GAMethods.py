@@ -6,10 +6,13 @@ import random
 class GA:
     @staticmethod
     def roulette_selection(population, fitness_values): # TOURNAMENT
+        num_positive = np.sum([1 if x > 0 else 0 for x in fitness_values])
+        if num_positive < len(population)*0.20:
+            return GA.tournament_selection(population, fitness_values, int(len(population)*0.2))
+
         fitness_values = [x if x > 0 else 0 for x in fitness_values]
         sum = np.sum(fitness_values)
-        if sum == 0:
-            return tournament_selection(population, fitness_values, 5)
+
         selection_probability = fitness_values/sum
 
         new_population_indexes = np.random.choice(len(population), size=len(population), p=selection_probability)
@@ -19,17 +22,48 @@ class GA:
 
     @staticmethod
     def tournament_selection(population, fitness_values, k=5): # TOURNAMENT
-        new_population = []
-        for i in range(0,len(population)):
-            individuals = []
-            fitnesses = []
+        """
+        Runs tournamnets between randomly chosen individuals and selects the best from each tournament.
+        """
 
-            for _ in range(0,k):
-                idx = random.randint(0,len(population)-1)
-                individuals.append(population[idx])
-                fitnesses.append(fitness_values[idx])
+        population = np.array(population, dtype=object)
+        fitness_values = np.array(fitness_values)
+
+        new_population = []
+        for _ in range(0,len(population)):
+            idx = np.random.choice(len(population), size=k)
+
+            individuals = population[idx]
+            fitnesses = fitness_values[idx]
 
             new_population.append(individuals[np.argmax(fitnesses)])
+
+        return new_population
+
+    @staticmethod
+    def tournament_prob_selection(population, fitness_values, probability=0.9, k=5): # TOURNAMENT
+        """
+        Runs tournamnets between randomly chosen individuals and selects one acording to probability based on their results
+
+        p-selection = p*((1-p)^indiv_tournament_result)
+        """
+        population = np.array(population, dtype=object)
+        fitness_values = np.array(fitness_values)
+
+        new_population = []
+        for _ in range(len(population)):
+            idx = np.random.choice(len(population), size=k)
+
+            individuals = population[idx]
+            fitnesses = fitness_values[idx]
+
+            indiv_fitness = zip(individuals, fitnesses)
+            sorted_indivs = [indiv for (indiv, _) in sorted(indiv_fitness, key=lambda x: x[1], reverse=True)]
+
+            selection_probability = probability*((1-probability)**np.arange(k))
+
+            selected = np.random.choice(len(sorted_indivs), p=selection_probability)
+            new_population.append(sorted_indivs[selected])
 
         return new_population
 
@@ -91,7 +125,7 @@ class GA:
         return new_population
 
     @staticmethod
-    def mutation(population, action_size, use_body_parts, indiv_mutation_prob=0.3, action_mutation_prob=0.05, body_mutation_prob=0.2):
+    def mutation(population, action_size, use_body_parts, indiv_mutation_prob=0.5, action_mutation_prob=0.1, body_mutation_prob=0.2):
         new_population = []
 
         for individual in population:

@@ -290,9 +290,11 @@ if __name__ == "__main__":
 
     if args.batch:
         robot = robots.SpotLike()
-        agent = gaAgent.TFSAgent(robot, [False for _ in range(len(robot.body_parts))])
+        # agent = gaAgent.TFSAgent(robot, [False for _ in range(len(robot.body_parts))])
+        agent = gaAgent.SineFuncFullAgent(robot, [False for _ in range(len(robot.body_parts))])
 
-        args.batch_note = "NEW_TFS_TEST_p4_s3_cr1"
+        # args.batch_note = "NEW_TFS_TEST_p4_s3_cr1"
+        args.batch_note = "SineFull"
         batch_dir = "./saves/batch_runs/" + f"run_{type(robot).__name__}_{type(agent).__name__}_{args.batch_note}_{time.time()}/"
         
         os.makedirs(batch_dir)

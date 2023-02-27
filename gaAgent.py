@@ -120,8 +120,8 @@ class SineFuncFullAgent(AgentType):
             super(SineFuncFullAgent, self).__init__(robot, body_part_mask)
 
         self.arguments = {}
-        self.arguments["amplitude_range"] = {"MIN":0.5, "MAX":5}
-        self.arguments["frequency_range"] = {"MIN":0.5, "MAX":5}
+        self.arguments["amplitude_range"] = {"MIN":0.5, "MAX":4}
+        self.arguments["frequency_range"] = {"MIN":0.5, "MAX":4}
         self.arguments["shift_x_range"]   = {"MIN":0,   "MAX":2*math.pi}
         self.arguments["shift_y_range"]   = {"MIN": self.arguments["frequency_range"]["MIN"]/2,
                                              "MAX": self.arguments["frequency_range"]["MAX"]/2}
@@ -138,7 +138,7 @@ class SineFuncFullAgent(AgentType):
     def get_action(self, individual, step):
         values, _ = individual
 
-        step = step/10
+        step = step/5
 
         actions = []
         for i in range(len(values)//4):
@@ -231,8 +231,8 @@ class SineFuncHalfAgent(AgentType):
             self.action_size = self.action_size//2
 
         self.arguments = {}
-        self.arguments["amplitude_range"] = {"MIN":0.5, "MAX":5}
-        self.arguments["frequency_range"] = {"MIN":0.5, "MAX":5}
+        self.arguments["amplitude_range"] = {"MIN":0.5, "MAX":4}
+        self.arguments["frequency_range"] = {"MIN":0.5, "MAX":4}
         self.arguments["shift_x_range"]   = {"MIN":0,   "MAX":2*math.pi}
         self.arguments["shift_y_range"]   = {"MIN": self.arguments["frequency_range"]["MIN"]/2,
                                              "MAX": self.arguments["frequency_range"]["MAX"]/2}
@@ -249,7 +249,7 @@ class SineFuncHalfAgent(AgentType):
     def get_action(self, individual, step):
         values, _ = individual
 
-        step = step/10
+        step = step/5
 
         actions = []
         for i in range(len(values)//4):
@@ -294,7 +294,7 @@ class SineFuncHalfAgent(AgentType):
         return population
 
     def selection(self, population, fitness_values):
-        return GA.tournament_selection(population, fitness_values, 5)
+        return GA.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
 
     def crossover(self, population):
         return GA.crossover_uniform(population, self.use_body_parts)
@@ -378,13 +378,13 @@ class FullRandomAgent(AgentType):
         return population
 
     def selection(self, population, fitness_values):
-        return GA.tournament_selection(population, fitness_values, 5)
+        return GA.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
 
     def crossover(self, population):
         return GA.crossover_uniform(population, self.use_body_parts)
 
     def mutation(self, population):
-        return GA.mutation(population, self.action_size, self.use_body_parts, indiv_mutation_prob=0.25, action_mutation_prob=0.03)
+        return GA.mutation(population, self.action_size, self.use_body_parts, indiv_mutation_prob=0.75, action_mutation_prob=0.1)
 
 # https://ic.unicamp.br/~reltech/PFG/2017/PFG-17-07.pdf
 # https://web.fe.up.pt/~pro09025/papers/Shafii%20N.%20-%202009%20-%20A%20truncated%20fourier%20series%20with%20genetic%20algorithm%20for%20the%20control%20of%20biped%20locomotion.pdf

@@ -62,23 +62,25 @@ def simulationRun(env, agent, actions, render=False):
         if done:
             # sim end
 
+            #### TEST 1
             # individual_reward = 0
             # individual_reward -= np.var(body_heights)*10
 
-            desired_directions = np.array([np.array([1,0]) for _ in range(steps+1)])
-            facing_directions =  np.array(facing_directions)
-             
-            dir_diff = np.linalg.norm(desired_directions - facing_directions, axis=1)
-            max_diff = np.max(dir_diff)
-            # individual_reward -= 10*max_diff
+            #### TEST 2
+            # desired_directions = np.array([np.array([1,0]) for _ in range(steps+1)])
+            # facing_directions =  np.array(facing_directions)
+            # dir_diff = np.linalg.norm(desired_directions - facing_directions, axis=1)
+            # max_diff = np.max(dir_diff)
 
+            #### 
             # individual_reward = (info["x_position"]-0.5*abs(info["y_position"]))*(2-max_diff) # = x distance from start
 
             # distance in reward=(desired_dir - 0.5*distance_offaxis) - 10*body_height_variance
             # individual_reward = (info["x_position"]-0.5*abs(info["y_position"])) - np.var(body_heights)*10  
+
             individual_reward = (info["x_position"]-0.5*abs(info["y_position"]))
 
-    # REWARD + INFO
+    # REWARD + INFO ???
     # return individual_reward, (body_heights, facing_directions)
     return individual_reward
 
@@ -213,8 +215,8 @@ class RunParams:
     def __init__(self, 
                  robot:robots.BaseRobot, 
                  agent:gaAgent.AgentType,
-                 ga_population_size=500,
-                 ga_generation_count=100,
+                 ga_population_size=100,
+                 ga_generation_count=150,
                  show_best=False,
                  save_best=False,
                  save_dir='./saves/individuals',
@@ -235,7 +237,7 @@ def Run(gui, params:RunParams, args=None):
     GUI_FLAG = gui
 
     # run multithreaded
-    client = Client(n_workers=12,threads_per_worker=1,scheduler_port=0, silence_logs=logging.ERROR)
+    client = Client(n_workers=11,threads_per_worker=1,scheduler_port=0, silence_logs=logging.ERROR)
 
     try:
         print("RUNNING")

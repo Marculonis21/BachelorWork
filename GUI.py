@@ -19,10 +19,10 @@ robots = {"OpenAI Ant-v3" : robotsClass.AntV3(),
 import math
 import gaAgent
 agents : 'dict[str, gaAgent.AgentType]'
-agents = {"Full Random"        : gaAgent.FullRandomAgent.ForGUI(),
-          "Sine Function Full" : gaAgent.SineFuncFullAgent.ForGUI(),
-          "Sine Function Half" : gaAgent.SineFuncHalfAgent.ForGUI(),
-          "Step Cycle Half"    : gaAgent.StepCycleHalfAgent.ForGUI(),
+agents = {"Full Random"              : gaAgent.FullRandomAgent.ForGUI(),
+          "Sine Function Full"       : gaAgent.SineFuncFullAgent.ForGUI(),
+          "Sine Function Half"       : gaAgent.SineFuncHalfAgent.ForGUI(),
+          "Step Cycle Half"          : gaAgent.StepCycleHalfAgent.ForGUI(),
           "Truncated Fourier Series" : gaAgent.TFSAgent.ForGUI()}
 
 
@@ -35,21 +35,21 @@ def range_value_option(key, text, default_min, default_max, disabled=False):
 
 agent_argument_options = [sg.Column([single_value_option("cycle_repeat", "Step Count", 25)], 
                                     element_justification='c', expand_x=True, visible=False, key="options_Full Random"),
-                          sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 5),
-                                     range_value_option("frequency_range", "Frequency range", 0.5, 5),
+                          sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 4),
+                                     range_value_option("frequency_range", "Frequency range", 0.5, 4),
                                      range_value_option("shift_x_range", "Shift x", 0, 2*math.pi),
                                      range_value_option("shift_y_range", "Amplitude range", "gaAgent.py", "gaAgent.py", disabled=True)], 
                                     element_justification='c', expand_x=True, visible=False, key="options_Sine Function Full"),
-                          sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 5),
-                                     range_value_option("frequency_range", "Frequency range", 0.5, 5),
+                          sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 4),
+                                     range_value_option("frequency_range", "Frequency range", 0.5, 4),
                                      range_value_option("shift_x_range", "Shift x", 0, 2*math.pi),
                                      range_value_option("shift_y_range", "Amplitude range", "gaAgent.py", "gaAgent.py", disabled=True)],
                                     element_justification='c', expand_x=True, visible=False, key="options_Sine Function Half"),
                           sg.Column([single_value_option("cycle_repeat", "Step Count", 25)], 
                                     element_justification='c', expand_x=True, visible=False, key="options_Step Cycle Half"),
-                          sg.Column([single_value_option("period", "Period", 3),
+                          sg.Column([single_value_option("period", "Period", 4),
                                      single_value_option("series_length", "Truncated series length", 3),
-                                     single_value_option("coeficient_range", "Coeficient range", 4)], 
+                                     single_value_option("coeficient_range", "Coeficient range", 1)], 
                                     element_justification='c', expand_x=True, visible=False, key="options_Truncated Fourier Series"),
                           ]
 
@@ -58,14 +58,14 @@ def main_tab():
 
     frame = [sg.Frame("Settings overview", frame_text, size=(800, 300), pad=(10,10))]
 
-    options_l = [[sg.Input("250", size=(5,None), enable_events=True, key="-MAIN_GEN_COUNT_IN-"), sg.Text("Generation count")],
+    options_l = [[sg.Input("150", size=(5,None), enable_events=True, key="-MAIN_GEN_COUNT_IN-"), sg.Text("Generation count")],
                  [sg.Checkbox("Show final run", key="-CB_FINAL-")],
                  [sg.Checkbox("Show progress runs", key="-CB_PROGRESS-")],
                  [sg.Sizer(0, 1)]]
 
-    options_r = [[sg.Input("50", size=(5,None), enable_events=True, key="-MAIN_POP_SIZE_IN-"), sg.Text("Starting population")],
+    options_r = [[sg.Input("100", size=(5,None), enable_events=True, key="-MAIN_POP_SIZE_IN-"), sg.Text("Starting population")],
                  [sg.Checkbox("Save best agent", default=True, key="-CB_SAVEBEST-")],
-                 [sg.Text("Save directory:"), sg.Text(".", size=(30,None), font=("Helvetica", 10), key="-SAVE_DIR-")],
+                 [sg.Text("Save directory:"), sg.Text("./saves/individuals/", size=(30,None), font=("Helvetica", 10), key="-SAVE_DIR-")],
                  [sg.FolderBrowse("Browse", target="-SAVE_DIR-")]]
 
     options = [sg.Col([[sg.Col(options_l, element_justification='l', vertical_alignment='t', expand_x=True), sg.Col(options_r, element_justification='l', vertical_alignment='t', expand_x=True)]], expand_x=True, pad=(5,10))]
@@ -228,7 +228,7 @@ def evolution_config_tab():
     return tab;
 
 def make_window():
-    tabGroup = [[sg.TabGroup([[main_tab(), robot_select_tab(), agent_select_tab(), evolution_config_tab()]], size=(800,600))]]
+    tabGroup = [[sg.TabGroup([[main_tab(), robot_select_tab(), agent_select_tab()]], size=(800,600))]]
 
     window = sg.Window('Test GUI', tabGroup, size=(800,600), font=font, finalize=True,  use_default_focus=False)
     window['-ROBOT_SELECT-'].TKStringVar.trace("w", robot_select_callback)
@@ -344,9 +344,9 @@ if __name__ == "__main__":
         plt.title('Training')
         plt.xlabel('Episode')
         plt.ylabel('Fitness')
-        plt.plot(antGA.GUI_GRAPH_VALUES[0], label='Mean')
-        plt.plot(antGA.GUI_GRAPH_VALUES[1], label='Min')
-        plt.plot(antGA.GUI_GRAPH_VALUES[2], label='Max')
+        plt.plot(antGA.GRAPH_VALUES[0], label='Mean')
+        plt.plot(antGA.GRAPH_VALUES[1], label='Min')
+        plt.plot(antGA.GRAPH_VALUES[2], label='Max')
         plt.legend(loc='upper left', fontsize=9)
         plt.tight_layout()
         FIG_AGG = draw_figure(
@@ -360,9 +360,9 @@ if __name__ == "__main__":
         plt.title('Training')
         plt.xlabel('Episode')
         plt.ylabel('Fitness')
-        plt.plot(antGA.GUI_GRAPH_VALUES[0], label='Mean')
-        plt.plot(antGA.GUI_GRAPH_VALUES[1], label='Min')
-        plt.plot(antGA.GUI_GRAPH_VALUES[2], label='Max')
+        plt.plot(antGA.GRAPH_VALUES[0], label='Mean')
+        plt.plot(antGA.GRAPH_VALUES[1], label='Min')
+        plt.plot(antGA.GRAPH_VALUES[2], label='Max')
         plt.legend(loc='upper left', fontsize=9)
         plt.tight_layout()
 
@@ -382,18 +382,18 @@ if __name__ == "__main__":
         elif agent_selected == "Truncated Fourier Series": agent = gaAgent.TFSAgent(robot, body_part_mask)
         else: raise AttributeError("Unknown control agent type - " + agent_selected)
 
-        population_size = window_values["-MAIN_POP_SIZE_IN-"]
-        generation_count = window_values["-MAIN_GEN_COUNT_IN-"]
+        population_size = int(window_values["-MAIN_POP_SIZE_IN-"])
+        generation_count = int(window_values["-MAIN_GEN_COUNT_IN-"])
 
         show_best = window_values["-CB_FINAL-"]
         save_best = window_values["-CB_SAVEBEST-"]
         save_dir = window_values["Browse"]
+        params = antGA.RunParams(robot, agent, population_size, generation_count, show_best, save_best, save_dir, "GUIRUN")
 
-        return  robot, agent, population_size, generation_count, show_best, save_best, save_dir
+        return params
             
     def startRun():
-        robot, agent, population_size, generation_count, show_best, save_best, save_dir = GetParams()
-        antGA.Run(robot, agent, population_size, generation_count, show_best, save_best, save_dir)
+        antGA.Run(True, GetParams())
 
     working_thread = threading.Thread(target=startRun, daemon=True)
     working_thread.start()

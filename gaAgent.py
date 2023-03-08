@@ -138,7 +138,7 @@ class SineFuncFullAgent(AgentType):
     def get_action(self, individual, step):
         values, _ = individual
 
-        step = step/5
+        step = step/10
 
         actions = []
         for i in range(len(values)//4):
@@ -249,7 +249,7 @@ class SineFuncHalfAgent(AgentType):
     def get_action(self, individual, step):
         values, _ = individual
 
-        step = step/5
+        step = step/10
 
         actions = []
         for i in range(len(values)//4):

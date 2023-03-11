@@ -1,5 +1,6 @@
 # custom
 dask-worker-space/
+docs/BP_vzor/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

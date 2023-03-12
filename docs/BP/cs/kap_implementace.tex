@@ -1,0 +1,65 @@
+%%% Fiktivní kapitola s ukázkami tabulek, obrázků a kódu
+
+\chapter{Implementace}
+V předchozí kapitole jsme prošli funkční požadavky, očekávané od vyvíjeného
+souboru programů. Následuje rozbor jednotlivých modulů, které vznikly při
+vlastní implementaci. Zároveň zde projdeme možné alternativy, které se pro
+vývoj nabízejí a probereme důvody stojící za zvolením jednotlivých z možností.
+
+Nejprve vysvětlíme volbu programovacího jazyka, ve kterém je celá knihovna
+vytvořena. Poté projdeme systémy umožňující vývoj ve fyzikálním prostředí a
+ovládání uživatelem definovaných robotů. Zde představíme i možnosti tvorby
+vlastních robotů. Dále ukážeme možné varianty modulů umožňující vývoj řízení
+robotů pomocí genetických algoritmů a popíšeme vlastní implementaci. Následně
+projdeme všechny části implementace spojující tyto moduly do přístupné
+rozšířitelné knihovny. V poslední části představíme implementaci grafického
+rozhraní, které slouží uživateli, který chce používat knihovnu a provádět
+experimenty, bez nutnosti využití příkazové řádky.
+
+\section{Programovací jazyk}
+
+
+\section{Simulované fyzikální prostředí}
+
+Jelikož chceme vyvíjet řízení robotů založených na korektních fyzikálních
+pravidlech a interakcích, je pro tuto práci důležité vybrat dostatečně
+robustní, deterministický fyzikální simulátor. Dále bychom od tohoto simulátoru
+chtěli, abychom~mohli dle vlastních potřeb měnit vlastnosti a podobu simulovaného
+prostředí. Zároveň chceme, aby nám simulátor dovolil konfigurovat morfologii
+vlastních robotů a případně nějakým stylem umožnil morfologii v průběhu běhu
+vývoje měnit. V~poslední řadě by bylo užitečné, aby modul spravující zvolený
+fyzikální simulátor byl open-source, což nám dá volnost v případě, že si budeme
+chtít chování systémů v prostředí nějak vlastnoručně upravit.
+
+Při hledání fyzikálních simulátorů, které by umožňovali kontrolu a ovládání
+prostředí skrz Python jsme narazili na několik možností.
+
+\begin{itemize}
+    \item \textbf{Gazebo}\\
+        Gazebo je sada open-source knihoven pro vývoj, výzkum a aplikaci
+        robotů. Umožňuje simulaci dynamického 3D prostředí s více agenty,
+        generování dat ze simulovaných senzorů a fyzikálně korektní interakce
+        robotů s prostředím. Uživatel s knihovnou pracuje skrz grafické
+        rozhraní nebo příkazovou řádku. Prostředí a roboti mohou být tvořené
+        buď  skrz grafické prostředí, nebo v textovém formátu XML.
+        \citet{koenig2004design}. 
+    \item \textbf{Webots}\\
+        Webots je open-source víceplatformní robotický simulátor, umožňující
+        programování a testování virtuálních robotů a následnou aplikaci
+        softwaru na reálné roboty. Využívá programovacích jazyků C a C++ s
+        možností přístupu skrz Python. Prostředí dále nabízí využití
+        připravených modelů robotů a možnosti vložení vlastních robotů z 3D
+        modelovacích softwarů v CAD formátu \citet{michel2004cyberbotics}. Více
+        informací v dokumentaci Webots \citep{Webots}.
+
+\end{itemize}
+
+
+
+\subsection{Roboti}
+
+\section{Genetické algoritmy}
+
+\section{Implementace knihovny}
+
+\section{Grafické rozhraní}

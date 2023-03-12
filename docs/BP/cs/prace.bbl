@@ -1,8 +1,28 @@
-\begin{thebibliography}{0}
+\begin{thebibliography}{3}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Koenig a Howard(2004)]{koenig2004design}
+{\sc Koenig, N. {\rm a} Howard, A.} (2004).
+\newblock Design and use paradigms for gazebo, an open-source multi-robot
+  simulator.
+\newblock In \emph{2004 IEEE/RSJ International Conference on Intelligent Robots
+  and Systems (IROS)(IEEE Cat. No. 04CH37566)}, volume~3, pages 2149--2154.
+  IEEE.
+
+\bibitem[Michel(2004)]{michel2004cyberbotics}
+{\sc Michel, O.} (2004).
+\newblock Cyberbotics ltd. webots™: professional mobile robot simulation.
+\newblock \emph{International Journal of Advanced Robotic Systems}, {\bf
+  1}\penalty0 (1), \penalty0 5.
+
+\bibitem[Webots()]{Webots}
+{\sc Webots}.
+\newblock http://www.cyberbotics.com.
+\newblock URL \url{http://www.cyberbotics.com}.
+\newblock Open-source Mobile Robot Simulation Software.
 
 \end{thebibliography}

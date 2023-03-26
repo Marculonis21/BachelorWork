@@ -18,47 +18,52 @@ experimenty, bez nutnosti využití příkazové řádky.
 
 \section{Programovací jazyk}
 
+Jako programovací jazyk, ve kterém tento projekt bude psán, jsme zvolili\\
+\textbf{Python}. Cílem projektu je vytvořit platformu, kterou bude uživatel
+moci použít k vývoji robotů pomocí evolučních algoritmů. Pokud uživatel bude
+mít potřebu jakkoli připravený proces vývoje měnit, Python lehce umožní
+nahlédnout do zdrojových kódů vypracované knihovny a provést úpravy dle
+vlastních potřeb. Zároveň to umožňuje rozšiřování knihovny o nové metody, které
+bude chtít uživatel zkusit zařadit do již funkčního procesu. Jednoduchá
+čitelnost Pythonu spojená s rychlostí, jakou mohou být prováděny iterace změn
+bez potřeby zdlouhavého překladu celé knihovny, se~zdají býti dostatečně dobré
+vlastnosti pro volbu programovacího jazyka pro tento projekt.
 
 \section{Simulované fyzikální prostředí}
 
-Jelikož chceme vyvíjet řízení robotů založených na korektních fyzikálních
-pravidlech a interakcích, je pro tuto práci důležité vybrat dostatečně
-robustní, deterministický fyzikální simulátor. Dále bychom od tohoto simulátoru
-chtěli, abychom~mohli dle vlastních potřeb měnit vlastnosti a podobu simulovaného
-prostředí. Zároveň chceme, aby nám simulátor dovolil konfigurovat morfologii
-vlastních robotů a případně nějakým stylem umožnil morfologii v průběhu běhu
-vývoje měnit. V~poslední řadě by bylo užitečné, aby modul spravující zvolený
-fyzikální simulátor byl open-source, což nám dá volnost v případě, že si budeme
-chtít chování systémů v prostředí nějak vlastnoručně upravit.
+Po zhodnocení vypsaných a dalších možností jsme vybrali pro využití v tomto
+projektu fyzikální simulátor MuJoCo. Na rozdíl od ostatních se zdá býti
+přístupnější do začátku a zároveň dostatečně robustní a konfigurovatelný tak,
+aby splnil veškeré požadavky, které od fyzikálního simulátoru máme.
 
-Při hledání fyzikálních simulátorů, které by umožňovali kontrolu a ovládání
-prostředí skrz Python jsme narazili na několik možností.
-
-\begin{itemize}
-    \item \textbf{Gazebo}\\
-        Gazebo je sada open-source knihoven pro vývoj, výzkum a aplikaci
-        robotů. Umožňuje simulaci dynamického 3D prostředí s více agenty,
-        generování dat ze simulovaných senzorů a fyzikálně korektní interakce
-        robotů s prostředím. Uživatel s knihovnou pracuje skrz grafické
-        rozhraní nebo příkazovou řádku. Prostředí a roboti mohou být tvořené
-        buď  skrz grafické prostředí, nebo v textovém formátu XML.
-        \citet{koenig2004design}. 
-    \item \textbf{Webots}\\
-        Webots je open-source víceplatformní robotický simulátor, umožňující
-        programování a testování virtuálních robotů a následnou aplikaci
-        softwaru na reálné roboty. Využívá programovacích jazyků C a C++ s
-        možností přístupu skrz Python. Prostředí dále nabízí využití
-        připravených modelů robotů a možnosti vložení vlastních robotů z 3D
-        modelovacích softwarů v CAD formátu \citet{michel2004cyberbotics}. Více
-        informací v dokumentaci Webots \citep{Webots}.
-
-\end{itemize}
-
-
+\textbf{MuJoCo 1.50} je fyzikální simulátor zpřístupněný skrz volně dostupné
+aplikační rozhraní společnosti \textbf{OpenAI} v rámci jejich sady různých
+prostředí \textbf{Gym} (textové hry, jednoduché 2D i plně fyzikálně simulované
+3D prostředí, Atari hry aj.) pro vývoj metod zpětnovazebného učení na různých
+problémech. Toto rozhraní umožňuje uživatelům jednoduchý přístup k datům z
+poskytnutých prostředí a ovládání prostředím definovaných agentů, pomocí
+standardizovaných vstupů i výstupů napříč všemi prostředími. Tímto způsobem
+můžeme velmi lehce ovládat i roboty v prostředích simulátoru MuJoCo. Navíc
+otevřená vlastnost tohoto aplikačního rozhraní umožňuje úpravu částí procesu
+tak, aby se lépe hodil při řešení námi zvolených problémů. Přestože je
+\textbf{Gym} převážně používána pro vývoj metod zpětnovazebného učení agentů,
+nic nám nebrání a je velmi jednoduché namísto toho využít vlastního agenta,
+který je vyvíjen pomocí evolučních algoritmů.
 
 \subsection{Roboti}
 
 \section{Genetické algoritmy}
+
+Po porovnání různých možností modulů pro tvorbu a použití evolučních algoritmů
+v naší knihovně, jsme se rozhodli pro vlastní implementaci jednotlivých částí
+evolučních algoritmů (genetických operátorů) a jejich propojení mezi sebou.
+Důvodem je hlavně jednodušší zapojení do zbytku knihovny a snížení nároků na
+znalosti mnohdy složitých výše popsaných externích knihoven pro uživatele,
+který by případně mohl chtít si do naší knihovny dopsat vlastní kus evolučního
+algoritmu. Tímto způsobem, pokud bude chtít něco takového udělat, dojde-li
+k~dodržení zdrojovým kódem stanovených pravidel, vlastní kus kódu (metoda
+popisující genetický operátor) bude možné hned bez problému využít při dalším
+vývoji robotů.
 
 \section{Implementace knihovny}
 

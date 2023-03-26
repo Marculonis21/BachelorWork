@@ -1,9 +1,48 @@
-\begin{thebibliography}{3}
+\begin{thebibliography}{16}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[CoppeliaRobotics()]{coppeliarobotics}
+{\sc CoppeliaRobotics}.
+\newblock https://www.coppeliarobotics.com.
+\newblock URL \url{https://www.coppeliarobotics.com}.
+\newblock Robot simulation software.
+
+\bibitem[Coumans()]{coumans}
+{\sc Coumans, E.}
+\newblock Bullet real-time physics simulation.
+\newblock URL \url{https://pybullet.org/wordpress/}.
+\newblock Accessed: March 19, 2023.
+
+\bibitem[DEAP()]{deapproject}
+{\sc DEAP, P.}
+\newblock Deap documentation.
+\newblock URL \url{https://deap.readthedocs.io/}.
+\newblock Accessed: March 19, 2023.
+
+\bibitem[Erez a~kol.(2015)Erez, Tassa a Todorov]{erez2015simulation}
+{\sc Erez, T., Tassa, Y. {\rm a} Todorov, E.} (2015).
+\newblock Simulation tools for model-based robotics: Comparison of bullet,
+  havok, mujoco, ode and physx.
+\newblock In \emph{2015 IEEE international conference on robotics and
+  automation (ICRA)}, pages 4397--4404. IEEE.
+
+\bibitem[Fortin a~kol.(2012)Fortin, De~Rainville, Gardner, Parizeau a
+  Gagn{\'e}]{fortin2012deap}
+{\sc Fortin, F.-A., De~Rainville, F.-M., Gardner, M.-A.~G., Parizeau, M. {\rm
+  a} Gagn{\'e}, C.} (2012).
+\newblock Deap: Evolutionary algorithms made easy.
+\newblock \emph{The Journal of Machine Learning Research}, {\bf 13}\penalty0
+  (1), \penalty0 2171--2175.
+
+\bibitem[Izadi a Bezuijen(2018)]{izadi2018simulating}
+{\sc Izadi, E. {\rm a} Bezuijen, A.} (2018).
+\newblock Simulating direct shear tests with the bullet physics library: A
+  validation study.
+\newblock \emph{PLOS one}, {\bf 13}\penalty0 (4), \penalty0 e0195073.
 
 \bibitem[Koenig a Howard(2004)]{koenig2004design}
 {\sc Koenig, N. {\rm a} Howard, A.} (2004).
@@ -13,16 +52,61 @@
   and Systems (IROS)(IEEE Cat. No. 04CH37566)}, volume~3, pages 2149--2154.
   IEEE.
 
+\bibitem[Lee a~kol.(2018)Lee, X.~Grey, Ha, Kunz, Jain, Ye, S.~Srinivasa,
+  Stilman a Karen~Liu]{lee2018dart}
+{\sc Lee, J., X.~Grey, M., Ha, S., Kunz, T., Jain, S., Ye, Y., S.~Srinivasa,
+  S., Stilman, M. {\rm a} Karen~Liu, C.} (2018).
+\newblock Dart: Dynamic animation and robotics toolkit.
+\newblock \emph{The Journal of Open Source Software}, {\bf 3}\penalty0 (22),
+  \penalty0 500.
+
 \bibitem[Michel(2004)]{michel2004cyberbotics}
 {\sc Michel, O.} (2004).
 \newblock Cyberbotics ltd. webots™: professional mobile robot simulation.
 \newblock \emph{International Journal of Advanced Robotic Systems}, {\bf
   1}\penalty0 (1), \penalty0 5.
 
+\bibitem[Nogueira(2014)]{nogueira2014comparative}
+{\sc Nogueira, L.} (2014).
+\newblock Comparative analysis between gazebo and v-rep robotic simulators.
+\newblock \emph{Seminario Interno de Cognicao Artificial-SICA}, {\bf
+  2014}\penalty0 (5), \penalty0 2.
+
+\bibitem[Rohmer a~kol.(2013)Rohmer, Singh a Freese]{coppeliaSim}
+{\sc Rohmer, E., Singh, S. P.~N. {\rm a} Freese, M.} (2013).
+\newblock Coppeliasim (formerly v-rep): a versatile and scalable robot
+  simulation framework.
+\newblock In \emph{Proc. of The International Conference on Intelligent Robots
+  and Systems (IROS)}.
+\newblock www.coppeliarobotics.com.
+
+\bibitem[Salimans a~kol.(2017)Salimans, Ho, Chen, Sidor a
+  Sutskever]{salimans2017evolution}
+{\sc Salimans, T., Ho, J., Chen, X., Sidor, S. {\rm a} Sutskever, I.} (2017).
+\newblock Evolution strategies as a scalable alternative to reinforcement
+  learning.
+\newblock \emph{arXiv preprint arXiv:1703.03864}.
+
+\bibitem[Smith a~kol.(2007)]{smith2007open}
+{\sc Smith, R. a~kol.} (2007).
+\newblock Open dynamics engine.
+
+\bibitem[Tonda(2020)]{tonda2020inspyred}
+{\sc Tonda, A.} (2020).
+\newblock Inspyred: Bio-inspired algorithms in python.
+\newblock \emph{Genetic Programming and Evolvable Machines}, {\bf 21}\penalty0
+  (1-2), \penalty0 269--272.
+
 \bibitem[Webots()]{Webots}
 {\sc Webots}.
 \newblock http://www.cyberbotics.com.
 \newblock URL \url{http://www.cyberbotics.com}.
 \newblock Open-source Mobile Robot Simulation Software.
+
+\bibitem[Yoon a~kol.(2023)Yoon, Son a Lee]{yoon2023comparative}
+{\sc Yoon, J., Son, B. {\rm a} Lee, D.} (2023).
+\newblock Comparative study of physics engines for robot simulation with
+  mechanical interaction.
+\newblock \emph{Applied Sciences}, {\bf 13}\penalty0 (2), \penalty0 680.
 
 \end{thebibliography}

@@ -22,3 +22,9 @@ Work done under supervision of *RNDr. František Mrázek, CSc.* - Faculty MFF CU
 - [ ] School Gitlab migrating (low)
 - [ ] Set up batch run possibility
 - [ ] Stats collecting from batch runs - csv/...?
+
+
+
+CoppeliaRobotics
+rozdělení fyz sim/sim prostředí
+možné ukázky při popisování GA

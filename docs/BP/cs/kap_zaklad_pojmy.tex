@@ -1,0 +1,349 @@
+%%% Fiktivní kapitola s ukázkami sazby
+
+\chapter{Základní pojmy}
+
+V této kapitole vysvětlíme a rozebereme důležité pojmy, se kterými se v dalším
+popisu práce budeme setkávat. Znalost těchto pojmů je potřebná pro pochopení
+důvodů volby daných vybraných technologií a pro pochopení základního rozboru
+implementace řešení, kterou popíšeme v následujících kapitolách.
+
+V této kapitole nejdříve vysvětlíme základní teorii evolučních algoritmů
+\ref{Evoluční algoritmy} a ukážeme si již existující knihovny pracující nebo
+pomáhající pracovat s genetickými algoritmy \ref{Evoluční algoritmy -
+implementace}. Poté se podíváme na základ teorie neuronových sítí \ref{NN} a
+popíšeme pokročilejší evoluční algoritmy (NEAT \ref{NN - NEAT}, HyperNEAT
+\ref{NN - HyperNEAT}) sloužící přímo k vývoji těchto sítí. Dále popíšeme
+simulátory prostředí \ref{Simulované prostředí} a fyzikální simulátory
+\ref{Simulované prostředí - f simulátory}, které využijeme pro simulaci při
+vyvíjení našich robotů.
+
+\section{Evoluční algoritmy} \label{Evoluční algoritmy}
+
+TODO: POPIS EVOLUČNÍ ALGORITMY
+
+\subsection{Existující implementace} \label{Evoluční algoritmy - implementace}
+
+Pro vývoj řízení robotů budeme využívat evoluční algoritmy. Naše knihovna tedy
+bude implementovat několik alespoň základních genetických operátorů,
+používaných při vývoji jedinců a co nejjednodušeji umožnit jejich konfiguraci před
+spouštěním jednotlivých experimentů. Naším cílem je co možná nejvíce
+zpřístupnit knihovnu, která má být výsledkem této práce, aby uživatel se základní
+znalostí genetických algoritmů a programovacího jazyka byl schopný pochopit běh
+algoritmu a v případě potřeby mohl jednoduše provádět zásahy do jeho běhu. Není
+pro nás tedy nutné najít tu nejefektivnější knihovnu, nýbrž tu, která přinese
+výhody jako přehlednost a snadnou úpravu algoritmů, bez větších obtíží s
+implementací a pochopením knihovny.
+
+Dále představíme několik knihoven implementujících nebo usnadňujících
+implementaci genetických algoritmů nebo jejich částí. 
+
+\begin{itemize}
+    \item \textbf{DEAP}\\ DEAP (\emph{Distributed Evolutionary Algorithms in
+        Python}) je open-source Python knihovna pro rychlou tvorbu a
+        prototypování evolučních algoritmů, která se snaží jejich tvorbu
+        zjednodušit pomocí přímočarého postupu, podobného pseudokódu, který je
+        se základní znalostí knihovny poměrně jednoduchý na porozumění Knihovna
+        je tvořena ze dvou hlavních struktur \texttt{creator}, který slouží k
+        vytváření genetických informací jedinců z libovolných datových struktur
+        a \texttt{toolbox}, který je seznamem nástrojů (genetických operátorů),
+        které mohou být použité při sestavování evolučního algoritmu. Dalšími
+        menšími strukturami jsou \texttt{algorithms} obsahující 4 základní typy
+        algoritmů a \texttt{tools} implementující další základní operátory
+        (kusy operátorů), které je posléze možné přidávat do \texttt{toolbox}.
+        Pomocí těchto základních stavebních bloků mohou uživatelé poměrně
+        jednoduše začít tvořit skoro libovolné evoluční algoritmy
+        \citep{fortin2012deap}. Následuje ukázka kódu tvorby základních částí
+        evolučního algoritmu pro One Max problém, popsaná v oficiální
+        dokumentaci knihovny DEAP \citep{deapproject}. V problému One Max máme
+        populaci jedinců tvořených z jedniček a nul a chceme vyvinout jedince,
+        který má na všech pozicích jen samé jedničky.
+
+\begin{code}
+import random
+
+from deap import base
+from deap import creator
+from deap import tools
+\end{code}
+
+        Tvorba vlastních tříd fitness funkce a individuí pomocí
+        \texttt{creator}.
+\begin{code}
+creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+creator.create("Individual", list, fitness=creator.FitnessMax)
+\end{code}
+
+        Šablonu vytvořených individuí můžeme dále použít při tvorbě populace
+        následujícím stylem.
+\begin{code}
+toolbox = base.Toolbox()
+
+toolbox.register("attr_bool", random.randint, 0, 1)
+toolbox.register("individual", tools.initRepeat, 
+                 creator.Individual, toolbox.attr_bool, 100)
+toolbox.register("population", tools.initRepeat, 
+                 list, toolbox.individual)
+\end{code}
+        
+        Zde jsme vytvořili dvě inicializační funkce \texttt{individual()} a
+        \texttt{population()}, které když zavoláme, vytvoří novou instanci
+        individua nebo populace.
+
+        V tomto problému je evaluační funkce jednoduchá, vytvoříme ji
+        následovně.
+\begin{code}
+def evalOneMax(individual):
+    return sum(individual)
+\end{code}
+        
+        Pro zvolení genetických operátorů je musíme registrovat v
+        \texttt{toolbox}.
+\begin{code}
+toolbox.register("evaluate", evalOneMax)
+toolbox.register("mate", tools.cxTwoPoint)
+toolbox.register("mutate", tools.mutFlipBit, indpb=0.05)
+toolbox.register("select", tools.selTournament, tournsize=3)
+\end{code}
+        
+        Nyní je vše připravené a můžeme začít s evolucí populace. Nejdřív
+        populaci vygenerujeme a poté populaci vyhodnotíme.
+\begin{code}
+pop = toolbox.population(n=300)
+fitnesses = list(map(toolbox.evaluate, pop))
+for ind, fit in zip(pop, fitnesses):
+    ind.fitness.values = fit
+
+# Extracting all the fitnesses of 
+fits = [ind.fitness.values[0] for ind in pop]
+\end{code}
+
+        Následně začneme evoluci. Naši jedinci jsou tvořeni ze 100 čísel 0/1.
+        Evoluce poběží tak dlouho, dokud nebude existovat jedinec z populace,
+        který má všech 100 čísel nastavených na 1, nebo evoluce doběhne
+        určitého počtu generací.
+\begin{code}
+# Number of generations
+g = 0
+# Begin the evolution
+while max(fits) < 100 and g < 1000:
+    g = g + 1
+\end{code}
+        
+        Nejdříve na základě fitness vybereme určité jedince jako rodiče další
+        generace.
+\begin{code}
+    # Select the next generation individuals
+    offspring = toolbox.select(pop, len(pop))
+    # Clone the selected individuals
+    offspring = list(map(toolbox.clone, offspring))
+\end{code}
+
+        Následně na vybrané jedince aplikujeme operátory křížení a mutace.
+\begin{code}
+    # Apply crossover and mutation on the offspring
+    for child1, child2 in zip(offspring[::2], offspring[1::2]):
+        if random.random() < CXPB:
+            toolbox.mate(child1, child2)
+            del child1.fitness.values
+            del child2.fitness.values
+
+    for mutant in offspring:
+        if random.random() < MUTPB:
+            toolbox.mutate(mutant)
+            del mutant.fitness.values
+\end{code}
+        \texttt{CXPB} a \texttt{MUTPB} jsou pravděpodobnosti aplikování operátorů
+        křížení a mutace. Klíčové slovo \texttt{del} udělá hodnotu fitness
+        daného jedince neplatnou.
+
+        Dále necháme zopakovat evaluaci celé populace jedinců a proces se může
+        opakovat.
+        
+        Dle zdrojů popisující porovnání několika Python modulů, snažící se
+        ulehčit práci s evolučními algoritmy, je DEAP nejefektivnější, tedy že 
+        tvoří nejkratší kód, v porovnání počtu řádků potřebných pro tvorbu
+        algoritmu řešící One Max problém z ukázky \citep{fortin2012deap}.
+
+    \item \textbf{Inspyred}\\
+        Inspyred poskytuje většinu z nejpoužívanějších evolučních algoritmů a
+        dalších přírodou inspirovaných algoritmů (simulace reálných
+        biologických systémů - př. optimalizace mravenčí kolonií) v jazyce
+        Python. Knihovna je již předpřipravená s funkčním řešením, ve formě
+        jednotlivých komponentů (Python funkcí), které si uživatel může sám
+        upravovat, nebo je úplně nahradit za vlastnoručně vytvořené řešení v
+        podobě vlastních funkcí. Uživatel pak při tvorbě algoritmu definuje
+        několik struktur, které ovlivňují jak celý vývoj probíhá. Těmito
+        strukturami jsou - struktury specifické k danému řešenému problému
+        \texttt{generator} (jak jsou generována řešení = jedinci) a
+        \texttt{evaluator} (definice fitness funkce)). A struktury specifické k
+        danému evolučnímu algoritmu - \texttt{observer} (jak uživatel
+        monitoruje evoluci), \texttt{terminator} (definuje pravidla pro konec
+        evoluce), \texttt{selector} (kteří jedinci se mají stát rodiči),
+        \texttt{variator} (jak jsou potomci vytvořeni z aktuálních jedinců),
+        \texttt{replacer} (volí kteří jedinci mají přežít do další generace),
+        \texttt{migrator} (jak se přenáší jedinci mezi různými
+        populacemi/generacemi) a \texttt{archiver} (jak jsou jedinci ukládání
+        mimo stávající populaci). Libovolný vybraný z těchto komponentů pak může být
+        nahrazen odpovídající vlastní implementací \citep{tonda2020inspyred}.
+
+\end{itemize}
+
+\section{Neuronové sítě} \label{NN}
+\section{NEAT} \label{NN - NEAT}
+\section{HyperNEAT} \label{NN - HyperNEAT}
+
+\section{Simulované prostředí} \label{Simulované prostředí}
+
+Jelikož chceme vyvíjet řízení robotů založených na korektních fyzikálních
+pravidlech a interakcích, je pro tuto práci důležité vybrat vhodný simulátor
+prostředí. Přáli bychom si mít možnost jednoduše konfigurovat co nejvíce
+vlastností prostředí a zároveň mít co nejlehčí přístup k morfologii
+simulovaných robotů. Zároveň chceme, abychom měli možnost do morfologie robotů
+nějakým stylem zasahovat i v průběhu vývoje a aktivně ji za běhu měnit. Jelikož
+plánujeme v prostředí provádět experimenty s různými typy robotů, používající
+různé styly pohybu (typy motorů, kloubů, tvarů končetin, atd.), je potřebné,
+aby fyzikální simulátor (\emph{fyzikální řešič=solver}) byl schopný simulovat i
+složitější typy robotů. Takovými mohou být právě třeba kráčející roboti, neboli
+roboti používající k pohybu končetiny připomínající nohy, na rozdíl od
+jednodušších typů robotů, kteří se mohou pohybovat pomocí kol, jejichž simulace
+bývá mnohdy jednodušší. Stejně tak jak potřebujeme umožnit složitost robotů,
+protože nebudeme mít možnost vlastnoručně kontrolovat každý parametr, který
+bude při vývoji robotům přiřazen, potřebujeme zajistit, aby fyzikální simulátor
+zvládal libovolné rozsahy parametrů a simulace zůstal pro tyto parametry
+stabilní. Zároveň chceme, aby simulátor v prostředí byl
+deterministický, což umožní, že předváděné experimenty můžeme dle potřeby
+opakovat a výsledky tak náležitě prezentovat. Evoluční algoritmy jsou velmi
+lehce paralelizovatelné a tedy pro urychlení procesu vývoje a experimentů nám
+bude výhodné, pokud by simulace zvládala paralelní běh na více vláknech (více
+simulací, každá na vlastním vlákně). V posledním řadě pro lehčí integraci do
+vlastního modulu bude užitečné, aby modul spravující zvolený simulátor byl
+open-source, což nám dá volnost v případě, že si budeme chtít chování systémů v
+prostředí nějak vlastnoručně upravit.
+
+Při hledání simulátorů prostředí, které by vyhovovali našim požadavkům a
+umožňovali kontrolu a ovládání prostředí skrz zvolený jazyk Python, jsme
+narazili na několik možností.
+
+\begin{itemize}
+    \item \textbf{Gazebo}\\
+        Gazebo je sada open-source víceplatformní knihoven pro vývoj, výzkum a
+        aplikaci robotů, původně založená v roce 2002. Umožňuje kompletní
+        kontrolu nad simulací dynamického 3D prostředí s více agenty a
+        generování dat ze simulovaných senzorů. Fyzikálně korektní interakce v
+        prostředí pak od začátku projektu zajišťuje známý fyzikální simulátor
+        ODE~\ref{ODE}, nad kterým Gazebo tvoří abstraktní vrstvu, umožňující
+        snazší tvorbu simulovaných objektů různých druhů. V dnešní době je
+        stále výchozím fyzikálním simulátorem ODE, nicméně uživatel již může
+        vybrat celkem ze čtyř různých simulátorů - Bullet~\ref{Bullet},
+        Simbody, Dart~\ref{Dart} a ODE. Uživatel s knihovnou pracuje skrz
+        grafické rozhraní založené na knihovně Open Scene Graph používající
+        OpenGL, nebo skrz příkazovou řádku. Prostředí a roboti mohou být
+        tvořené buď skrz grafické prostředí, nebo v textovém formátu XML.
+        Limitací Gazebo je pak neschopnost rozdělit simulace mezi vícero vláken
+        kvůli vnitřní architektuře spojené s fyzikální simulací
+        \citep{koenig2004design}. 
+
+    \item \textbf{Webots}\\
+        Webots je open-source víceplatformní robustní a deterministický
+        robotický simulátor vyvíjený od roku 1998, umožňující programování a
+        testování virtuálních robotů mnoha různých typů a jednoduchou následnou
+        aplikaci softwaru na reálné roboty. Simulátor je možné použít pro
+        simulaci prostředí s vícero agenty najednou s možnostmi lokální i
+        globální komunikace mezi agenty. Výpočty fyzikálních interakcí
+        zajišťuje fyzikální simulátor ODE. Pro vývoj robotů a
+        prostředí je možné využít řady programovacích jazyků a to C, C++,
+        Python, Java, MATLAB nebo ROS (\emph{Robot Operating System}).
+        Prostředí umožňuje práci v grafickém rozhraní a vizualizaci simulací
+        pomocí OpenGL. Knihovna dále nabízí využití připravených modelů robotů,
+        vlastní editor robotů a map a možnosti vložení vlastních robotů z 3D
+        modelovacích softwarů v CAD formátu \citep{michel2004cyberbotics}
+        \citep{Webots}.
+
+    \item \textbf{CoppeliaSim}\\ CoppeliaSim (kdysi známý pod jménem
+        \emph{V-REP} = \emph{Virtual Robot Experimentation Platform}) je
+        víceplatformní simulační modul pro vývoj, testování a jednoduchou
+        aplikaci softwaru pro roboty. Dovoluje vývoj ovladačů pomocí 7 různých
+        programovacích jazyků a ulehčuje jejich aplikace v simulovaných a
+        skutečných robotech. Simulaci ovladačů je možno jednoduše
+        rozdistribuovat mezi vícero vláken dokonce vícero strojů, což urychluje
+        vývoj a snižuje nároky na procesor v době simulace. Navíc je možné
+        vyvíjený ovladač nechat v době simulací běžet na vlastním na dálku
+        připojeném robotovi, co dále ulehčuje přenos finální verze ovladačů od
+        vývoje do skutečného světa. Prostředí umožňuje práci s širokou řadou
+        typů objektů, druhů kloubů, senzorů a dalších objektů obvykle
+        používaných při vývojích robotických ovladačů. Obsahuje lehce
+        použitelný editor prostředí a robotů samotných s řadou předem
+        vytvořených modelů, které může uživatel hned využít. Modely zároveň
+        mohou být přidány skrz řadu různých formátů (XML, URDF, SDF). Prostředí
+        podporuje pět různých fyzikálních simulátorů (Bullet, ODE,
+        MuJoCo~\ref{MuJoCo}, Vortex~\ref{Vortex}, Newton), mezi kterými si
+        uživatel může vybrat dle potřeb přesnosti (reálnosti), rychlosti a
+        dalších možností jednotlivých fyzikálních simulátorů
+        \citep{coppeliaSim} \citep{nogueira2014comparative}.
+\end{itemize}
+
+\subsection{Fyzikální simulátory} \label{Simulované prostředí - f simulátory}
+
+V této podkapitole se podíváme na základní popis a možné výhody a nevýhody
+jednotlivých fyzikálních simulátorů, na které jsme narazili při hledání
+simulátorů prostředí.
+
+\begin{itemize}
+    \item \textbf{ODE}\\ \label{ODE}
+        ODE (\emph{Open Dynamics Engine}) je víceplatformní open-source
+        fyzikální simulátor, jehož vývoj začal v roce 2001. Vhodný pro simulaci
+        pevných těles s různými druhy kloubů a pro detekci kolizí. Tvořený pro
+        využití v interaktivních nebo real-time simulacích, upřednostňující
+        rychlost a stabilitu nad fyzikální přesností \citep{smith2007open}.
+        Potřeba menších simulačních kroků pro stabilitu. Hodí se pro simulaci
+        vozidel, pochodujících robotů a virtuálních prostředí. Široké využití v
+        počítačových hrách a 3D simulačních nástrojích
+        \citet{coppeliarobotics}.
+
+    \item \textbf{Bullet}\\ \label{Bullet}
+        Bullet je open-source fyzikální knihovna, podporující detekci kolizí a
+        simulaci pevných a měkkých těles. Bullet je používán jako fyzikální
+        simulátor pro hry, vizuální efekty a robotiku \citep{coumans}. Byl použit jako hlavní
+        fyzikální simulátor pro simulaci NASA \emph{Tensegrity} robotů (s
+        vlastními úpravami pro simulaci měkkých těles, kvůli nerealistickým
+        metodám řešení simulace provazů) \citep{izadi2018simulating}.
+
+    \item \textbf{Dart}\\ \label{Dart}
+        Dart (\emph{Dynamic Animation and Robotics Toolkit}) je víceplatformní
+        open-source knihovna pro simulace a animace robotů. Od předchozích se odlišuje
+        stabilitou a přesností, díky zobecněné reprezentaci koordinací pevných
+        těles v simulaci. Na rozdíl od ostatních fyzikálních simulátorů, aby
+        dal vývojáři plnou kontrolu nad simulací, umožňuje Dart plný přístup k
+        interním hodnotám simulace. Zároveň se díky línému vyhodnocování hodí
+        pro vývoj real-time ovladačů pro roboty. \citep{lee2018dart}.
+
+    \item \textbf{MuJoCo}\\ \label{MuJoCo}
+        MuJoCo (\emph{Multi-Joint Dynamics with Contact}) je open-source
+        fyzikální simulátor pro vývoj v oblasti robotiky, biomechaniky a
+        dalších. Často je využíváno pro testování a porovnávání různých metod
+        navrhování robotických systémů jako jsou třeba evoluční algoritmy nebo
+        metody zpětnovazebného učení \citep{salimans2017evolution}. V
+        simulacích je pro roboty možné nakonfigurovat využití mnoha druhů
+        aktuátorů, včetně těch simulující práci svalů a k dispozici je i velké
+        množství kloubů. Simulátor zároveň umožňuje velký nárůst v rychlosti
+        běhu simulace za pomoci plné podpory paralelizace na všech dostupných
+        vláknech a stabilitě simulace i při velmi velkých simulačních krocích
+        \citep{todorov2014mujoco}. Zároveň nabízí jednoduchý styl, jakým si
+        může uživatel konfigurovat všechny detaily simulace a samotných
+        simulovaných robotů pomocí jednoduchých XML konfiguračních souborů (XML
+        formát modelů \emph{MJCF}). V komplexním rozboru řady četně používaných
+        fyzikálních simulátorů byl simulátor MuJoCo hodnocen jako jeden z
+        nejlepších co se týče stability, přesnosti a rychlosti simulací. Další
+        výhodou zlepšující přesnost tohoto simulátoru je, že MuJoCo pro
+        simulaci používá kloubní souřadnicový systém, který předchází narušení
+        fyzikálních pravidel a tedy nepřesností v kloubech
+        \citep{erez2015simulation}.
+
+    \item \textbf{Vortex}\\ \label{Vortex}
+        Vortex je uzavřený, komerční fyzikální simulátor určený pro tvorbu
+        reálnému světu odpovídajících simulací. Obsahuje mnoho parametrů,
+        umožňující nastavení reálných fyzikálních parametrů dle potřeb,
+        většinou industriálních a výzkumných aplikací \citep{coppeliarobotics}
+        \citep{yoon2023comparative}.
+
+\end{itemize}

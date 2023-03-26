@@ -63,22 +63,9 @@ def simulationRun(agent, actions, render=False, render_start_paused=False):
 ###################################################
 ###################################################
 
-def printHelp():
-    return
-    # print("-h --help       ... Print help")
-    # print("-o <individual> ... Select input file to play")
-
 from robots.robots import *
 
 if __name__ == "__main__":
-    # if len(sys.argv) != 2:
-    #     print("not enough params")
-    #     quit()
-
-    if ("-h" in sys.argv or "--help" in sys.argv):
-        printHelp()
-        quit()
-
     robot = SpotLike()
     agent = gaAgent.TFSAgent(robot, [False for _ in range(len(robot.body_parts))])
     indiv = agent.generate_population(1)[0]

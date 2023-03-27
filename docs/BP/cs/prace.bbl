@@ -1,4 +1,4 @@
-\begin{thebibliography}{16}
+\begin{thebibliography}{21}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -23,6 +23,12 @@
 \newblock URL \url{https://deap.readthedocs.io/}.
 \newblock Accessed: March 19, 2023.
 
+\bibitem[DeepMind(2021)]{deepmind_2021}
+{\sc DeepMind} (2021).
+\newblock Mujoco.
+\newblock URL \url{https://mujoco.org/}.
+\newblock Accessed: March 26, 2023.
+
 \bibitem[Erez a~kol.(2015)Erez, Tassa a Todorov]{erez2015simulation}
 {\sc Erez, T., Tassa, Y. {\rm a} Todorov, E.} (2015).
 \newblock Simulation tools for model-based robotics: Comparison of bullet,
@@ -37,6 +43,12 @@
 \newblock Deap: Evolutionary algorithms made easy.
 \newblock \emph{The Journal of Machine Learning Research}, {\bf 13}\penalty0
   (1), \penalty0 2171--2175.
+
+\bibitem[Garrett(2012)]{InspyredDocs}
+{\sc Garrett, A.} (2012).
+\newblock Inspyred: Bio-inspired algorithms in python.
+\newblock URL \url{https://pythonhosted.org/inspyred/}.
+\newblock Accessed: March 26, 2023.
 
 \bibitem[Izadi a Bezuijen(2018)]{izadi2018simulating}
 {\sc Izadi, E. {\rm a} Bezuijen, A.} (2018).
@@ -72,6 +84,11 @@
 \newblock \emph{Seminario Interno de Cognicao Artificial-SICA}, {\bf
   2014}\penalty0 (5), \penalty0 2.
 
+\bibitem[OpenRobotics()]{gazeborobotics}
+{\sc OpenRobotics}.
+\newblock URL \url{https://gazebosim.org/}.
+\newblock Accessed: March 26, 2023.
+
 \bibitem[Rohmer a~kol.(2013)Rohmer, Singh a Freese]{coppeliaSim}
 {\sc Rohmer, E., Singh, S. P.~N. {\rm a} Freese, M.} (2013).
 \newblock Coppeliasim (formerly v-rep): a versatile and scalable robot
@@ -87,9 +104,20 @@
   learning.
 \newblock \emph{arXiv preprint arXiv:1703.03864}.
 
+\bibitem[Smith()]{opendynamicsengine}
+{\sc Smith, R.}
+\newblock URL \url{http://ode.org/}.
+\newblock Accessed: March 26, 2023.
+
 \bibitem[Smith a~kol.(2007)]{smith2007open}
 {\sc Smith, R. a~kol.} (2007).
 \newblock Open dynamics engine.
+
+\bibitem[Todorov a~kol.(2012)Todorov, Erez a Tassa]{todorov2012mujoco}
+{\sc Todorov, E., Erez, T. {\rm a} Tassa, Y.} (2012).
+\newblock Mujoco: A physics engine for model-based control.
+\newblock In \emph{2012 IEEE/RSJ international conference on intelligent robots
+  and systems}, pages 5026--5033. IEEE.
 
 \bibitem[Tonda(2020)]{tonda2020inspyred}
 {\sc Tonda, A.} (2020).

@@ -1,5 +1,3 @@
-%%% Fiktivní kapitola s ukázkami sazby
-
 \chapter{Základní pojmy}
 
 V této kapitole vysvětlíme a rozebereme důležité pojmy, se kterými se v dalším
@@ -8,23 +6,192 @@ důvodů volby daných vybraných technologií a pro pochopení základního roz
 implementace řešení, kterou popíšeme v následujících kapitolách.
 
 V této kapitole nejdříve vysvětlíme základní teorii evolučních algoritmů (oddíl
-\ref{Evoluční algoritmy}) a dále v oddíle \ref{Evoluční algoritmy -
-implementace} si ukážeme již existující knihovny pracující nebo umožňující
-pracovat s genetickými algoritmy. Poté, v oddílu \ref{NN} se podíváme na základ
-teorie neuronových sítí a popíšeme pokročilejší evoluční algoritmy (NEAT v
-oddílu \ref{NN - NEAT}, HyperNEAT v oddílu \ref{NN - HyperNEAT}) sloužící přímo
-k evolučnímu vývoji těchto sítí. Dále popíšeme simulátory prostředí (oddíl
-\ref{Simulované prostředí}) a fyzikální simulátory (oddíl \ref{Simulované
-prostředí - f simulátory}), které využijeme pro simulaci při vyvíjení našich
-robotů.
-
-TODO: Fyzikální simulátory a sim prostředí
+\ref{Evoluční algoritmy}) a dále v oddíle \ref{EA-impl} si ukážeme již
+existující knihovny pracující nebo umožňující pracovat s genetickými algoritmy.
+Poté, v oddílu \ref{NN} se podíváme na základ teorie neuronových sítí a
+popíšeme pokročilejší evoluční algoritmy (NEAT v oddílu \ref{NN - NEAT},
+HyperNEAT v oddílu \ref{NN - HyperNEAT}) sloužící přímo k evolučnímu vývoji
+těchto sítí. Dále popíšeme simulátory prostředí (oddíl \ref{Simulované
+prostředí}) a fyzikální simulátory (oddíl \ref{Simulované prostředí - f
+simulátory}), které využijeme pro simulaci při vyvíjení našich robotů.
 
 \section{Evoluční algoritmy} \label{Evoluční algoritmy}
 
-TODO: POPIS EVOLUČNÍ ALGORITMY
+Evoluční algoritmus je označení pro stochastické vyhledávací algoritmy, které
+svými procesy napodobují principy Darwinovy evoluční teorie o přirozeném výběru
+a přežívání pouze nejlepších jedinců. Pomocí těchto algoritmů se často snažíme
+optimalizovat nějaké procesy, nebo vlastnosti systémů, a tedy evoluční
+algoritmy můžeme označovat i jako optimalizační algoritmy. Mohou být úspěšné v
+řešení komplexních problémů (např. aproximace NP-úplných problémů) a problémů
+se složitě definovanou hodnotící funkcí. Stochastická vlastnost těchto
+algoritmů způsobuje, že algoritmy nezaručují nalezení optimálního řešení, ale
+jsou schopné se tomuto řešení přiblížit nějakým kvalitním suboptimálním
+řešením.
 
-\subsection{Existující implementace} \label{Evoluční algoritmy - implementace}
+Mezi známé varianty evoluční algoritmů patří:
+\begin{itemize}
+    \item \emph{Genetické algoritmy (GA)} - kódující řešení pomocí vektorů binárních
+        hodnot,
+    \item \emph{Evoluční strategie (ES)} - namísto binárních hodnot v GA,
+        využívají ES reálné hodnoty a vektory reálných hodnot pro reprezentaci
+        řešení, 
+    \item \emph{Genetické programování (GP)} - řešení reprezentováno skládáním
+        složitějších operací (např. pravidla bezkontextových gramatik, stromy s
+        funkcemi a konstantami).
+\end{itemize}
+
+Jednotlivá řešení v evolučních algoritmech jsou nazývána jako \textbf{jedinci}
+s vlastními genetickými informacemi (\textbf{genotyp}). Kvalitu genotypu
+(označujeme jako \textbf{fitness}) je možné pro daný problém otestovat,
+vyhodnocením předem definované hodnotící funkce. Fitness je potom číselná
+hodnota, kterou se v procesem evolučního algoritmu snažíme
+maximalizovat/minimalizovat (dle definice hodnotící funkce). Množinu takových
+jedinců v evolučních algoritmech nazýváme \textbf{populace}. Celý vývoj
+evolučního algoritmu potom probíhá v cyklech, kdy v každém cyklu je otestována
+kvalita genotypu celé populace. Tyto jednotlivé cykly nazýváme
+\textbf{generace}.
+
+Vedle inicializace populace, která je obvykle provedena náhodně, jsou
+důležitými částmi evolučních algoritmů tzv. \textbf{genetické operátory}. Jedná
+se o procesy silně inspirované přírodními jevy pozorovaných při evoluci
+organismů. Tak jako se vyvíjí organismy v přírodě, za účelem udržení těch
+nejvhodnějších vlastností pro dané prostředí, vyvíjí se i jedinci v evolučních
+algoritmech, aby se přibližovali optimálnímu řešení zadaného problému
+(optimalizovali hodnotící funkci). Proces vývoje v evolučních algoritmech je
+pak zajištěn třemi genetickými operátory -- \textbf{selekce}, \textbf{křížení}
+a \textbf{mutace}, všechny blíže popsány v následujících odstavcích. Určité
+varianty evolučních algoritmů nemusí využívat všechny genetické operátory.
+
+\paragraph{Selekce}
+Selekce je proces, který vybírá jedince z populace, kteří buď přímo postoupí do
+další generace, nebo budou vybráni jako rodič (zdroj genetických informací) pro
+další generaci. Selekce má upřednostňovat jedince s vyšší kvalitou genotypu,
+což by mělo v průběhu vývoje produkovat kvalitnější jedince, a tedy směřovat
+vývoj k optimálnímu řešení. Při vývoji může být aplikována ve dvou bodech.
+Pomocí selekce můžeme vybírat rodičovské jedince, kteří budou použiti pro
+tvorbu potomků, ze kterých se následně stane nová populace pro další generaci
+(\emph{mating selection=selekce pro křížení}). Zároveň můžeme selekci využít po
+vytvoření potomků, pro výběr těch nejlepších jedinců z původní populace a z
+nových potomků, kteří budou v další generaci tvořit novou populaci
+(\emph{environmentální selekce}).
+
+Nejpoužívanějšími způsoby implementace operátoru selekce jsou \emph{turnajová
+selekce} a \emph{ruletová selekce}. 
+
+Při \emph{turnajové selekci} náhodně vybereme specifický počet jedinců z
+populace a dle jejich ohodnocení (fitness) je rozřadíme (uspořádáme turnaj mezi
+jedinci). V tuto chvíli nejčastěji selekce vybere vítěze turnaje (nejlepšího
+jedince z turnaje). Existují i pravděpodobnostní varianty \emph{turnajové
+selekce}, kdy pořadí v turnaji určuje pravděpodobnost zvolení daného jedince
+(vítěz turnaje nejvyšší pravděpodobnost, další v pořadí mají klesající šanci na
+zvolení). Výhodou \emph{turnajové selekce} je, že nedává žádná omezení na
+fitness jedinců. Stačí nám, když jdou jednotlivé hodnoty fitness porovnat a
+rozlišit tak, která je lepší a která horší.
+
+\emph{Ruletová selekce} je abstrakce ruletového kola, kde každý jedinec má
+proměnlivou šanci na zvolení (šance, že jeho hodnota padne na ruletovém kole),
+přímo úměrnou jeho fitness. Tato selekce se potom provádí opakovaně, dokud
+nevybereme požadovaný počet jedinců, nad celou civilizací a ne pouze nad
+náhodně vybranou podmnožinou jedinců z populace (jak tomu bylo u
+\emph{turnajové selekce}). Pokud se v populaci nachází jedinec s dominantní
+hodnotou fitness, která výrazně překonává ostatní jedince v populaci, může se
+stávat, že bude docházet k opakovanému výběru jednoho a toho samého jedince,
+což může vést k velmi rychlému omezení prohledávaného prostoru a tedy nalezení
+neoptimálního řešení (vývoj může uvíznout v tzv. \emph{lokálním optimu}).
+
+\paragraph{Křížení}
+Křížení je proces, při kterém nějakým stylem kombinujeme genetické informace
+dvou (nebo více) jedinců. Tímto procesem vznikají potomci původních jedinců,
+kteří se mohou stát novou populací v následující generaci. Výběr jedinců pro
+křížení zajišťuje \textbf{selekce}. Křížení umožňuje důkladnější prohledávání
+prostoru možných řešení mezi již prohledanými možnostmi. Existuje mnoho variant
+křížení. Často využívanými variantami křížení jsou např. \emph{jednobodové
+křížení}/\emph{vícebodové křížení} nebo \emph{uniformní křížení}.
+
+Při \emph{jednobodovém křížení} (pro dva rodičovské jedince) vybereme náhodně
+jedno místo (bod dělení), ve kterém genotyp rozdělíme. Genetickou informaci
+potomků následně vytvoříme tak, že složíme zpět rozdělené části genotypů
+různých rodičů (např. první potomek vznikne složením první části genotypu
+prvního rodiče a druhé části genotypu druhého rodiče a druhý potomek naopak).
+\emph{Vícebodové křížení} probíhá stejně, pouze na začátku volíme vícero bodů,
+ve kterých genotyp rozdělíme a tak máme více možností, jak genotyp složit zpět.
+
+\emph{Uniformní křížení} při tvorbě potomků najednou prochází celý genotyp
+všech rodičů a u každé hodnoty uniformně náhodně vybere, z jakého rodiče se
+daný kus genetické informace zkopíruje do potomka. U tohoto typu křížení lze
+jednoduše použít i větší množství rodičů pro tvorbu potomků.
+
+Jedná se o příklady metod křížení, často používané pro \textbf{genetické
+algoritmy}. Algoritmy pracující s reálnými hodnotami nebo jinak složitými
+strukturami mohou využívat jiné metody, pracující specificky s danými hodnotami
+genotypu (příkladem může být \emph{křížení průměrováním} reálných hodnot dvou
+nebo více rodičů). 
+
+\paragraph{Mutace}
+Při mutaci náhodně měníme malé části genotypu jedinců. Obvykle probíhá po
+vygenerování nových potomků pomocí \textbf{křížení}. Pomocí mutace evoluční
+algoritmy rozšiřují prostor prohledávaných řešení. Správně zvolená hodnota
+mutace zabraňuje uvíznutí evolučního algoritmu v lokálních optimech. Příliš
+silná mutace ale může způsobovat velké změny v genotypech a tedy tak zabránit
+vývoji jakýchkoli vlastností jedinců, které by vedli k optimalizaci řešení.
+Hodnotou mutace označujeme pravděpodobnost, že část genotypu bude pozměněna.
+
+Styl, jakým se genotyp mutuje, je závislý na typu evolučního algoritmu. Pro
+genetické algoritmy s genotypem tvořeným vektorem binárních hodnot se může
+jednat o např. náhodný \emph{bit flip} (tedy změnu dané hodnoty z 0 na 1 nebo
+naopak). U jiných typů evolučních algoritmů je možné používat např. přiřazení
+nové náhodně vygenerované hodnoty z rozsahu povolených hodnot pro danou část
+genotypu, nebo posun o malou náhodně vygenerovanou hodnotu.
+
+\paragraph{Elitismus}
+Elitismus je speciální proces, řadící se většinou k \textbf{selekci}, který
+umožňuje zachovat určité množství jedinců mezi generacemi beze změny. Obvykle
+jeden nebo malé množství nejlepších jedinců jsou po každé generaci přesunuti
+beze změny do další (tedy neprojdou žádnou mutací a jejich genotyp je stejný
+mezi generacemi). Jelikož je evoluční vývoj proces postavený na náhodě, mohlo
+by se stát, že náhodnou mutací přijdeme o nějaké potřebné vlastnosti z
+nejlepších jedinců a těch už nikdy nebudeme moci dosáhnout. Elitismus umožní
+tyto aktuálně nejlepší vlastnosti mezi generacemi zachovat.
+
+\paragraph{}
+Následující ukázka pseudokódu předvede jednoduchý příklad běhu evolučního
+algoritmu. 
+\pagebreak
+\begin{code}
+POP = náhodná inicializace populace
+otestuj populaci a vypočti fitness
+dokud problém není vyřešen:
+    PARENTS = pomocí selekce vyber množinu rodičů
+    OFFSPRING = křížením z rodičů vytvoř množinu potomků
+    MUT_OFFSPRING = aplikuj mutaci na potomky 
+
+    POP = MUT_OFFSPRING z potomků vytvoř populaci další generace
+    otestuj novou populaci a vypočti fitness
+\end{code}
+
+V ukázce můžeme vidět jednotlivé kroky jednoduchého evolučního algoritmu.
+Nejdříve inicializujeme populaci a zjistíme fitness jedinců. Následně dokud se
+nesplní podmínka pro ukončení evolučního vývoje (např. dosažení specifické
+fitness hodnoty), bude cyklicky v generacích probíhat vývoj populace, dokud se
+neobjeví takový jedinec, který problém vyřeší podmínku splní (vyřeší zadaný
+problém).
+
+\paragraph{Možnosti paralelizace}
+Všechny části evolučních algoritmů jsou ve své podstatě velmi jednoduché a tedy
+i rychlé na výpočet. Jediný bod, který může vývoj zpomalit je samotné testování
+jedinců. Pro příklad v našem problému má každý robot určitý čas pro vykonání
+svého pohybu. Jelikož každý robot musí být simulován zvlášť, je tento krok v
+našem evolučním algoritmu zdaleka ten nejnáročnější co se týče délky běhu.
+Naštěstí ve většině příkladů použití evolučních algoritmů, je tento krok možné
+poměrně jednoduše paralelizovat a i v našem případě tomu tak je. Jednotliví
+jedinci jsou v absolutní většině evolučních algoritmů naprosto nezávislí na
+ostatních. Pokud to simulační prostředí dovolí, je možné nechat každého robota
+simulovat nezávisle na ostatních ve vlastním vlákně (procesu) a tak využít
+moderních vícevláknových procesorů. Tato změna je poměrně jednoduchá na
+implementaci a absolutní většina evolučních algoritmů může tohoto využít pro
+mnohonásobné urychlení celého procesu evolučního vývoje.
+
+\subsection{Existující implementace} \label{EA-impl}
 
 Pro vývoj řízení robotů budeme využívat evoluční algoritmy. Naše knihovna tedy
 bude implementovat několik alespoň základních genetických operátorů,
@@ -394,6 +561,9 @@ evolučních algoritmů.
 \section{HyperNEAT} \label{NN - HyperNEAT}
 
 \section{Simulované prostředí} \label{Simulované prostředí}
+
+TODO: Fyzikální simulátory a sim prostředí rozlišní (\emph{fyzikální
+matematický model})
 
 Jelikož chceme vyvíjet řízení robotů založené na interakcích s prostředím, je
 pro tuto práci důležité vybrat vhodný simulátor prostředí, založený na

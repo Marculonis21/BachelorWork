@@ -557,6 +557,91 @@ ulehčí to jejich další experimenty, třeba i s implementací vlastních blok
 evolučních algoritmů.
 
 \section{Neuronové sítě} \label{NN}
+Umělé neuronové sítě jsou matematickou abstrakcí biologických neuronů a jejich
+chování v nervové soustavě. Umělé neurony jsou zjednodušeně vrcholy v grafu,
+propojeného hranami (podobně jako reálné neurony jsou propojeny synapsemi)
+proměnlivých vah. Hodnota na neuronu (vzruch) je pro každý neuron vypočtena
+jako vážený součet příchozích vzruchů propojených korespondujícími hranami. V
+poslední řadě je na neuron aplikována nelineární aktivační funkce dále
+transformující výslednou hodnotu neuronu.
+
+\paragraph{Neuron}
+Nejmenší jednotkou neuronových sítí je jeden neuron. Pro neuron s $n$ vstupy,
+jejichž hodnoty označíme $x_1,...,x_n$ a váhy korespondujících hran označíme\\
+$w_1,...,w_n$, potom výstupní hodnotu tohoto neuronu, označenou $O$,
+můžeme spočítat jako,
+\begin{equation}
+    O = f(\sum_{i=1}^{n} x_iw_i)
+\end{equation}
+
+kde $f$ je nelineární aktivační funkce aplikovaná na neuron.
+
+\paragraph{Aktivační funkce}
+Aktivační funkce slouží k transformaci hodnoty neuronu. Nejčastěji se jedná o
+nelineární transformaci pomocí nelineární funkce. Dnes nejpoužívanějšími
+aktivačními funkcemi jsou například \emph{logistická sigmoida} (vzorec
+\ref{eq:sigmoid}), \emph{hyperbolický tangens} (vzorec \ref{eg:tanh}) nebo
+\emph{ReLU} (vzorec \ref{eg:relu}). Pokud výstup neuronu před použitím
+aktivační funkce $f$ označíme $x$,
+
+\begin{equation} \label{eq:sigmoid}
+    f(x) = \frac{1}{1+e^{-x}}
+\end{equation}
+
+\begin{equation} \label{eg:tanh}
+    f(x) = tanh(x) = \frac{2}{1+e^{-2x}} - 1
+\end{equation}
+
+\begin{equation} \label{eg:relu}
+    f(x) = \max(0, x)
+\end{equation}
+
+??? TODO: Obrázky funkcí???
+
+\paragraph{Neuronová síť}
+Architektura neuronové sítě je tvořena ze třech základních typů neuronů --
+vstupní (ze kterých pouze vycházejí spojení), výstupní (do kterých pouze
+přicházení spojení) a skryté (spojení přicházejí a jsou předávány dál).
+Neuronová síť pak jde popsat jako orientovaný graf. Pokud se jedná o graf bez
+orientovaných cyklů můžeme síť označit za \emph{dopřednou neuronovou síť}.
+Pokud obsahuje nějaké orientované cykly, označujeme ji jako \emph{rekurentní
+neuronovou síť}. Dále se budeme zaměřovat na \emph{dopředné neuronové sítě}.
+
+V těchto sítích vstup přechází po orientovaných hranách vrstvami neuronů, kde
+každý neuron z předchozí vrstvi je spojen hranou s každým vrcholem následující
+vrstvě. První vrstva se nazývá \emph{vstupní vrstva}, tvořena ze
+\emph{vstupních neuronů}, a slouží pro vstup parametrů (vstupů) do sítě.
+Poslední vrstva se nazývá \emph{výstupní vrstva}, tvořena z \emph{výstupních
+neuronů}, a můžeme na ní sledovat výstupní hodnoty neuronové sítě. Každá
+neuronová síť musí nutně mít alespoň jeden vstupní a alespoň jeden výstupní
+neuron. Libovolná další vrstva mezi \emph{vstupní} a \emph{výstupní vrstvou} se
+nazývá \emph{skrytá vrstva}. Těchto vrstev může být v síti teoreticky neomezené
+množství.
+
+\paragraph{Trénování neuronových sítí}
+Trénování (nebo učení) neuronových sítí je často velmi složitý proces, při
+kterém se snažíme nastavit hodnoty vah jednotlivých spojů mezi neurony tak,
+abychom pro konkrétní vstup na \emph{vstupní vrstvě}, dostali požadovaný výstup
+na \emph{výstupní vrstvě}. 
+
+Toto je nejčastější požadavek pro neuronové sítě při tzv. \emph{učení s
+učitelem} (\emph{supervised learning}). Při tomto učení síť dostává dvojice
+\emph{(vstup, chtěný výstup)}. Následně vloží předložené vstupní hodnoty na vstup a
+sleduje svůj výstup. Poté porovná chtěný výstup se svým skutečným výstupem a na
+základě rozdílů (chyba) těchto hodnot provede úpravu vah jednotlivých spojů
+tak, aby se při dalším spuštění chyba zmenšila. Tohoto lze dosáhnout často
+používaným \emph{backpropagation} algoritmem, který hledá derivace chybové
+funkce, aby vždy prováděl úpravy vah spojů ve směru klesající chybové funkce.
+
+Tento přístup ale přestává fungovat, pokud nedokážeme vytvořit vstupní
+trénovací dvojice \emph{(vstup, chtěný výstup)}, a tedy bychom nevěděli jakým
+směrem váhy spojů upravovat. Toto je překážka v mnoha praktických problémech,
+na které by se neuronové sítě hodilo použít. Možným řešením je nevyužívat učící
+metody založené na propagaci výsledné chyby sítě, ale použít nějakou hodnotící
+funkci, která ohodnotí kvalitu konfigurace dané sítě (např. po simulačním
+běhu). Toto nás vede na možnost využití evolučních algoritmů pro trénovaní
+neuronových sítí evolučním vývojem.
+
 \section{NEAT} \label{NN - NEAT}
 \section{HyperNEAT} \label{NN - HyperNEAT}
 

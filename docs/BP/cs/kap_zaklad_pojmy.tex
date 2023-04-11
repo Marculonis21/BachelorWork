@@ -6,12 +6,13 @@ důvodů volby daných vybraných technologií a pro pochopení základního roz
 implementace řešení, kterou popíšeme v následujících kapitolách.
 
 V této kapitole nejdříve vysvětlíme základní teorii evolučních algoritmů (oddíl
-\ref{Evoluční algoritmy}) a dále v oddíle \ref{EA-impl} si ukážeme již
+\ref{Evoluční algoritmy}) a dále si v oddíle \ref{EA-impl} ukážeme již
 existující knihovny pracující nebo umožňující pracovat s genetickými algoritmy.
-Poté, v oddílu \ref{NN} se podíváme na základ teorie neuronových sítí a
-popíšeme pokročilejší evoluční algoritmy (NEAT v oddílu \ref{NN - NEAT},
-HyperNEAT v oddílu \ref{NN - HyperNEAT}) sloužící přímo k evolučnímu vývoji
-těchto sítí. Dále popíšeme simulátory prostředí (oddíl \ref{Simulované
+Poté se v oddílu \ref{NN} podíváme na základ teorie umělých neuronových sítí a
+v oddílu \ref{NN - evolve} popíšeme neuroevoluci, kategorii pokročilých
+evolučních algoritmů sloužící přímo k vývoji umělých neuronových sítí
+(algoritmy NEAT v oddílu \ref{NN - NEAT} a HyperNEAT v oddílu \ref{NN -
+HyperNEAT}). Dále popíšeme simulátory prostředí (oddíl \ref{Simulované
 prostředí}) a fyzikální simulátory (oddíl \ref{Simulované prostředí - f
 simulátory}), které využijeme pro simulaci při vyvíjení našich robotů.
 
@@ -19,7 +20,7 @@ simulátory}), které využijeme pro simulaci při vyvíjení našich robotů.
 
 Evoluční algoritmus je označení pro stochastické vyhledávací algoritmy, které
 svými procesy napodobují principy Darwinovy evoluční teorie o přirozeném výběru
-a přežívání pouze nejlepších jedinců. Pomocí těchto algoritmů se často snažíme
+a přežívání nejlepších jedinců. Pomocí těchto algoritmů se často snažíme
 optimalizovat nějaké procesy, nebo vlastnosti systémů, a tedy evoluční
 algoritmy můžeme označovat i jako optimalizační algoritmy. Mohou být úspěšné v
 řešení komplexních problémů (např. aproximace NP-úplných problémů) a problémů
@@ -584,6 +585,7 @@ aktivačními funkcemi jsou například \emph{logistická sigmoida} (vzorec
 \emph{ReLU} (vzorec \ref{eg:relu}). Pokud výstup neuronu před použitím
 aktivační funkce $f$ označíme $x$,
 
+
 \begin{equation} \label{eq:sigmoid}
     f(x) = \frac{1}{1+e^{-x}}
 \end{equation}
@@ -596,7 +598,8 @@ aktivační funkce $f$ označíme $x$,
     f(x) = \max(0, x)
 \end{equation}
 
-??? TODO: Obrázky funkcí???
+% TODO: Obrázky funkcí
+Grafy funkcí??
 
 \paragraph{Neuronová síť}
 Architektura neuronové sítě je tvořena ze třech základních typů neuronů --
@@ -642,13 +645,183 @@ funkci, která ohodnotí kvalitu konfigurace dané sítě (např. po simulační
 běhu). Toto nás vede na možnost využití evolučních algoritmů pro trénovaní
 neuronových sítí evolučním vývojem.
 
-\section{NEAT} \label{NN - NEAT}
-\section{HyperNEAT} \label{NN - HyperNEAT}
+\section{Neuroevoluce} \label{NN - evolve}
+Neuroevoluce \citet{Lehman:2013} je technika pro evoluční vývoj umělých
+neuronových sítí pomocí principů evolučních algoritmů (popsáno v sekci
+\ref{Evoluční algoritmy}). Vývoj pomocí neuroevoluce je méně omezený než vývoj
+pomocí klasických trénovacích metod, jelikož vývoj, na rozdíl od trénovacích
+metod založených na principu \emph{učení s učitelem}, může probíhat i na sítích
+proměnlivé architektury a nepotřebuje znát korektní výstupy pro daný vstup
+sítě. Pro trénovaní stačí, když jsme schopni nějakým stylem ohodnotit kvalitu
+řešení, k jakému se s využitím dané konfigurace (architektura a váhy spojení)
+sítě dostaneme. Díky tomuto se neuroevoluce hodí pro vývoj neuronových sítí v
+případech, kdy nejsme schopni přesně určit správné výstupy sítě a pouze můžeme
+pozorovat kvalitu chování daného vyvíjeného systému.
+
+\paragraph{Vývoj neuronových sítí}
+Vývoj pomocí neuroevoluce probíhá stejně jako u jiných evolučních algoritmů.
+Neuronová síť je zakódovaná do genotypu jedinců, množina těchto jedinců potom
+tvoří populaci, procházející vývojem skrz opakované generace. V každé generaci
+je genotyp každého jedince rozkódován a z těchto informací vytvořena neuronová
+síť pomocí zakódované architektury a vah spojení. Sítě odpovídajících jedinců
+jsou následně otestovány v testovací prostředí, které ohodnotí kvalitu jedince
+(fitness).
+
+Pro příklad jednoduchým typem kódování může být uložení hodnot vah všech hran v
+neuronové  síti do jediného vektoru a tento vektor využít jako genotyp jedinců.
+To umožňuje optimalizaci vah sítě s fixní architekturou. Může být ale velmi
+náročný, kvůli rychle narůstající délce genotypu s velikostí architektury
+neuronové sítě.
+
+\paragraph{Pokročilé metody}
+S těmito problémy se můžeme potýkat hned několika způsoby. Různé styly
+zakódování neuronových sítí do genotypu umožňují vývoj mnohem
+rozsáhlejších sítí, zachovávající udržitelně malou velikost genetické
+informace jedinců. 
+
+Některé metody \citet{gomez2008accelerated} navrhovaly postup, jakým můžeme
+omezit vývoj z celých neuronových sítí na pouze menší komponenty, které dále
+mohly být spojovány dohromady s ostatními jedinci v kooperativní evoluci. To
+umožnilo evoluční vývoj sítí rozsáhlejších architektur s menšími nároky na
+velikost genotypu.
+
+Jiné metody se poté zaměřily na vývoj jak vah, tak topologie neuronové sítě.
+Navíc se ukázalo, že současný vývoj topologie často přináší lepší výsledky, než
+vývoj pouze vah sítě. Vývoj v těchto metodách začíná s nejzákladnější
+strukturou sítě, která se podle nároků problému sama vyvíjí a rozšiřuje, dokud
+tyto změny přináší kvalitativní zlepšení. Často využívaným algoritmem
+využívající těchto metod je algoritmus NEAT (\emph{NeuroEvolution of Augmenting
+Topologies}), který si předvedeme v následujícím oddílu.
+
+\subsection{NEAT} \label{NN - NEAT}
+NEAT (\emph{NeuroEvolution of Augmenting Topologies})
+\citep{stanley2002evolving} je neuroevoluční algoritmus vyvíjející najednou
+váhy synapsí i topologii neuronové sítě, který se díky své výkonnosti stal
+jedním z nejznámějších algoritmů používaných pro účely evolučního vývoje
+neuronových sítí. Autoři jeho efektivitu připisují třem základním principům, se
+kterými algoritmus pracuje:
+\begin{enumerate}
+    \item značení genetických informací pomocí tzv. \emph{historických značek},
+        umožňující křížení genotypů napříč různými topologiemi,
+   \item ochrana nových genetických informací v populaci pomocí rozdělení\\
+       do druhů,
+    \item postupný vývoj topologie sítí začínající nejjednoduššími strukturami.
+\end{enumerate}
+S těmito principy se NEAT ukázal jako algoritmus, který často nachází efektivní
+sítě rychleji než ostatní algoritmy a výkony překonal nejlepší neuroevoluční
+algoritmy pracující s neuronovými sítěmi s fixní topologií.
+
+\paragraph{Algoritmus}
+NEAT používá tzv. \emph{přímé kódování}, tedy genotyp každého jedinců přímo
+popisuje celou topologii sítě (všechny neurony a všechny hrany mezi neurony).
+Každý genotyp obsahuje list obsahující \emph{geny synapsí} a list obsahující
+\emph{geny neuronů}. Seznam genů neuronů popisuje vstupní, výstupní a skryté
+neurony sítě, které mohou být spojené hranami. Každý z genů synapsí obsahuje
+záznam o informacích:
+\begin{itemize}
+    \item vstupní neuron -- neuron, do kterého synapse přichází,
+    \item výstupní neuron -- neuron, ze kterého synapse vychází,
+    \item hodnotu váhy synapse,
+    \item příznak, jestli je spojení v síti použito,
+    \item \emph{inovační}/\emph{historické číslo}, popisující kdy v historii
+        byla daná hrana do sítě přidána, umožňující nacházet
+        odpovídající geny pro křížení.
+\end{itemize}
+Algoritmus začíná s nejzákladnější strukturou, připomínající jednoduchý
+perceptron, pouze s předem daným počtem vstupních a výstupních neuronů a
+hranami mezi nimi. Tato jednoduchá topologie je rozšiřována pomocí
+následujících genetických operátorů.
+
+\paragraph{Mutace}
+Mutace v algoritmu NEAT má schopnost měnit jak spojení v síti, tak její
+strukturu. Mutace synapsí sítě mutují jednoduchou změnou váhy spojení nebo
+změnou příznaku použití daného spojení v síti. Struktura sítě může mutovat
+dvěma styly. První typ mutace přidává nový gen synapsí, spojující dva doposud
+nespojené neurony. Druhý typ mutace přidává nový neuron. Tato mutace probíhá
+tak, že na místo existující synapse se přidá nový neuron. Původní synapse se
+označí jako nepoužívaná a namísto toho se vytvoří dvě nové rozdělující tu
+původní. Váha spojení je v tomto procesu zachována. Při těchto operacích je
+vždy novým genům synapsí navýšeno jejich \emph{inovační číslo} (používán
+globální čítač inovací, jehož číslo je s každým novým genem navýšeno). Růst
+sítí popisovaných genotypy probíhá právě díky mutaci.
+
+\paragraph{Křížení}
+Křížení probíhá za pomoci \emph{inovačních čísel}. Dva jedinci se nejdříve
+hranami zarovnají pomocí jejich \emph{inovačních čísel}. Stejná čísla totiž v
+síti značí stejnou strukturu. Synapse, které se v obou jedincích schodují se
+dědí náhodně. Synapse, které má jen nějaký z jedinců se dědí z toho lepšího z
+dvojce rodičů a pokud je v nějakém jedinci hrana neaktivní a v druhém aktivní,
+s určitou pravděpodobností se tento stav v novém jedinci změní. Algoritmus je
+tímto stylem schopný vytvářet velké množství různých topologií. Tyto nové
+topologie, přestože často důležité pro řešení zadaného problému, ale mají jen
+velmi malou šanci se v populaci menších topologií udržet, protože původní menší
+topologie jsou na začátku často optimálnější než větší topologie. Proto NEAT
+využívá systém, kterým chrání tyto nové topologie před vyhynutím z populace.
+
+\paragraph{Ochrana nových druhů}
+Nové topologie jsou chráněny rozřazením genotypů do odlišných druhů. Jednotlivé
+genotypy poté primárně soutěží s jedinci stejného druhu a nové druhy tak mají
+šanci se vyvinout a optimalizovat na jejich úroveň. NEAT pro výpočet odlišností
+jedinců opět využívá \emph{inovační čísla}, pomocí kterých hledá společné hrany
+a vypočítá vzdálenost dvou genomů. V každé generaci je pak tvořen seznam
+různých druhů a pokud je genom, který nezapadá do žádného z druhů, je pro něj
+vytvořen jeho vlastní nový druh.
+
+\paragraph{Fitness}
+Rozdělení do druhů má vliv i na fitness jedinců. Kvalita každého jedince se při
+výpočtu fitness dělí počtem jedinců stejného druhu. To zároveň omezuje druhy v
+ovládnutí celé generace a dál ochraňuje nové topologie.
+
+\paragraph{Minimalizace dimenzionality jedinců}
+Jak již bylo zmíněno, algoritmus NEAT inicializuje celou jedinců s minimální
+topologií, obsahující pouze potřebný počet vstupních a výstupních neuronů,
+které jsou navzájem plně propojené a žádné skryté neurony. Nové topologie
+vznikají díky genetickým operátorům a všechna zvětšení genotypů jsou tedy v
+evoluci opodstatněná. Díky tomuto NEAT samovolně vede k vývoji minimálních
+topologií. To umožňuje tomuto algoritmu být často výkonnější než ostatní,
+protože musí prohledávat minimální prostor, aby našel řešení, oproti
+neuroevolučním algoritmům používající fixní topologie neuronových sítí.
+
+\subsection{HyperNEAT} \label{NN - HyperNEAT}
+Algoritmus HyperNEAT (\emph{Hypercube-based NEAT}) \citep{stanley2009hypercube}
+\citep{eplex} je neuroevoluční algoritmus rozšiřující algoritmus NEAT.
+HyperNEAT slouží pro vývoj umělých neuronových sítí fixní topologie (typicky
+omezená tvarem hyperkrychle). 
+
+Na rozdíl od algoritmu NEAT, používá HyperNEAT nepřímou
+reprezentaci vah sítě. Tyto váhy jsou reprezentovány pomocí jiné neuronové
+sítě (\emph{Compositional Pattern-Producing Network}, zkráceně \emph{CPPN}),
+která jako vstup dostává pozice dvou neuronů v prostoru a vrací váhu jejich
+spojení (synapse). Tímto stylem může \emph{CPPN} být využita pro reprezentaci
+sítě libovolné topologie. 
+
+Síť \emph{CPPN} je poté v algoritmu HyperNEAT vyvíjena pomocí NEAT.
+
+Díky této nepřímé reprezentaci vah má HyperNEAT schopnost efektivně vyvinout
+velmi rozsáhlé neuronové sítě s předem určenou strukturou (schopnost napodobit
+regularitu velkého množství spojů v lidském mozku).
+
+\paragraph{}
+Následuje naznačení průběhu HyperNEAT algoritmu:
+\begin{enumerate}
+    \item Zvolit konfiguraci vyvíjené sítě (vstupní a výstupní neurony a
+        rozložení skrytých neuronů),
+    \item Inicializovat NEAT algoritmus s \emph{CPPN} sítěmi,
+    \item Běh NEAT algoritmu, dokud není nalezeno řešení:
+        \begin{enumerate}
+            \item Pomocí \emph{CPPN} daného jedince vytvoř synapse pro původní
+                síť,
+            \item Síť otestuj v testovacím prostředí pro výpočet kvality
+                řešení,
+            \item S fitness hodnotami pokračuj vývoj genotypů popisující
+                \emph{CPPN} sítě.
+        \end{enumerate}
+\end{enumerate}
 
 \section{Simulované prostředí} \label{Simulované prostředí}
 
-TODO: Fyzikální simulátory a sim prostředí rozlišní (\emph{fyzikální
-matematický model})
+% TODO: Fyzikální simulátory a sim prostředí rozlišní (\emph{fyzikální model})
+++ Rozlišit simulátory
 
 Jelikož chceme vyvíjet řízení robotů založené na interakcích s prostředím, je
 pro tuto práci důležité vybrat vhodný simulátor prostředí, založený na

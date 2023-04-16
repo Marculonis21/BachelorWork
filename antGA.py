@@ -5,6 +5,7 @@ import gaAgent
 import robots.robots as robots
 
 import gym
+# import gymnasium as gym
 import matplotlib.pyplot as plt
 import numpy as np
 import copy
@@ -50,14 +51,16 @@ def simulationRun(env, agent, actions, render=False):
     _ = env.reset()
     while not done:
         steps += 1
-        action = agent.get_action(actions, steps)
+        action = agent.get_action(actions, steps).squeeze()
+        
 
         _, _, done, info = env.step(action)
         body_heights.append(info["y_position"])
         facing_directions.append(info["facing_direction"])
 
         if render:
-            env.render(start_paused=True)
+            # env.render(start_paused=True)
+            env.render()
 
         if done:
             # sim end
@@ -103,9 +106,11 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
 
         robot_source_files.append(file)
 
-        env = gym.make('CustomAntLike-v1',
+        env = gym.make('CustomEnv-v1',
                        xml_file=file.name,
-                       reset_noise_scale=0.0)
+                       reset_noise_scale=0.0,
+                       # render_mode="human",
+                       )
         env._max_episode_steps = 500
 
         environments.append(env)
@@ -190,7 +195,7 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
             environments[i].close()
             robot.create(robot_source_files[i], agent.body_part_mask, population[i][1])
 
-            env = gym.make('CustomAntLike-v1',
+            env = gym.make('CustomEnv-v1',
                            xml_file=robot_source_files[i].name,
                            reset_noise_scale=0.0)
             env._max_episode_steps = 500
@@ -272,7 +277,7 @@ if __name__ == "__main__":
 
             robot.create(file, agent.body_part_mask, individual[1])
 
-            env = gym.make('CustomAntLike-v1',
+            env = gym.make('CustomEnv-v1',
                            xml_file=file.name,
                            reset_noise_scale=0.0)
             env._max_episode_steps = 500
@@ -326,6 +331,6 @@ if __name__ == "__main__":
                          show_best=True, 
                          save_best=True,
                          save_dir="./saves/individuals",
-                         note="NewTournament3_TFS_p3_s3_cr4"))
+                         note="NewTournament3_TFS_p3_s3_cr4"), args)
 
     print("DONE")

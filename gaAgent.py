@@ -15,7 +15,7 @@ class AgentType(ABC):
         self.body_part_mask = np.array(body_part_mask)
 
         file = robot.create_default()
-        default_env = gym.make('CustomAntLike-v1', xml_file=file.name)
+        default_env = gym.make('CustomEnv-v1', xml_file=file.name)
         file.close()
 
         self.action_size = default_env.action_space.shape[0]
@@ -355,7 +355,7 @@ class FullRandomAgent(AgentType):
         actions = []
         actions, _ = individual
 
-        action = actions[step % self.arguments["cycle_repeat"]]
+        action = np.array(actions[step % self.arguments["cycle_repeat"]])
 
         return action
 
@@ -426,7 +426,7 @@ class TFSAgent(AgentType):
 
             action.append(remap(_out, self.min, self.max, -1, 1))
 
-        return action
+        return np.array(action)
 
     def generate_population(self, population_size):
         population = []

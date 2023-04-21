@@ -5,7 +5,7 @@
 Semestral work in the summer semester 2021/22 MFF-CUNI.
 Work done under supervision of *RNDr. František Mrázek, CSc.* - Faculty MFF CUNI.
 
-### WEEKLY TASKS
+### TASKS
 - [x] Try working with the mujoco environment in gym
 - [x] Genetic algorithm working in mujoco
 - [x] Play around with fitness functions
@@ -17,14 +17,8 @@ Work done under supervision of *RNDr. František Mrázek, CSc.* - Faculty MFF CU
 - [x] Graphs from collected data
 - [x] Try adjusting ant model
 - [x] New models - 3/... legged ant?, Spot-like robot
+- [x] Set up batch run possibility
+- [x] Stats collecting from batch runs - csv/...?
 
 ### TODO:
 - [ ] School Gitlab migrating (low)
-- [ ] Set up batch run possibility
-- [ ] Stats collecting from batch runs - csv/...?
-
-
-
-CoppeliaRobotics
-rozdělení fyz sim/sim prostředí
-možné ukázky při popisování GA

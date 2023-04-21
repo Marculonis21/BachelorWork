@@ -2,12 +2,13 @@
 from abc import ABC, abstractmethod, abstractclassmethod, abstractproperty
 import numpy as np
 import math
-import gym
+# import gym
+import gymnasium as gym
 import pickle
 import lzma
 
-import GAMethods
-GA = GAMethods.GA()
+import resources.gaMethods as gaMethods
+GA = gaMethods.GA()
 
 class AgentType(ABC):
     def  __init__(self, robot, body_part_mask):
@@ -15,9 +16,10 @@ class AgentType(ABC):
         self.body_part_mask = np.array(body_part_mask)
 
         file = robot.create_default()
-        default_env = gym.make('CustomEnv-v1', xml_file=file.name)
+        default_env = gym.make('custom/CustomEnv-v0', xml_file=file.name)
         file.close()
 
+        assert default_env.action_space.shape is not None
         self.action_size = default_env.action_space.shape[0]
         default_env.close()
 

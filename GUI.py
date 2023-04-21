@@ -2,7 +2,7 @@
 
 import PySimpleGUI as sg
 from PIL import Image, ImageTk
-import antGA
+import roboEvo
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import threading
@@ -10,20 +10,20 @@ import numpy as np
 
 font = ("Helvetica", 15)
 
-import robots.robots as robotsClass
+import resources.robots.robots as robotsClass
 robots = {"OpenAI Ant-v3" : robotsClass.AntV3(),
           "Basic Ant"     : robotsClass.StickAnt(),
           "SpotLike dog"  : robotsClass.SpotLike()}
 
 
 import math
-import gaAgent
-agents : 'dict[str, gaAgent.AgentType]'
-agents = {"Full Random"              : gaAgent.FullRandomAgent.ForGUI(),
-          "Sine Function Full"       : gaAgent.SineFuncFullAgent.ForGUI(),
-          "Sine Function Half"       : gaAgent.SineFuncHalfAgent.ForGUI(),
-          "Step Cycle Half"          : gaAgent.StepCycleHalfAgent.ForGUI(),
-          "Truncated Fourier Series" : gaAgent.TFSAgent.ForGUI()}
+import resources.gaAgents as gaAgents
+agents : 'dict[str, gaAgents.AgentType]'
+agents = {"Full Random"              : gaAgents.FullRandomAgent.ForGUI(),
+          "Sine Function Full"       : gaAgents.SineFuncFullAgent.ForGUI(),
+          "Sine Function Half"       : gaAgents.SineFuncHalfAgent.ForGUI(),
+          "Step Cycle Half"          : gaAgents.StepCycleHalfAgent.ForGUI(),
+          "Truncated Fourier Series" : gaAgents.TFSAgent.ForGUI()}
 
 
 def single_value_option(key, text, default, disabled=False):
@@ -38,12 +38,12 @@ agent_argument_options = [sg.Column([single_value_option("cycle_repeat", "Step C
                           sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 4),
                                      range_value_option("frequency_range", "Frequency range", 0.5, 4),
                                      range_value_option("shift_x_range", "Shift x", 0, 2*math.pi),
-                                     range_value_option("shift_y_range", "Amplitude range", "gaAgent.py", "gaAgent.py", disabled=True)], 
+                                     range_value_option("shift_y_range", "Amplitude range", "gaAgents.py", "gaAgents.py", disabled=True)], 
                                     element_justification='c', expand_x=True, visible=False, key="options_Sine Function Full"),
                           sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 4),
                                      range_value_option("frequency_range", "Frequency range", 0.5, 4),
                                      range_value_option("shift_x_range", "Shift x", 0, 2*math.pi),
-                                     range_value_option("shift_y_range", "Amplitude range", "gaAgent.py", "gaAgent.py", disabled=True)],
+                                     range_value_option("shift_y_range", "Amplitude range", "gaAgents.py", "gaAgents.py", disabled=True)],
                                     element_justification='c', expand_x=True, visible=False, key="options_Sine Function Half"),
                           sg.Column([single_value_option("cycle_repeat", "Step Count", 25)], 
                                     element_justification='c', expand_x=True, visible=False, key="options_Step Cycle Half"),
@@ -344,9 +344,9 @@ if __name__ == "__main__":
         plt.title('Training')
         plt.xlabel('Episode')
         plt.ylabel('Fitness')
-        plt.plot(antGA.GRAPH_VALUES[0], label='Mean')
-        plt.plot(antGA.GRAPH_VALUES[1], label='Min')
-        plt.plot(antGA.GRAPH_VALUES[2], label='Max')
+        plt.plot(roboEvo.GRAPH_VALUES[0], label='Mean')
+        plt.plot(roboEvo.GRAPH_VALUES[1], label='Min')
+        plt.plot(roboEvo.GRAPH_VALUES[2], label='Max')
         plt.legend(loc='upper left', fontsize=9)
         plt.tight_layout()
         FIG_AGG = draw_figure(
@@ -360,9 +360,9 @@ if __name__ == "__main__":
         plt.title('Training')
         plt.xlabel('Episode')
         plt.ylabel('Fitness')
-        plt.plot(antGA.GRAPH_VALUES[0], label='Mean')
-        plt.plot(antGA.GRAPH_VALUES[1], label='Min')
-        plt.plot(antGA.GRAPH_VALUES[2], label='Max')
+        plt.plot(roboEvo.GRAPH_VALUES[0], label='Mean')
+        plt.plot(roboEvo.GRAPH_VALUES[1], label='Min')
+        plt.plot(roboEvo.GRAPH_VALUES[2], label='Max')
         plt.legend(loc='upper left', fontsize=9)
         plt.tight_layout()
 
@@ -375,11 +375,11 @@ if __name__ == "__main__":
         robot = robots[window_values["-ROBOT_SELECT-"]] 
 
         agent_selected = window_values["-AGENT_SELECT-"]
-        if agent_selected == "Full Random":                agent = gaAgent.FullRandomAgent(robot, body_part_mask, 25)
-        elif agent_selected == "Sine Function Full":       agent = gaAgent.SineFuncFullAgent(robot, body_part_mask)
-        elif agent_selected == "Sine Function Half":       agent = gaAgent.SineFuncHalfAgent(robot, body_part_mask)
-        elif agent_selected == "Step Cycle Half":          agent = gaAgent.StepCycleHalfAgent(robot, body_part_mask, 20)
-        elif agent_selected == "Truncated Fourier Series": agent = gaAgent.TFSAgent(robot, body_part_mask)
+        if agent_selected == "Full Random":                agent = gaAgents.FullRandomAgent(robot, body_part_mask, 25)
+        elif agent_selected == "Sine Function Full":       agent = gaAgents.SineFuncFullAgent(robot, body_part_mask)
+        elif agent_selected == "Sine Function Half":       agent = gaAgents.SineFuncHalfAgent(robot, body_part_mask)
+        elif agent_selected == "Step Cycle Half":          agent = gaAgents.StepCycleHalfAgent(robot, body_part_mask, 20)
+        elif agent_selected == "Truncated Fourier Series": agent = gaAgents.TFSAgent(robot, body_part_mask)
         else: raise AttributeError("Unknown control agent type - " + agent_selected)
 
         population_size = int(window_values["-MAIN_POP_SIZE_IN-"])
@@ -388,12 +388,12 @@ if __name__ == "__main__":
         show_best = window_values["-CB_FINAL-"]
         save_best = window_values["-CB_SAVEBEST-"]
         save_dir = window_values["Browse"]
-        params = antGA.RunParams(robot, agent, population_size, generation_count, show_best, save_best, save_dir, "GUIRUN")
+        params = roboEvo.RunParams(robot, agent, population_size, generation_count, show_best, save_best, save_dir, "GUIRUN")
 
         return params
             
     def startRun():
-        antGA.Run(True, GetParams())
+        roboEvo.Run(True, GetParams())
 
     working_thread = threading.Thread(target=startRun, daemon=True)
     working_thread.start()
@@ -413,19 +413,19 @@ if __name__ == "__main__":
             break
 
         if event == "-RUN_PREVIEW-":
-            antGA.RaisePreview()
+            roboEvo.RaisePreview()
 
         if event == "-EXIT-":
-            antGA.RaiseAbort()
+            roboEvo.RaiseAbort()
             working_thread.join()
             window.close()
 
         update_chart()
 
-        window["-GENNUM-"].update(str(antGA.GUI_GEN_NUMBER))
-        if len(antGA.GUI_FITNESS) > 0:
-            window["-MEANFIT-"].update(str(antGA.GUI_FITNESS[0]))
-            window["-MINFIT-"].update(str(antGA.GUI_FITNESS[1]))
-            window["-MAXFIT-"].update(str(antGA.GUI_FITNESS[2]))
+        window["-GENNUM-"].update(str(roboEvo.GUI_GEN_NUMBER))
+        if len(roboEvo.GUI_FITNESS) > 0:
+            window["-MEANFIT-"].update(str(roboEvo.GUI_FITNESS[0]))
+            window["-MINFIT-"].update(str(roboEvo.GUI_FITNESS[1]))
+            window["-MAXFIT-"].update(str(roboEvo.GUI_FITNESS[2]))
 
     window.close()

@@ -1,0 +1,76 @@
+\babel@toc {czech}{}
+\contentsline {chapter}{Úvod}{2}{chapter*.2}%
+\contentsline {chapter}{\numberline {1}Základní pojmy}{3}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Evoluční algoritmy}{3}{section.1.1}%
+\contentsline {paragraph}{Selekce}{4}{section*.3}%
+\contentsline {paragraph}{Křížení}{4}{section*.4}%
+\contentsline {paragraph}{Mutace}{5}{section*.5}%
+\contentsline {paragraph}{Elitismus}{5}{section*.6}%
+\contentsline {paragraph}{}{5}{section*.7}%
+\contentsline {paragraph}{Možnosti paralelizace}{6}{section*.8}%
+\contentsline {subsection}{\numberline {1.1.1}Existující implementace}{6}{subsection.1.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.1.1}DEAP}{7}{subsubsection.1.1.1.1}%
+\contentsline {paragraph}{\texttt {Creator}}{7}{section*.9}%
+\contentsline {paragraph}{\texttt {Toolbox}}{7}{section*.10}%
+\contentsline {paragraph}{Hodnotící funkce}{8}{section*.11}%
+\contentsline {paragraph}{Genetické operátory}{8}{section*.12}%
+\contentsline {paragraph}{Evoluce}{9}{section*.13}%
+\contentsline {paragraph}{}{9}{section*.14}%
+\contentsline {paragraph}{}{9}{section*.15}%
+\contentsline {subsubsection}{\numberline {1.1.1.2}Inspyred}{9}{subsubsection.1.1.1.2}%
+\contentsline {paragraph}{\texttt {Generator}}{10}{section*.16}%
+\contentsline {paragraph}{\texttt {Evaluator}}{10}{section*.17}%
+\contentsline {paragraph}{Genetický algoritmu}{11}{section*.18}%
+\contentsline {paragraph}{Evoluce}{11}{section*.19}%
+\contentsline {subsubsection}{\numberline {1.1.1.3}Porovnání}{12}{subsubsection.1.1.1.3}%
+\contentsline {section}{\numberline {1.2}Neuronové sítě}{12}{section.1.2}%
+\contentsline {paragraph}{Neuron}{12}{section*.20}%
+\contentsline {paragraph}{Aktivační funkce}{13}{section*.21}%
+\contentsline {paragraph}{Neuronová síť}{14}{section*.22}%
+\contentsline {paragraph}{Trénování neuronových sítí}{14}{section*.23}%
+\contentsline {section}{\numberline {1.3}Neuroevoluce}{15}{section.1.3}%
+\contentsline {paragraph}{Vývoj neuronových sítí}{15}{section*.24}%
+\contentsline {paragraph}{Pokročilé metody}{15}{section*.25}%
+\contentsline {subsection}{\numberline {1.3.1}NEAT}{16}{subsection.1.3.1}%
+\contentsline {paragraph}{Algoritmus}{16}{section*.26}%
+\contentsline {paragraph}{Mutace}{17}{section*.27}%
+\contentsline {paragraph}{Křížení}{17}{section*.28}%
+\contentsline {paragraph}{Ochrana nových druhů}{17}{section*.29}%
+\contentsline {paragraph}{Fitness}{17}{section*.30}%
+\contentsline {paragraph}{Minimalizace dimenzionality jedinců}{18}{section*.31}%
+\contentsline {subsection}{\numberline {1.3.2}HyperNEAT}{18}{subsection.1.3.2}%
+\contentsline {paragraph}{}{18}{section*.32}%
+\contentsline {section}{\numberline {1.4}Simulované prostředí}{18}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Simulátory prostředí}{19}{subsection.1.4.1}%
+\contentsline {subsubsection}{\numberline {1.4.1.1}Gazebo}{19}{subsubsection.1.4.1.1}%
+\contentsline {subsubsection}{\numberline {1.4.1.2}Webots}{20}{subsubsection.1.4.1.2}%
+\contentsline {subsubsection}{\numberline {1.4.1.3}CoppeliaSim}{20}{subsubsection.1.4.1.3}%
+\contentsline {subsection}{\numberline {1.4.2}Fyzikální simulátory}{20}{subsection.1.4.2}%
+\contentsline {subsubsection}{\numberline {1.4.2.1}ODE}{20}{subsubsection.1.4.2.1}%
+\contentsline {subsubsection}{\numberline {1.4.2.2}Bullet}{21}{subsubsection.1.4.2.2}%
+\contentsline {subsubsection}{\numberline {1.4.2.3}Dart}{21}{subsubsection.1.4.2.3}%
+\contentsline {subsubsection}{\numberline {1.4.2.4}MuJoCo}{21}{subsubsection.1.4.2.4}%
+\contentsline {subsubsection}{\numberline {1.4.2.5}Vortex}{21}{subsubsection.1.4.2.5}%
+\contentsline {subsubsection}{\numberline {1.4.2.6}Porovnání simulátorů}{22}{subsubsection.1.4.2.6}%
+\contentsline {chapter}{\numberline {2}Specifikace}{23}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Funkční požadavky}{23}{section.2.1}%
+\contentsline {paragraph}{Python knihovna}{23}{section*.33}%
+\contentsline {paragraph}{Grafické rozhraní}{24}{section*.34}%
+\contentsline {paragraph}{Rozšířitelnost}{24}{section*.35}%
+\contentsline {chapter}{\numberline {3}Implementace}{25}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Programovací jazyk}{25}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Simulované fyzikální prostředí}{25}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Roboti}{26}{subsection.3.2.1}%
+\contentsline {section}{\numberline {3.3}Genetické algoritmy}{26}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Implementace knihovny}{26}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Grafické rozhraní}{26}{section.3.5}%
+\contentsline {chapter}{\numberline {4}Experimenty a výsledky}{27}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Vývoj řízení robotů}{27}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Vývoj řízení a morfologie robotů}{30}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Oddělený vývoj řízení a morfologie}{30}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Simultánní vývoj řízení a morfologie}{30}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Diskuze výsledků}{30}{section.4.3}%
+\contentsline {chapter}{Závěr}{31}{chapter*.36}%
+\contentsline {chapter}{Seznam použité literatury}{32}{chapter*.37}%
+\contentsline {chapter}{\numberline {A}Přílohy}{34}{appendix.A}%
+\contentsline {section}{\numberline {A.1}První příloha}{34}{section.A.1}%

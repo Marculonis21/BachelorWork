@@ -1,0 +1,62 @@
+This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: prace.aux
+A level-1 auxiliary file: titulka.aux
+A level-1 auxiliary file: uvod.aux
+A level-1 auxiliary file: kap_zaklad_pojmy.aux
+A level-1 auxiliary file: kap_specifikace.aux
+A level-1 auxiliary file: kap_implementace.aux
+A level-1 auxiliary file: kap_experimenty.aux
+A level-1 auxiliary file: zaver.aux
+A level-1 auxiliary file: literatura.aux
+The style file: czplainnat.bst
+Database file #1: literatura.bib
+Warning--empty year in coppeliarobotics
+Warning--empty year in coumans
+Warning--empty year in deapproject
+Warning--empty year in eplex
+Warning--empty year in gazeborobotics
+Warning--empty year in opendynamicsengine
+Warning--empty year in Webots
+You've used 26 entries,
+            2828 wiz_defined-function locations,
+            775 strings with 9304 characters,
+and the built_in function-call counts, 11307 in all, are:
+= -- 1013
+> -- 593
+< -- 21
++ -- 206
+- -- 180
+* -- 919
+:= -- 1718
+add.period$ -- 89
+call.type$ -- 26
+change.case$ -- 134
+chr.to.int$ -- 26
+cite$ -- 59
+duplicate$ -- 508
+empty$ -- 965
+format.name$ -- 215
+if$ -- 2385
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 16
+newline$ -- 146
+num.names$ -- 104
+pop$ -- 320
+preamble$ -- 1
+purify$ -- 111
+quote$ -- 0
+skip$ -- 367
+stack$ -- 0
+substring$ -- 338
+swap$ -- 101
+text.length$ -- 4
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 286
+warning$ -- 7
+while$ -- 101
+width$ -- 0
+write$ -- 346
+(There were 7 warnings)

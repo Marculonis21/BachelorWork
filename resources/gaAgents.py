@@ -140,7 +140,7 @@ class SineFuncFullAgent(AgentType):
     def get_action(self, individual, step):
         values, _ = individual
 
-        step = step/10
+        step = step/5
 
         actions = []
         for i in range(len(values)//4):
@@ -192,8 +192,8 @@ class SineFuncFullAgent(AgentType):
     def mutation(self, population):
         new_population = []
 
-        individual_mutation_prob = 0.75
-        action_mutation_prob = 0.10
+        individual_mutation_prob = 0.6
+        action_mutation_prob = 0.2
         body_mutation_prob = 0.05
 
         for individual in population:
@@ -251,7 +251,7 @@ class SineFuncHalfAgent(AgentType):
     def get_action(self, individual, step):
         values, _ = individual
 
-        step = step/10
+        step = step/5
 
         actions = []
         for i in range(len(values)//4):
@@ -304,8 +304,8 @@ class SineFuncHalfAgent(AgentType):
     def mutation(self, population):
         new_population = []
 
-        individual_mutation_prob = 0.75
-        action_mutation_prob = 0.10
+        individual_mutation_prob = 0.6
+        action_mutation_prob = 0.20
         body_mutation_prob = 0.05
 
         for individual in population:
@@ -443,7 +443,7 @@ class TFSAgent(AgentType):
 
         _step = np.linspace(0, 2*self.arguments["period"], 100000).reshape(-1,1)
 
-        _min_max_search = np.sum(_amps*np.sin(((N*2*np.pi)*_step)/self.arguments["period"] + _shifts), axis=1)
+        _min_max_search = np.sum(_amps*np.sin((N*2*np.pi*_step)/self.arguments["period"] + _shifts), axis=1)
 
         self.max = np.array([np.max(_min_max_search)])
         self.min = -self.max

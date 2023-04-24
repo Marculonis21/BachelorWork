@@ -65,7 +65,7 @@ class CustomEnv(MujocoEnv, utils.EzPickle):
         try:
             v = self.get_body_com("front")[:2].copy() - self.get_body_com("torso")[:2].copy()
             facing_direction = v / np.linalg.norm(v) # normalized direction
-        except ValueError as _:
+        except KeyError:
             pass
 
         done = self.done
@@ -106,5 +106,4 @@ from gymnasium.envs.registration import register
 register(
      id="custom/CustomEnv-v0",
      entry_point="resources.gymnasiumCustomEnv:CustomEnv",
-     # max_episode_steps=500,
 )

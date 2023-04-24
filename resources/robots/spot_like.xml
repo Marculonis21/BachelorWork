@@ -135,7 +135,6 @@
       <body name="bottom" pos="0 0 -2.2">
       </body>
     </body>
-
   </worldbody>
   <actuator>
     <position ctrllimited="true" ctrlrange="-1.0 1.0" joint="FL_hip_X" kp="100"/>

@@ -5,26 +5,31 @@ import resources.gymnasiumCustomEnv as _
 
 import resources.gaAgents as gaAgents
 import resources.robots.robots as robots
+from resources.runParams import RunParams
+from experiment_setter import Experiments
 
 import argparse
 
 # import gym
 import gymnasium as gym
-from gymnasium.wrappers import time_limit
+from gymnasium.wrappers.time_limit import TimeLimit
 import matplotlib.pyplot as plt
 import numpy as np
 import copy
 from dask.distributed import Client
 import time
 import tempfile
-import logging
+# import logging
 import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--open", default=False, const=True, nargs='?', type=str, help="Open saved individual")
-parser.add_argument("--debug", default=False, action="store_true", help="Run env in debug mode")
+parser.add_argument("--experiment", default="", const=True, nargs='?', type=str, help="Enter experiment name")
+parser.add_argument("--experiment_names", default=False, action="store_true", help="Show all known experiment names")
 parser.add_argument("--batch", default=False, const=True, nargs='?', type=int, help="Number of iterations in batch")
-parser.add_argument("--batch_note", default=False, const=True, nargs='?', type=str, help="Batch run note")
+parser.add_argument("--batch_note", default="", const=True, nargs='?', type=str, help="Batch run note")
+
+parser.add_argument("--debug", default=False, action="store_true", help="Run env in debug mode")
 
 GUI_FLAG = False
 GUI_FITNESS = []
@@ -35,16 +40,17 @@ GUI_ABORT = False
 
 GRAPH_VALUES = [[],[],[]]
 EPISODE_HISTORY = []
+LAST_POP = None
 
-def RaisePreview():
+def raisePreview():
     global GUI_PREVIEW
     GUI_PREVIEW = True
 
-def RaiseAbort():
+def raiseAbort():
     global GUI_ABORT
     GUI_ABORT = True
 
-def simulationRun(env, agent, actions, render=False):
+def simulationRun(env, agent, individual, render=False):
     steps = -1
     individual_reward = 0
     terminated = False
@@ -53,16 +59,13 @@ def simulationRun(env, agent, actions, render=False):
     env.reset()
     while True:
         steps += 1
-        action = agent.get_action(actions, steps).squeeze()
+        action = agent.get_action(individual, steps).squeeze()
         
         # obs, reward, terminated, truncated, info
         _, _, terminated, truncated, info = env.step(action)
 
         if render:
             env.render()
-
-        if truncated:
-            print("$$$$$$$$$$ truncated")
 
         if terminated or truncated: # calculate reward after finishing last step
             individual_reward = (info["x_position"]-0.5*abs(info["y_position"]))
@@ -71,8 +74,29 @@ def simulationRun(env, agent, actions, render=False):
     # Optionally - return REWARD + some colected information ??? 
     return individual_reward
 
+def renderRun(agent, robot, individual):
+    run_reward = -1 
+    file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
+    try:
+        robot.create(file, agent.body_part_mask, individual)
+
+        env = gym.make('custom/CustomEnv-v0',
+                        xml_file=file.name,
+                        reset_noise_scale=0.0,
+                        disable_env_checker=True,
+                        render_mode="human")
+        env = TimeLimit(env, max_episode_steps=500)
+
+        run_reward = simulationRun(env, agent, individual, render=True)
+    finally:
+        file.close()
+
+    return run_reward
+
 def evolution(robot, agent, client, generation_count, population_size, debug=False):
-    global GRAPH_VALUES, EPISODE_HISTORY, GUI_GEN_NUMBER, GUI_FITNESS, GUI_PREVIEW
+    global GRAPH_VALUES, EPISODE_HISTORY, LAST_POP
+    global GUI_GEN_NUMBER, GUI_FITNESS, GUI_PREVIEW
+
     GUI_FITNESS = []
     GRAPH_VALUES = [[],[],[]]
     EPISODE_HISTORY = []
@@ -82,11 +106,11 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
         
     environments = []
 
-    # create individual source files for different bodies
+    # create individual source files for different bodies (if needed)
     for i in range(len(population)):
         file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
 
-        robot.create(file, agent.body_part_mask, population[i][1])
+        robot.create(file, agent.body_part_mask, population[i])
 
         robot_source_files.append(file)
 
@@ -94,15 +118,17 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
                        xml_file=file.name,
                        reset_noise_scale=0.0,
                        disable_env_checker=True,
-                       render_mode=None,
-                       )
-        env = time_limit.TimeLimit(env, max_episode_steps=500)
+                       render_mode=None)
+        env = TimeLimit(env, max_episode_steps=500)
 
         environments.append(env)
+        # there exists only 1 env if we don't need more!
         if not agent.use_body_parts:
             break
 
-    best_individual = tuple()
+    best_individual = None 
+    best_individual_env = None 
+
     for generations in range(generation_count+1):
         if GUI_ABORT:
             break
@@ -110,25 +136,23 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
         GUI_GEN_NUMBER = generations
 
         if GUI_PREVIEW: # GUI FORCED PREVIEW
-            simulationRun(best_individual[1], agent, best_individual[0], render=True)
+            renderRun(agent, robot, best_individual)
             GUI_PREVIEW = False
         # else: # ITERATION FORCED PREVIEW
         #     if generations != 0 and generations % 50 == 0:
         #         print("Generation: ", generations)
         #         simulationRun(best_individual[1], agent, best_individual[0], render=True)
 
-        print("FUTURES STARTING")
         # Get fitness values
         fitness_values = []
         futures = []
         if debug:
             for index, individual in enumerate(population):
-                fitness_values.append(simulationRun(environments[index if agent.use_body_parts else 0], agent, individual, generations % 25 == 0))
+                fitness_values.append(simulationRun(environments[index if agent.use_body_parts else 0], agent, individual))
         else:
             for index, individual in enumerate(population):
                 futures.append(client.submit(simulationRun, environments[index if agent.use_body_parts else 0], agent, individual))
 
-            print("FUTURES GATHERING")
             fitness_values = client.gather(futures)
 
         if GUI_FLAG:
@@ -136,13 +160,12 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
                            min(fitness_values),
                            max(fitness_values)]
 
+        # for statistical reconstruction later
+        EPISODE_HISTORY.append(fitness_values)
         if generations % 5 == 0: # frequency of info update
-            print("GRAPH")
             GRAPH_VALUES[0].append(np.mean(fitness_values))
             GRAPH_VALUES[1].append(min(fitness_values))
             GRAPH_VALUES[2].append(max(fitness_values))
-            # for later statistical reconstruction
-            EPISODE_HISTORY.append(fitness_values)
 
             if not GUI_FLAG:
                 print("Best fitness: ", max(fitness_values))
@@ -159,55 +182,49 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
                 plt.pause(0.1)
 
         # get index of the best individuals for elitism
-        # elitism_count = int(population_size*0.05) # 5% of pop size
+        elitism_count = int(population_size*0.10) # 10% of pop size
 
-        # fitness_values = np.array(fitness_values)
-        # top_indices = np.argpartition(fitness_values, -elitism_count)
-        # sorted_top_indices = top_indices[np.argsort(fitness_values[top_indices])[::-1]]
+        fitness_values = np.array(fitness_values)
+        top_indices = np.argpartition(fitness_values, -elitism_count)[-elitism_count:]
+        sorted_top_indices = top_indices[np.argsort(fitness_values[top_indices])[::-1]]
 
-        # elite_individuals = []
-        # for top_i in sorted_top_indices:
-        #     elite_individuals.append(copy.deepcopy((population[top_i], environments[top_i if agent.use_body_parts else 0])))
-        # best_individual = elite_individuals[0]
-        # best_individual = (copy.deepcopy(population[best_index]), environments[best_index if agent.use_body_parts else 0])
+        elite_individuals = []
+        elite_individuals_envs = []
+        for top_i in sorted_top_indices:
+            elite_individuals.append(copy.deepcopy(population[top_i]))
+            elite_individuals_envs.append(copy.deepcopy(environments[top_i if agent.use_body_parts else 0]))
 
-        print("BEST INDEX")
-        best_index = np.argmax(fitness_values)
-        best_individual = (copy.deepcopy(population[best_index]), environments[best_index if agent.use_body_parts else 0])
+        best_individual = copy.deepcopy(elite_individuals[0])
+        best_individual_env = copy.deepcopy(elite_individuals_envs[0])
 
-        print("OPS")
         # Genetic operators - selection, crossover, mutation
         parents          = agent.selection(population,fitness_values)
         children         = agent.crossover(parents)
         mutated_children = agent.mutation(children)
         population = mutated_children
 
-        print("ELITE")
-        # apply elitism
-        # for i, elite in enumerate(elite_individuals):
-        #     population[i] = elite[0] # elite:(genetic info, env)
-        population[0] = best_individual[0]
-
-        print(f"finished gen {generations}")
         # change environments based on possible robot morphology changes
         for i in range(len(population)):
             environments[i].close()
-            robot.create(robot_source_files[i], agent.body_part_mask, population[i][1])
+            robot.create(robot_source_files[i], agent.body_part_mask, population[i])
 
             if generations != generation_count:
                 env = gym.make('custom/CustomEnv-v0',
-                            xml_file=robot_source_files[i].name,
-                            reset_noise_scale=0.0,
-                            disable_env_checker=True,
-                            render_mode=None,
-                            )
-                env = time_limit.TimeLimit(env, max_episode_steps=500)
+                               xml_file=robot_source_files[i].name,
+                               reset_noise_scale=0.0,
+                               disable_env_checker=True,
+                               render_mode=None)
+                env = TimeLimit(env, max_episode_steps=500)
                 environments[i] = env
 
             if not agent.use_body_parts:
                 break
 
-        print("ENV TRANSFER DONE")
+        # apply elitism
+        for i in range(len(elite_individuals)):
+            population[i] = elite_individuals[i]
+            if agent.use_body_parts:
+                environments[i] = elite_individuals_envs[i]
 
     # after evo close tmp files
     for file in robot_source_files:
@@ -216,127 +233,96 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
     if not GUI_FLAG:
         plt.close()
 
-    return best_individual
+    LAST_POP = copy.deepcopy(population)
+
+    return best_individual, best_individual_env
 
 ################################################################################
 ################################################################################
 
-class RunParams:
-    def __init__(self, 
-                 robot:robots.BaseRobot, 
-                 agent:gaAgents.AgentType,
-                 ga_population_size=100,
-                 ga_generation_count=150,
-                 show_best=False,
-                 save_best=False,
-                 save_dir='./saves/individuals',
-                 note=""):
 
-        self.robot               = robot
-        self.agent               = agent
-        self.ga_population_size  = ga_population_size
-        self.ga_generation_count = ga_generation_count
-        self.show_best           = show_best
-        self.save_best           = save_best
-        self.save_dir            = save_dir
-        self.note                = note
-
-
-def Run(gui, params:RunParams, args=None):
+def RunEvolution(params, gui=False, args=None):
     global GUI_FLAG
     GUI_FLAG = gui
 
-    # run multithreaded
+    # Start threading client
     # client = Client(n_workers=11,threads_per_worker=1,scheduler_port=0, silence_logs=logging.ERROR)
     client = Client(n_workers=11,threads_per_worker=1,scheduler_port=0)
 
+    # Run evolution
     try:
-        print("RUNNING")
-        best_individual_actions, best_individual_env = evolution(params.robot, 
-                                                                 params.agent,
-                                                                 client,
-                                                                 generation_count=params.ga_generation_count, 
-                                                                 population_size=params.ga_population_size, 
-                                                                 debug=args.debug if args != None else False)
-        print("DONE")
+        print("RUNNING EVOLUTION")
+        best_individual, best_individual_env = evolution(params.robot, 
+                                                         params.agent,
+                                                         client,
+                                                         generation_count=params.ga_generation_count, 
+                                                         population_size=params.ga_population_size, 
+                                                         debug=args.debug if args != None else False)
+        print("EVOLUTION DONE")
     finally:
         client.close()
 
-    best_reward = simulationRun(best_individual_env, agent, best_individual_actions, params.show_best)
+    # Set final reward (render best if set)
+    best_reward = 0
+    if params.show_best: best_reward = renderRun(params.agent, params.robot, best_individual)
+    else:                best_reward = simulationRun(best_individual_env, params.agent, best_individual, render=False)
+
+    # File saving
+    if not os.path.exists(params.save_dir):
+        os.makedirs(params.save_dir)
 
     current_time = time.time()
     if params.save_best:
-        gaAgents.AgentType.save(agent, robot, best_individual_actions, params.save_dir + f"/{params.note}_individual_run{current_time}_rew{best_reward}.save")
+        gaAgents.AgentType.save(agent, robot, best_individual, params.save_dir + f"/{params.note}_individual_run{current_time}_rew{best_reward}.save")
 
     episode_history = np.array(EPISODE_HISTORY)
+    last_population = np.array(LAST_POP, dtype=object)
     np.save(params.save_dir + f"/{params.note}_episode_history{current_time}", episode_history)
+    np.save(params.save_dir + f"/{params.note}_last_population{current_time}", last_population)
 
-if __name__ == "__main__":
-    args = parser.parse_args([] if "__file__" not in globals() else None)
+def main(args):
+    experiments = Experiments()
 
     # Run selected saved individual
     if args.open:
-        agent, individual = (None, None)
-        file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
         try:
             agent, robot, individual = gaAgents.AgentType.load(args.open)
-
-            robot.create(file, agent.body_part_mask, individual[1])
-
-            env = gym.make('custom/CustomEnv-v0',
-                           xml_file=file.name,
-                           reset_noise_scale=0.0,
-                           disable_env_checker=True
-                           )
-            env = time_limit.TimeLimit(env, max_episode_steps=500)
-
-            reward = simulationRun(env, agent, individual, render=True)
-            print("Run reward: ", reward)
-            print()
-            # env.close() # TODO: NO NEED TO CLOSE?
-
+            run_reward = renderRun(agent, robot, individual)
+            print("Run reward: ", run_reward)
         except Exception as e:
             print("Problem occured while loading save file\n")
             print(e)
-
-        finally:
-            file.close()
         
         quit()
 
+    if args.experiment_names:
+        print("List of created experiments: ")
+        for name in experiments.get_experiment_names():
+            print(" -", name)
+        quit()
+
     if args.batch: # BATCH RUN
-        robot = robots.SpotLike()
-        agent = gaAgents.TFSAgent(robot, [False]*len(robot.body_parts))
-        # agent = gaAgents.SineFuncFullAgent(robot, [False for _ in range(len(robot.body_parts))])
-
-        args.batch_note = "TFS(p4_s3_cr1)"
-
-        batch_dir = "./saves/batch_runs/" + f"run_{type(robot).__name__}_{type(agent).__name__}_{args.batch_note}_{time.time()}/"
-        os.makedirs(batch_dir)
-        params = RunParams(robot, 
-                           agent, 
-                           ga_population_size=150,
-                           ga_generation_count=200, 
-                           show_best=False, 
-                           save_best=True,
-                           save_dir=batch_dir,
-                           note="")
-
         for i in range(args.batch):
             print(f"STARTING BATCH RUN - {i+1}/{args.batch}")
+
+            if args.experiment == "":
+                params = experiments.exp11_TFS_spotlike()
+            else:
+                params = experiments.get_experiment(args.experiment)
+
             params.note = f"run{i+1}"
-            Run(False, params)
+            RunEvolution(params)
 
     else: # SINGLE RUN
-        robot = robots.SpotLike()
-        agent = gaAgents.TFSAgent(robot, [False]*len(robot.body_parts))
-        Run(False, RunParams(robot, 
-                             agent, 
-                             ga_population_size=150,
-                             ga_generation_count=10, 
-                             show_best=False, 
-                             save_best=True,
-                             save_dir="./saves/individuals",
-                             note="TFS(4_3_1)"), args)
+        if args.experiment == "":
+            params = experiments.exp12_SineFull_spotlike()
+            params.note = "motors_test"
+        else:
+            params = experiments.get_experiment(args.experiment)
 
-    print("DONE")
+        RunEvolution(params, args=args)
+    print("Exiting ...")
+
+if __name__ == "__main__":
+    args = parser.parse_args([] if "__file__" not in globals() else None)
+    main(args)

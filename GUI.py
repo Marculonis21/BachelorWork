@@ -15,7 +15,6 @@ robots = {"OpenAI Ant-v3" : robotsClass.AntV3(),
           "Basic Ant"     : robotsClass.StickAnt(),
           "SpotLike dog"  : robotsClass.SpotLike()}
 
-
 import math
 import resources.gaAgents as gaAgents
 agents : 'dict[str, gaAgents.AgentType]'
@@ -25,32 +24,31 @@ agents = {"Full Random"              : gaAgents.FullRandomAgent.ForGUI(),
           "Step Cycle Half"          : gaAgents.StepCycleHalfAgent.ForGUI(),
           "Truncated Fourier Series" : gaAgents.TFSAgent.ForGUI()}
 
-
 def single_value_option(key, text, default, disabled=False):
-    return [sg.Text(text,pad=(10,10)), sg.Input(default, size=(8,None), enable_events=True, key=key, disabled=disabled)]
+    return [sg.Column([[sg.Text(text)]], expand_x=True, element_justification='l', background_color='red'), 
+            sg.Column([[sg.Input(default, size=(8,None), enable_events=True, key=key, disabled=disabled)]], expand_x=True, element_justification='l', background_color='blue')]
 
 def range_value_option(key, text, default_min, default_max, disabled=False):
     return [sg.Text(text,pad=(10,10)), sg.Text("MIN", font=("Helvetica", 12)), sg.Input(default_min, size=(8,None), enable_events=True, key=key+"_min", disabled=disabled), 
                                        sg.Text("MAX", font=("Helvetica", 12)), sg.Input(default_max, size=(8,None), enable_events=True, key=key+"_max", disabled=disabled)]
 
-agent_argument_options = [sg.Column([single_value_option("cycle_repeat", "Step Count", 25)], 
-                                    element_justification='c', expand_x=True, visible=False, key="options_Full Random"),
+agent_argument_options = [sg.Column([single_value_option("cycle_repeat", "Step Count", 25),
+                                     single_value_option("testtest", "TEst because why not", 42)], 
+                                     element_justification='l', pad=(30,None), expand_x=True, visible=False, key="options_Full Random"),
                           sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 4),
                                      range_value_option("frequency_range", "Frequency range", 0.5, 4),
-                                     range_value_option("shift_x_range", "Shift x", 0, 2*math.pi),
-                                     range_value_option("shift_y_range", "Amplitude range", "gaAgents.py", "gaAgents.py", disabled=True)], 
-                                    element_justification='c', expand_x=True, visible=False, key="options_Sine Function Full"),
+                                     range_value_option("shift_x_range", "Shift x", 0, 2*math.pi)], 
+                                     element_justification='l', pad=(30,None), expand_x=True, visible=False, key="options_Sine Function Full"),
                           sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 4),
                                      range_value_option("frequency_range", "Frequency range", 0.5, 4),
-                                     range_value_option("shift_x_range", "Shift x", 0, 2*math.pi),
-                                     range_value_option("shift_y_range", "Amplitude range", "gaAgents.py", "gaAgents.py", disabled=True)],
-                                    element_justification='c', expand_x=True, visible=False, key="options_Sine Function Half"),
+                                     range_value_option("shift_x_range", "Shift x", 0, 2*math.pi)],
+                                     element_justification='l', expand_x=True, visible=False, key="options_Sine Function Half"),
                           sg.Column([single_value_option("cycle_repeat", "Step Count", 25)], 
-                                    element_justification='c', expand_x=True, visible=False, key="options_Step Cycle Half"),
+                                     element_justification='l', expand_x=True, visible=False, key="options_Step Cycle Half"),
                           sg.Column([single_value_option("period", "Period", 4),
                                      single_value_option("series_length", "Truncated series length", 3),
                                      single_value_option("coeficient_range", "Coeficient range", 1)], 
-                                    element_justification='c', expand_x=True, visible=False, key="options_Truncated Fourier Series"),
+                                     element_justification='l', expand_x=True, visible=False, key="options_Truncated Fourier Series"),
                           ]
 
 def main_tab():
@@ -393,7 +391,7 @@ if __name__ == "__main__":
         return params
             
     def startRun():
-        roboEvo.Run(True, GetParams())
+        roboEvo.RunEvolution(GetParams(), gui=True)
 
     working_thread = threading.Thread(target=startRun, daemon=True)
     working_thread.start()
@@ -413,10 +411,10 @@ if __name__ == "__main__":
             break
 
         if event == "-RUN_PREVIEW-":
-            roboEvo.RaisePreview()
+            roboEvo.raisePreview()
 
         if event == "-EXIT-":
-            roboEvo.RaiseAbort()
+            roboEvo.raiseAbort()
             working_thread.join()
             window.close()
 

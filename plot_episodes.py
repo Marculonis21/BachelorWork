@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-import numpy as np
 import matplotlib.pyplot as plt
 
+import numpy as np
 import argparse 
 import os
 
@@ -16,41 +16,31 @@ if __name__ == "__main__":
         print("Set --open to select file to for plotting")
         quit()
 
+    episode_history_list = [x for x in os.listdir(args.open) if "episode_history" in x]
 
-    episode_history_list = [x for x in os.listdir(args.open) if "npy" in x]
+    history = []
 
-    fig, ax = plt.subplots(2,3)
+    for i in range(len(episode_history_list)):
+        _data = np.load(args.open+ "/" +episode_history_list[i])
+        history.append(_data.T)
 
-    # axs[0, 0].plot(x, y)
-    # axs[0, 0].set_title('Axis [0, 0]')
-    # axs[0, 1].plot(x, y, 'tab:orange')
-    # axs[0, 1].set_title('Axis [0, 1]')
-    # axs[1, 0].plot(x, -y, 'tab:green')
-    # axs[1, 0].set_title('Axis [1, 0]')
-    # axs[1, 1].plot(x, -y, 'tab:red')
-    # axs[1, 1].set_title('Axis [1, 1]')
+    history = np.array(history)
+    per_gen_values = history.reshape(-1,history.shape[2])
+    # per_gen_values = np.array(history)
 
-    for i in range(5):
-        x_plot = i%3
-        y_plot = i//3
+    # print(per_gen_values.shape)
+    # quit()
 
-        history = np.load(args.open+ "/" +episode_history_list[i])
-        max = np.max(history, axis=1)
-
-        s_history = np.sort(history, axis=1)
-
-        X = np.arange(len(history))
-        min = np.min(history, axis=1)
-        max = np.max(history, axis=1)
-        # mean = np.mean(history, axis=1)
-
-        for i in range(len(history[0])//5):
-            alpha = 10/(len(history[0])*2) # Modify the alpha value for each iteration.
-
-            ax[y_plot,x_plot].fill_between(X, s_history[:,(i*5)], s_history[:,-((i*5)+1)], color='blue', alpha=alpha)
-
-        ax[y_plot,x_plot].plot(X, min)
-        ax[y_plot,x_plot].plot(X, max)
-    # ax.plot(X, mean)
-
+    n_ticks = 21
+    tick_step = 10
+    index = np.arange(n_ticks)*tick_step
+    plt.boxplot(per_gen_values[:,index], positions=np.arange(n_ticks))
+    plt.plot(np.max(per_gen_values[:,index], axis=0), label="max fitness")
+    # plt.plot(np.mean(per_gen_values[:,index], axis=0))
+    plt.plot(np.min(per_gen_values[:,index], axis=0), c='r', label="min fitness")
+    plt.xticks(ticks=np.arange(n_ticks),labels=np.arange(n_ticks)*tick_step)
+    plt.xlabel("Generace")
+    plt.ylabel("Fitness")
+    plt.legend()
     plt.show()
+

@@ -27,10 +27,12 @@ class BaseRobot(ABC):
 
         return regex
 
-    def create(self, file, body_part_mask, adjustment=[]):
+    def create(self, file, body_part_mask, individual=([],[])):
         """
             Writes XML file (in place) - robot specific XML string with changed body part variables
         """
+
+        _, body_part_adjustments = individual
 
         text = copy.deepcopy(self.source_text)
         
@@ -38,7 +40,7 @@ class BaseRobot(ABC):
         for i, key in enumerate(self.body_parts):
             regex = self._key_to_regex(key)
             # set to desired body part length if True in mask ELSE set to a default value given by xml source file
-            text = re.sub(regex, str(adjustment[i] if body_part_mask[i] else self.body_parts[key]), text)
+            text = re.sub(regex, str(body_part_adjustments[i] if body_part_mask[i] else self.body_parts[key]), text)
 
         # clear and change file in place
         file.seek(0)
@@ -109,3 +111,15 @@ class SpotLike(BaseRobot):
 The robot has 4 legs made of 2 parts each (thigh and calf ended with fixed foot). \n\
 Altogether there are 12 joints (12 actuators) - 2 for each hip free to rotate along X and Y axis and 1 for each knee along Y axis\n"
 
+class Humanoid(BaseRobot):
+    def __init__(self):
+        DIR = os.path.dirname(__file__)
+        source_file = DIR+"/humanoid.xml"
+        picture_path = DIR+"/SpotLike"
+
+        super(Humanoid , self).__init__(source_file, picture_path)
+
+    @property
+    def description(self):
+        # raise NotImplementedError()
+        return ""

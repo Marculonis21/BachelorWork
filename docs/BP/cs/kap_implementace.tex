@@ -1,70 +1,111 @@
 %%% Fiktivní kapitola s ukázkami tabulek, obrázků a kódu
 
-\chapter{Implementace}
+\chapter{Implementace projektu}
 V předchozí kapitole jsme prošli funkční požadavky, očekávané od vyvíjeného
 souboru programů. Následuje rozbor jednotlivých modulů, které vznikly při
-vlastní implementaci. Zároveň zde projdeme možné alternativy, které se pro
-vývoj nabízejí a probereme důvody stojící za zvolením jednotlivých z možností.
+vlastní implementaci. 
 
-Nejprve vysvětlíme volbu programovacího jazyka, ve kterém je celá knihovna
-vytvořena. Poté projdeme systémy umožňující vývoj ve fyzikálním prostředí a
-ovládání uživatelem definovaných robotů. Zde představíme i možnosti tvorby
-vlastních robotů. Dále ukážeme možné varianty modulů umožňující vývoj řízení
-robotů pomocí genetických algoritmů a popíšeme vlastní implementaci. Následně
-projdeme všechny části implementace spojující tyto moduly do přístupné
-rozšířitelné knihovny. V poslední části představíme implementaci grafického
-rozhraní, které slouží uživateli, který chce používat knihovnu a provádět
-experimenty, bez nutnosti využití příkazové řádky.
+Celý projekt je napsána v programovacím jazyce \textbf{Python}. Cílem projektu
+je vytvořit čitelnou rozšířitelnou platformu, která bude uživateli jednoduše
+dostupná. Pokud uživatel bude mít potřebu vytvořené moduly jakkoli měnit nebo
+rozšiřovat, Python toto bez problémů umožní. Jednoduchá čitelnost Pythonu
+spojená s rychlostí, jakou mohou být prováděny iterace změn, bez potřeby
+zdlouhavého překladu celé knihovny, se nám zdají býti dostatečně užitečné
+vlastnosti volbu Pythonu jako jazyka pro tento projekt.
 
-\section{Programovací jazyk}
+\paragraph{}
+Dále v této kapitole v sekci \ref{imp:roboevo} popíšeme centrální modul
+\emph{RoboEvo}, pomocí kterého může uživatel s knihovnou pracovat z příkazové
+řádky nebo ze samotného kódu. Tento modul pracuje s řadou dalších
+pomocných modulů, jejichž implementace popíšeme v dalších oddílech. Třídy
+agentů popisující celé evoluční algoritmy v oddílu \ref{imp:gaAgents}.
+Implementace vlastních genetických operátorů v oddílu \ref{imp:gaMethods}.
+Třída propojující roboty ze simulátoru \emph{MuJoCo} (MuJoCo popsáno v
+základních pojmech v oddílu \ref{MuJoCo}) s ostatními třídami (v oddílu
+\ref{imp:robots}). Následovně si v sekci \ref{imp:GUI} popíšeme architekturu
+grafické aplikace, umožňující nastavování experimentů v centrálním modulu bez
+použití kódu nebo příkazové řádky. Jako poslední (v sekci
+\ref{imp:experimentsetter}) si představíme implementaci třídy sloužící k
+uchování a předvolbě parametrů pro experimenty.
 
-Jako programovací jazyk, ve kterém tento projekt bude psán, jsme zvolili\\
-\textbf{Python}. Cílem projektu je vytvořit platformu, kterou bude uživatel
-moci použít k vývoji robotů pomocí evolučních algoritmů. Pokud uživatel bude
-mít potřebu jakkoli připravený proces vývoje měnit, Python lehce umožní
-nahlédnout do zdrojových kódů vypracované knihovny a provést úpravy dle
-vlastních potřeb. Zároveň to umožňuje rozšiřování knihovny o nové metody, které
-bude chtít uživatel zkusit zařadit do již funkčního procesu. Jednoduchá
-čitelnost Pythonu spojená s rychlostí, jakou mohou být prováděny iterace změn
-bez potřeby zdlouhavého překladu celé knihovny, se~zdají býti dostatečně dobré
-vlastnosti pro volbu programovacího jazyka pro tento projekt.
+\section{Modul RoboEvo} \label{imp:roboevo}
+Modul \emph{RoboEvo} je centrální modul tohoto projektu, sloužící hlavně pro
+spouštění a běh experimentů s evolučním vývojem robotů. 
 
-\section{Simulované fyzikální prostředí}
+Každý experiment se skládá vždy z několika nezávislých bloků. Experiment může
+využívat různé typy evolučních agentů s různými genetickými operátor a může se
+snažit vyvíjet různé typy robotů. Pro usnadnění přehlednosti, čitelnosti a
+rozšířitelnosti jsou tyto části rozdělené do vlastních menších implementací,
+rozšiřující hlavní modul (jednotlivé implementace budou popsány v dalších
+oddílech). 
 
-Po zhodnocení vypsaných a dalších možností jsme vybrali pro využití v tomto
-projektu fyzikální simulátor MuJoCo. Na rozdíl od ostatních se zdá býti
-přístupnější do začátku a zároveň dostatečně robustní a konfigurovatelný tak,
-aby splnil veškeré požadavky, které od fyzikálního simulátoru máme.
+\paragraph{Implementace modulu \emph{RoboEvo}}
+Implementace modulu se snazší co nejvíce oddělit funkční jádro modulu (funkce,
+využívané převážně v průběhu evolučního algoritmu a uživatel do nich nemusí
+zasahovat) od interaktivní části programu, pomocí které může uživatel (buď v
+kódu nebo pomocí argumentů z příkazové řádky) konfigurovat a spouštět
+experimenty. 
 
-\textbf{MuJoCo 1.50} je fyzikální simulátor zpřístupněný skrz volně dostupné
-aplikační rozhraní společnosti \textbf{OpenAI} v rámci jejich sady různých
-prostředí \textbf{Gym} (textové hry, jednoduché 2D i plně fyzikálně simulované
-3D prostředí, Atari hry aj.) pro vývoj metod zpětnovazebného učení na různých
-problémech. Toto rozhraní umožňuje uživatelům jednoduchý přístup k datům z
-poskytnutých prostředí a ovládání prostředím definovaných agentů, pomocí
-standardizovaných vstupů i výstupů napříč všemi prostředími. Tímto způsobem
-můžeme velmi lehce ovládat i roboty v prostředích simulátoru MuJoCo. Navíc
-otevřená vlastnost tohoto aplikačního rozhraní umožňuje úpravu částí procesu
-tak, aby se lépe hodil při řešení námi zvolených problémů. Přestože je
-\textbf{Gym} převážně používána pro vývoj metod zpětnovazebného učení agentů,
-nic nám nebrání a je velmi jednoduché namísto toho využít vlastního agenta,
-který je vyvíjen pomocí evolučních algoritmů.
+Hlavní funkcí ve které probíhá samotná konfigurace parametrů pro experimenty je
+funkce \texttt{main}, která je spuštěná první po vstupu uživatele do aplikace.
+Zde modul vyhodnocuje, zda uživatel při spuštění nevybral nějaký z nepovinných
+parametrů, které by ovlivnily konfiguraci a spuštění experimentu. 
 
-\subsection{Roboti}
+\pagebreak
+Těmito parametry jsou:
+\begin{itemize}
+    \item \texttt{-{}-experiment} -- argument přijímající textový vstup
+        specifikující jméno experimentu, jehož parametry chceme načíst a
+        spustit (pracující s modulem \texttt{experiment\_setter} popsaného v
+        oddíle \ref{imp:experimentsetter}),
+    \item \texttt{-{}-experiment\_names} -- při výběru tohoto argumentu při
+        spuštění programu program vypíše názvy všech dostupných vytvořených
+        experimentů z modulu \texttt{experiment\_setter} a následně se ukončí,
+    \item \texttt{-{}-batch} -- argument přijímající číselnou hodnotu,
+        specifikující kolikrát se má nakonfigurovaný experiment opakovaně
+        spustit (používané pro statistické vyhodnocení výsledků experimentů),
+    \item \texttt{-{}-batch\_note} -- textový argument umožňující připojit
+        vlastní poznámku k názvu složky, do které se experimenty z
+        několikanásobného spuštění ukládají (argument nemá žádný efekt pro
+        experimenty z modulu \texttt{experiment\_setter}),
+    \item \texttt{-{}-open} -- textový argument přijímající cestu k uloženým
+        datům nejlepšího jedince z libovolného předchozího experimentu,
+        umožňující vizualizaci řešení daného jedince.
+\end{itemize}
 
-\section{Genetické algoritmy}
+Pokud uživatel zvolil spuštění buď jednorázového, nebo opakovaného experimentu,
+funkce \texttt{main} pro spouštění evolučního vždy vývoje volá funkci
+\texttt{RunEvolution}, parametry experimentu jako je zvolený typ genetického
+agenta, typ robota, parametry evolučního algoritmu a další.
 
-Po porovnání různých možností modulů pro tvorbu a použití evolučních algoritmů
-v naší knihovně, jsme se rozhodli pro vlastní implementaci jednotlivých částí
-evolučních algoritmů (genetických operátorů) a jejich propojení mezi sebou.
-Důvodem je hlavně jednodušší zapojení do zbytku knihovny a snížení nároků na
-znalosti mnohdy složitých výše popsaných externích knihoven pro uživatele,
-který by případně mohl chtít si do naší knihovny dopsat vlastní kus evolučního
-algoritmu. Tímto způsobem, pokud bude chtít něco takového udělat, dojde-li
-k~dodržení zdrojovým kódem stanovených pravidel, vlastní kus kódu (metoda
-popisující genetický operátor) bude možné hned bez problému využít při dalším
-vývoji robotů.
+Tato funkce zajišťuje vše od spuštění výpočetních jednotek a samotného
+evolučního algoritmu se zvolenými parametry, po prezentaci a uložení
+výsledných dat (při zvolení opakovaného experimentu je tato funkce volána
+opakovaně).
 
-\section{Implementace knihovny}
+\paragraph{Běh evolučního algoritmu}
+Funkce \texttt{RunEvolution} zajišťuje spuštění evolučního algoritmu s danými
+parametry. Samotný běh evolučního algoritmu je spuštěn voláním funkce
+\texttt{evolution}, ve které se celý algoritmus bude odehrávat. V rámci této
+funkce provádíme všechny kroky evolučního algoritmu (jak byly popsány v
+základních pojmech evolučních algoritmů v sekci \ref{Evoluční algoritmy}).
+Navíc zde pro jedince vytváříme simulační prostředí, ve kterých jsou jedinci
+testování při výpočtu fitness.
 
-\section{Grafické rozhraní}
+Po výpočtu fitness přichází na řadu genetické operátory, které jsou vždy
+specifické pro zvolený evoluční algoritmus. V naší implementaci jsou zvolené
+operátory specifikované v třídě agenta. Ta mimo jiné specifikuje jak vypadá
+genotyp jedinců, jakým způsobem se generuje populace jedinců a jak probíhá
+rozkódování genotypu každého jedince do aktuální konfigurace motorů ovládaného
+robota. Podrobněji popíšeme třídu agentů v dalším oddíle \ref{imp:gaAgents}.
+
+\subsection{Agenti} \label{imp:gaAgents}
+
+\subsection{Genetické operátory} \label{imp:gaMethods}
+
+\subsection{Roboti} \label{imp:robots}
+
+\section{Grafické rozhraní} \label{imp:GUI}
+
+\section{Třída experimentů} \label{imp:experimentsetter}
+

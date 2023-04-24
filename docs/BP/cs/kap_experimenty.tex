@@ -48,7 +48,7 @@ aktuálního nastavení motorů.
 %TODO: imp ref robots SPOT
 První pokus se bude snažit vyvinout řízení pro pokročilého robota v projektu
 označovaném jako \emph{SpotLike} (blíže popsaný v implementaci v sekci
-\ref{robot:Spot}). Jedná se o robota kráčejícího na čtyřech nohách, kde každá
+\ref{imp:robots.Spot}). Jedná se o robota kráčejícího na čtyřech nohách, kde každá
 noha má 3 stupně volnost (tedy 12 celkem pro celého robota). Můžeme ho tedy
 řadit mezi roboty, u kterých již bude obtížnější vyvinout stabilní pohyb v
 určeném směru.
@@ -58,27 +58,26 @@ poměrně jednoduchý periodický pohyb. Proto se pro vývoj řízení pokusíme
 agenty, kteří interně podle parametrů generují periodické hodnoty pro motory
 robotů. 
 
-Nejdříve se pokusíme řízení robota vyvinout pomocí evolučního
+\paragraph{}
+Nejprve se pokusíme řízení robota vyvinout pomocí evolučního
 algoritmu, který kóduje nastavení motorů pomocí základních periodických funkcí
 (agent popisující tento algoritmus popsán v implementaci v sekci
-\ref{agent:sinefull}). Každý motor robota má v tomto případě přiřazenou vlastní
+\ref{imp:gaAgents.sinefull}). Každý motor robota má v tomto případě přiřazenou vlastní
 periodickou funkci a genotyp jedinců specifikuje parametry těchto periodických
 funkcí (4 parametry pro každý kloub -- amplituda, frekvence, $x$ a $y$ posun).
 
 Evoluční algoritmus poběží \textbf{200 generací} se \textbf{100} náhodně
 inicializovanými jedinci. Pro vyhodnocení bude celý běh evolučního algoritmu
-bude \textbf{pětkrát opakován} vždy s novou náhodně vygenerovanou první populací.
-
-% TODO: graph resolution
+bude pětkrát opakován vždy s novou náhodně vygenerovanou první populací.
 
 \begin{figure}[!h]
     \centering
     \includegraphics[width=1\textwidth]{../img/experiment1_Sine_10ticks.pdf}
-    \caption{Průběh fitness populace v experimentu se základním agentem}
+    \caption{Vývoj fitness populace v experimentu se základním agentem}
     \label{exp:first_sinefull}
 \end{figure}
 
-Graf na obrázku \ref{exp:first_sinefull} vizualizuje průběh vývoje fitness
+Graf na obrázku \ref{exp:first_sinefull} zobrazuje vývoj fitness
 hodnot za běhu výše popsaného evolučního algoritmu. Data jsou vytvořena
 kombinací záznamů o fitness hodnotách v dané generaci ze všech pěti nezávislých
 běhů.
@@ -86,8 +85,9 @@ běhů.
 Z grafu se ukazuje, že tento přístup vývoje řízení dosáhl maximální hodnotu
 fitness okolo 10 a absolutní většina populace není schopna většího posunu. 
 
+\paragraph{}
 Pro porovnání volíme pokročilého agenta, kódujícího nastavení motorů pomocí
-omezených Fourierových řad (agent popsán v sekci \ref{agent:TFS}). Tento agent
+omezených Fourierových řad (agent popsán v sekci \ref{imp:gaAgents.TFS}). Tento agent
 je na úkor malého zvětšení genotypu, oproti předchozímu agentovi schopný
 generovat mnohem komplexnější periodické funkce popsané skládáním několika
 funkcí sinus.
@@ -98,41 +98,85 @@ bude opět pětkrát zopakován.
 \begin{figure}[!h]
     \centering
     \includegraphics[width=1\textwidth]{../img/experiment1_TFS_10ticks.pdf}
-    \caption{Průběh fitness populace v experimentu s pokročilým agentem}
+    \caption{Vývoj fitness populace v experimentu s pokročilým agentem}
     \label{exp:first_TFS}
 \end{figure}
 
-Graf \ref{exp:first_TFS} průběhu vývoje fitness hodnot z experimentu s
+Graf \ref{exp:first_TFS} vývoje fitness hodnot z experimentu s
 pokročilým agentem ukazuje, že tento agent již je schopný vyvinout stabilní
 pohyb i pro zadaného komplexního robota. Maximální fitness hodnota, které při
 vývoji agent dosáhl se pohybovala okolo 60. Zároveň poměrně velká část populace
 byla schopná dosáhnout výsledků, přesahující nejlepší výsledky jednoduššího
-agenta. Průběh vývoje dále naznačuje, že pokud bychom navýšili počet generací,
+agenta. Vývoj fitness dále naznačuje, že pokud bychom navýšili počet generací,
 tak by byla možnost pohyb dále optimalizovat a dosáhnout tak ještě vyšší
 fitness. 
 
-Z experimentu, vedle hodnot pro zpětné statistické zpracování dat, dostaneme i
-nejlepšího jedince, který byl otestován v poslední generaci běhu evolučního
-algoritmu. Jelikož naše simulované fyzikální prostředí je deterministické,
-máme možnost jedince nahrát zpět do simulace a vizualizovat tak nejlepší řešení
-daného evolučního algoritmu. 
+\paragraph{}
+Z experimentů zároveň dostaneme i nejlepšího jedince z poslední generace
+evolučního algoritmu. Jelikož naše simulované fyzikální prostředí je
+deterministické, můžeme řešení nejlepšího jedince zpětně vizualizovat.
 
 Ruční kontrolou těchto výsledků jsme dále zjistili, že pouze část (dva z pěti
 běhů) dosáhly takového pohybu, který bychom od robota této morfologie
-očekávali. Pohybovali se tedy až na menší odchylku rovně, způsobem
-připomínající chůzi skutečných čtyřnohých zvířat. Zbylé běhy vyvinuly pohyb,
-který sice je schopný stabilní, ale ne zcela estetické chůze. Roboti se v
-těchto případech posouvali bokem vpřed, využívající většího rozsahu v rotaci
-(\emph{kyčelních}) kloubů pro stabilizaci.
+očekávali. Tělo v robota v těchto případech (až na menší odchylky) směřovalo
+rovně, způsobem připomínající chůzi čtyřnohých zvířat podobné morfologie. Zbylé
+běhy vyvinuly pohyb, který je schopný stabilní, ale ne zcela estetické chůze.
+Roboti se v těchto případech posouvali stranou, využívající většího rozsahu
+v rotaci (\emph{kyčelních}) kloubů pro stabilizaci.
 
-Osobně si myslím, že vývoj estetického pohybu pro tohoto robota je možný jen s
-malou úpravou hodnotící, která by například penalizovala rotaci těla od
-požadovaného směru pohybu. Myslím si, že chůze stranou je kvůli rozsahu
-(\emph{kyčelních}) kloubů hlavně v ose délky těla robota, mnohem snazší na
-dosažení, tvořící zde silné lokální optimum. Agenti totiž velmi rychle
-konvergují ke způsobům chůze, které jsou stabilní a chůze stranou je oproti
-vratké chůzi rovně mnohem stabilnější. Úprava hodnotící funkce by měla
-být schopna toto lokální optimum penalizovat.
+Osobně si myslím, že vývoj estetického pohybu pro tohoto robota je s malou
+úpravou hodnotící funkce možný. Ta by například mohla penalizovat rotaci těla
+od požadovaného směru pohybu. Chůze stranou je kvůli rozsahu (\emph{kyčelních})
+kloubů (hlavně v ose délky těla robota) mnohem snazší na vyvinutí a tak tento
+způsob chůze tvoří silné lokální optimum. Agenti velmi rychle konvergují ke
+způsobům chůze, které jsou stabilní, což jim navyšuje šanci urazit větší
+vzdálenost bez pádu. Chůze stranou je oproti vratké chůzi rovně mnohem
+stabilnější. Navržená jednoduchá úprava hodnotící funkce by měla být schopna
+toto lokální optimum penalizovat a tedy přinutit estetičtější pohyb.
+
+\paragraph{}
+Ve srovnání s předchozími pokusy se nyní pokusíme pomocí vyvinout řízení
+jednoduššího robota označeného jako \emph{Ant} (popsán v implementaci v sekci
+\ref{imp:robots.Ant}). Můžeme ho brát jako jednoduššího, protože obsahuje menší
+počet kloubů (8 stupňů volnosti) v porovnání s robotem \emph{SpotLike}. Zároveň
+jeho morfologie umožňuje snazší pohyb všemi směry s menším rizikem pádu.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.4\textwidth]{../img/crop_Ant-v3.jpg}
+    \caption{Robot \emph{Ant}}
+    \label{fig:robot:ant}
+\end{figure}
+
+Řízení se budeme snažit vyvinout pomocí agentů se stejnými parametry jako v
+případě s pokročilým robotem. Celý běh bude opět pro statistické vyhodnocení
+pětkrát opakován se stejnou velikostí náhodně vygenerované populace
+(\textbf{100 jedinců}). Jelikož kvůli menšímu počtu stupňů volnosti očekáváme
+schopnost agentů vyvinout řízení rychleji, zkrátíme délku evoluci na
+\textbf{100 generací}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\textwidth]{../img/experiment1_2_Sine_10ticks.pdf}
+    \caption{Vývoj fitness populace se základním agentem a jednodušším robotem}
+    \label{exp:first2_sinefull}
+\end{figure}
+\begin{figure}[h!]
+    \includegraphics[width=1\textwidth]{../img/experiment1_2_TFS_10ticks.pdf}
+    \caption{Vývoj fitness populace s pokročilým agentem a jednodušším robotem}
+    \label{exp:first2_TFS}
+\end{figure}
+
+\pagebreak
+Z vývoje fitness (v grafu \ref{exp:first2_sinefull} a \ref{exp:first2_TFS})
+můžeme pozorovat, že oba agenti byli schopní u tohoto jednoduššího robota
+dosáhnout přijatelných výsledků i s omezeným počtem generací. Přijatelné
+výsledky jsou částečně podpořeny faktem, že i náhodně konfigurace mají dobrou
+šanci tohoto robota rozpohybovat v požadovaném směru a tedy již velmi brzy
+získat dobré ohodnocení. To se zároveň projevuje i na minimální fitness. Pro
+tohoto robota je totiž stejně jednoduché dostat takovou konfiguraci motorů,
+které ho rozpohybují v opačném směru (jedinec z definice hodnotící funkce
+obdrží záporné ohodnocení).
 
 \section{Vývoj řízení a morfologie robotů} \label{exp2}
 \subsection{Oddělený vývoj řízení a morfologie}

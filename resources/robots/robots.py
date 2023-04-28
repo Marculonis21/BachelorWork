@@ -8,17 +8,19 @@ import tempfile
 import numpy as np
 
 class BaseRobot(ABC):
-    def __init__(self, source_file, picture_path):
+    def __init__(self, source_file, picture_path, env_id):
         self.picture_path = picture_path
         with open(source_file) as file:
             lines = file.readlines()
             self.source_text = "".join(lines)
 
+        self.environment_id = env_id # defined in custom evn script
         self.body_parts = {}
         self._collect_body_parts()
 
     @abstractproperty
-    def description(self): pass
+    def description(self):
+        return ""
 
     def _key_to_regex(self, key):
         regex = key.replace("$", "\$")
@@ -74,8 +76,9 @@ class StickAnt(BaseRobot):
         DIR = os.path.dirname(__file__)
         source_file = DIR+"/custom_stick_ant.xml"
         picture_path = DIR+"/Basic-Ant"
+        environment_id = "custom/CustomEnv-v0"
 
-        super(StickAnt, self).__init__(source_file, picture_path)
+        super(StickAnt, self).__init__(source_file, picture_path, environment_id)
 
     @property
     def description(self):
@@ -89,8 +92,9 @@ class AntV3(BaseRobot):
         DIR = os.path.dirname(__file__)
         source_file = DIR+"/ant.xml"
         picture_path = DIR+"/Ant-v3"
+        environment_id = "custom/CustomEnv-v0"
 
-        super(AntV3, self).__init__(source_file, picture_path)
+        super(AntV3, self).__init__(source_file, picture_path, environment_id)
 
     @property
     def description(self):
@@ -101,8 +105,9 @@ class SpotLike(BaseRobot):
         DIR = os.path.dirname(__file__)
         source_file = DIR+"/spot_like.xml"
         picture_path = DIR+"/SpotLike"
+        environment_id = "custom/CustomEnv-v0"
 
-        super(SpotLike, self).__init__(source_file, picture_path)
+        super(SpotLike, self).__init__(source_file, picture_path, environment_id)
 
     @property
     def description(self):
@@ -116,8 +121,9 @@ class Humanoid(BaseRobot):
         DIR = os.path.dirname(__file__)
         source_file = DIR+"/humanoid.xml"
         picture_path = DIR+"/SpotLike"
+        environment_id = "custom/CustomEnv-v0"
 
-        super(Humanoid , self).__init__(source_file, picture_path)
+        super(Humanoid , self).__init__(source_file, picture_path, environment_id)
 
     @property
     def description(self):

@@ -1,55 +1,76 @@
 #!/usr/bin/env python
 
+import roboEvo
+
 import PySimpleGUI as sg
 from PIL import Image, ImageTk
-import roboEvo
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import threading
 import numpy as np
+import math
 
 font = ("Helvetica", 15)
 
-import resources.robots.robots as robotsClass
-robots = {"OpenAI Ant-v3" : robotsClass.AntV3(),
-          "Basic Ant"     : robotsClass.StickAnt(),
-          "SpotLike dog"  : robotsClass.SpotLike()}
+robots : 'dict[str, roboEvo.robots.BaseRobot]'
+robots = {"OpenAI Ant-v3" : roboEvo.robots.AntV3(),
+          "Basic Ant"     : roboEvo.robots.StickAnt(),
+          "SpotLike dog"  : roboEvo.robots.SpotLike()}
 
-import math
-import resources.gaAgents as gaAgents
-agents : 'dict[str, gaAgents.AgentType]'
-agents = {"Full Random"              : gaAgents.FullRandomAgent.ForGUI(),
-          "Sine Function Full"       : gaAgents.SineFuncFullAgent.ForGUI(),
-          "Sine Function Half"       : gaAgents.SineFuncHalfAgent.ForGUI(),
-          "Step Cycle Half"          : gaAgents.StepCycleHalfAgent.ForGUI(),
-          "Truncated Fourier Series" : gaAgents.TFSAgent.ForGUI()}
+agents : 'dict[str, roboEvo.gaAgents.AgentType]'
+agents = {"Full Random"              : roboEvo.gaAgents.FullRandomAgent.ForGUI(),
+          "Sine Function Full"       : roboEvo.gaAgents.SineFuncFullAgent.ForGUI(),
+          "Sine Function Half"       : roboEvo.gaAgents.SineFuncHalfAgent.ForGUI(),
+          "Step Cycle Half"          : roboEvo.gaAgents.StepCycleHalfAgent.ForGUI(),
+          "Truncated Fourier Series" : roboEvo.gaAgents.TFSAgent.ForGUI()}
 
 def single_value_option(key, text, default, disabled=False):
-    return [sg.Column([[sg.Text(text)]], expand_x=True, element_justification='l', background_color='red'), 
-            sg.Column([[sg.Input(default, size=(8,None), enable_events=True, key=key, disabled=disabled)]], expand_x=True, element_justification='l', background_color='blue')]
+        text = [sg.Text(text)]
+        input = [sg.Input(default, size=(8,None), enable_events=True, key=key, disabled=disabled)]
+
+        return text, input
 
 def range_value_option(key, text, default_min, default_max, disabled=False):
-    return [sg.Text(text,pad=(10,10)), sg.Text("MIN", font=("Helvetica", 12)), sg.Input(default_min, size=(8,None), enable_events=True, key=key+"_min", disabled=disabled), 
-                                       sg.Text("MAX", font=("Helvetica", 12)), sg.Input(default_max, size=(8,None), enable_events=True, key=key+"_max", disabled=disabled)]
+    text = [sg.Text(text)]
+    FONT = ("Helvetica", 12)
+    input = [sg.Text("MIN", font=FONT), sg.Input(default_min, size=(8,None), enable_events=True, key=key+"_min", disabled=disabled),
+             sg.Text("MAX", font=FONT), sg.Input(default_min, size=(8,None), enable_events=True, key=key+"_max", disabled=disabled)]
+    return text, input
 
-agent_argument_options = [sg.Column([single_value_option("cycle_repeat", "Step Count", 25),
-                                     single_value_option("testtest", "TEst because why not", 42)], 
-                                     element_justification='l', pad=(30,None), expand_x=True, visible=False, key="options_Full Random"),
-                          sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 4),
-                                     range_value_option("frequency_range", "Frequency range", 0.5, 4),
-                                     range_value_option("shift_x_range", "Shift x", 0, 2*math.pi)], 
-                                     element_justification='l', pad=(30,None), expand_x=True, visible=False, key="options_Sine Function Full"),
-                          sg.Column([range_value_option("amplitude_range", "Amplitude range", 0.5, 4),
-                                     range_value_option("frequency_range", "Frequency range", 0.5, 4),
-                                     range_value_option("shift_x_range", "Shift x", 0, 2*math.pi)],
-                                     element_justification='l', expand_x=True, visible=False, key="options_Sine Function Half"),
-                          sg.Column([single_value_option("cycle_repeat", "Step Count", 25)], 
-                                     element_justification='l', expand_x=True, visible=False, key="options_Step Cycle Half"),
-                          sg.Column([single_value_option("period", "Period", 4),
-                                     single_value_option("series_length", "Truncated series length", 3),
-                                     single_value_option("coeficient_range", "Coeficient range", 1)], 
-                                     element_justification='l', expand_x=True, visible=False, key="options_Truncated Fourier Series"),
-                          ]
+
+def options_FullRandomAgent():
+    cycle = single_value_option("cycle_repeat", "Step Count", 25)
+
+    return [[sg.Column([cycle[0]]), sg.Column([cycle[1]])]]
+
+def options_StepCycleHalf():
+    cycle = single_value_option("cycle_repeat", "Step Count", 25)
+    return [[sg.Column([cycle[0]]), sg.Column([cycle[1]])]]
+
+def options_SineFunctionFull():
+    amp_range = range_value_option("amplitude_range", "Amplitude range", 0.5, 4)
+    freq_range = range_value_option("frequency_range", "Frequency range", 0.5, 4)
+
+    return [[sg.Column([amp_range[0],freq_range[0]]), sg.Column([amp_range[1],freq_range[1]])]]
+
+def options_SineFunctionHalf():
+    amp_range = range_value_option("amplitude_range", "Amplitude range", 0.5, 4)
+    freq_range = range_value_option("frequency_range", "Frequency range", 0.5, 4)
+
+    return [[sg.Column([amp_range[0],freq_range[0]]), sg.Column([amp_range[1],freq_range[1]])]]
+
+def options_TruncatedFourierSeries():
+    period = single_value_option("period", "Period", 4)
+    series_length = single_value_option("series_length", "Truncated series length", 3)
+    coef_range = single_value_option("coef_range", "Max coeficient value", 1)
+
+    return [[sg.Column([period[0], series_length[0], coef_range[0]]), sg.Column([period[1], series_length[1], coef_range[1]])]]
+
+agents_argument_options = {"Full Random"              : sg.Column(options_FullRandomAgent()       , expand_x=True, element_justification='c', key="options_Full Random"),
+                           "Sine Function Full"       : sg.Column(options_SineFunctionFull()      , expand_x=True, element_justification='c', key="options_Sine Function Full"),
+                           "Sine Function Half"       : sg.Column(options_SineFunctionHalf()      , expand_x=True, element_justification='c', key="options_Sine Function Half"),
+                           "Step Cycle Half"          : sg.Column(options_StepCycleHalf()         , expand_x=True, element_justification='c', key="options_Step Cycle Half"),
+                           "Truncated Fourier Series" : sg.Column(options_TruncatedFourierSeries(), expand_x=True, element_justification='c', key="options_Truncated Fourier Series")}
 
 def main_tab():
     frame_text = [[sg.Text("", font=("Helvetica", 14), size=(58, 8), pad=(10,10), key="-MAIN_SETTINGS_OVERVIEW-")]]
@@ -79,9 +100,11 @@ def main_tab():
     return tab
 
 def robot_select_callback(var, index, mode):
+    assert window['-ROBOT_SELECT-'].TKStringVar is not None
     window.write_event_value('-ROBOT_SELECT-', window['-ROBOT_SELECT-'].TKStringVar.get())
 
 def agent_select_callback(var, index, mode):
+    assert window['-AGENT_SELECT-'].TKStringVar is not None
     window.write_event_value('-AGENT_SELECT-', window['-AGENT_SELECT-'].TKStringVar.get())
 
 def expand_description(text):
@@ -116,7 +139,6 @@ def popup_robot_parts(robot_selected):
                sg.Column(right, expand_x=True, expand_y=True, element_justification='c')]]
 
     popup = sg.Window("Select body parts for GA", layout, size=(700,400), font=font, keep_on_top=True, modal=True)
-
     while True:
         event, values = popup.read()
 
@@ -157,6 +179,7 @@ def set_robot(robot_selected):
 
     # check needed range
     cutoff = 320
+    
     TEXT = robot.description
     if len(TEXT) > cutoff:
         TEXT = TEXT[:cutoff] + " ..."
@@ -174,6 +197,7 @@ def robot_select_tab():
     options_menu = [sg.Text("Select robot: "), sg.OptionMenu(robot_names, robot_names[0], pad=(0,10), key="-ROBOT_SELECT-")]
 
     img = sg.Image(source="", size=(400, 400), key="-ROBOT_IMAGE-")
+
     overview = sg.Frame("Robot overview", [[sg.Text(robots[robot_names[0]].description,font=("Helvetica", 14), size=(24, None), pad=(10,10), key="-ROBOT_OVERVIEW-")], 
                                            [sg.VPush()], 
                                            [sg.Push(), sg.Button("...", button_color=sg.theme_background_color(), border_width=0, key="-ROBOT_OVERVIEW_MORE-")]], expand_x=True, expand_y=True)
@@ -206,18 +230,26 @@ def set_agent(agent_selected):
     for name in agent_names:
         window["options_"+name].update(visible=False)
 
+    # Show selected option
     window["options_"+agent_selected].update(visible=True)
 
 def agent_select_tab():
     agent_names = list(agents.keys())
-    options_menu = [sg.Text("Select agent type: "), sg.OptionMenu(agent_names, agent_names[0], pad=(0,20,0,20), key="-AGENT_SELECT-")]
-    frame = [sg.Frame("Agent overview", [[sg.Text(agents[agent_names[0]].description, font=("Helvetica", 14), size=(58, 6), pad=(10,10), key="-AGENT_OVERVIEW-")],
+    default_name = agent_names[0]
+    options_menu = [sg.Text("Select agent type: "), sg.OptionMenu(agent_names, default_name, pad=(0,20,0,20), key="-AGENT_SELECT-")]
+
+    frame = [sg.Frame("Agent overview", [[sg.Text(agents[default_name].description, font=("Helvetica", 14), size=(58, 6), pad=(10,10), key="-AGENT_OVERVIEW-")],
                                          [sg.Push(), sg.Button("...", button_color=sg.theme_background_color(), border_width=0, key="-AGENT_OVERVIEW_MORE-")]], expand_x=True, pad=(10,0))]
+
+
+    agent_options = []
+    for name in agent_names:
+        agent_options.append(agents_argument_options[name])
 
     tab = sg.Tab("Agent config", [options_menu, 
                                   frame,
                                   [sg.VPush()],
-                                  agent_argument_options,
+                                  agent_options,
                                   [sg.VPush()]])
     return tab;
 
@@ -229,6 +261,8 @@ def make_window():
     tabGroup = [[sg.TabGroup([[main_tab(), robot_select_tab(), agent_select_tab()]], size=(800,600))]]
 
     window = sg.Window('Test GUI', tabGroup, size=(800,600), font=font, finalize=True,  use_default_focus=False)
+
+    assert window['-ROBOT_SELECT-'].TKStringVar and window['-AGENT_SELECT-'].TKStringVar is not None
     window['-ROBOT_SELECT-'].TKStringVar.trace("w", robot_select_callback)
     window['-AGENT_SELECT-'].TKStringVar.trace("w", agent_select_callback)
     window['-AGENT_OVERVIEW_MORE-'].block_focus()
@@ -347,11 +381,12 @@ if __name__ == "__main__":
         plt.plot(roboEvo.GRAPH_VALUES[2], label='Max')
         plt.legend(loc='upper left', fontsize=9)
         plt.tight_layout()
-        FIG_AGG = draw_figure(
-            window['-FIG-'].TKCanvas, FIG)
+        FIG_AGG = draw_figure(window['-FIG-'].TKCanvas, FIG)
 
     def update_chart():
         global FIG, FIG_AGG
+
+        assert FIG_AGG is not None
         FIG_AGG.get_tk_widget().forget()
         plt.clf()
         # plt.cla()
@@ -364,8 +399,7 @@ if __name__ == "__main__":
         plt.legend(loc='upper left', fontsize=9)
         plt.tight_layout()
 
-        FIG_AGG = draw_figure(
-            window['-FIG-'].TKCanvas, FIG)
+        FIG_AGG = draw_figure(window['-FIG-'].TKCanvas, FIG)
 
     def GetParams():
         robot = agent = population_size = generation_count = show_best = save_best = save_dir = None
@@ -373,11 +407,11 @@ if __name__ == "__main__":
         robot = robots[window_values["-ROBOT_SELECT-"]] 
 
         agent_selected = window_values["-AGENT_SELECT-"]
-        if agent_selected == "Full Random":                agent = gaAgents.FullRandomAgent(robot, body_part_mask, 25)
-        elif agent_selected == "Sine Function Full":       agent = gaAgents.SineFuncFullAgent(robot, body_part_mask)
-        elif agent_selected == "Sine Function Half":       agent = gaAgents.SineFuncHalfAgent(robot, body_part_mask)
-        elif agent_selected == "Step Cycle Half":          agent = gaAgents.StepCycleHalfAgent(robot, body_part_mask, 20)
-        elif agent_selected == "Truncated Fourier Series": agent = gaAgents.TFSAgent(robot, body_part_mask)
+        if agent_selected == "Full Random":                agent = roboEvo.gaAgents.FullRandomAgent(robot, body_part_mask, 25)
+        elif agent_selected == "Sine Function Full":       agent = roboEvo.gaAgents.SineFuncFullAgent(robot, body_part_mask)
+        elif agent_selected == "Sine Function Half":       agent = roboEvo.gaAgents.SineFuncHalfAgent(robot, body_part_mask)
+        elif agent_selected == "Step Cycle Half":          agent = roboEvo.gaAgents.StepCycleHalfAgent(robot, body_part_mask, 20)
+        elif agent_selected == "Truncated Fourier Series": agent = roboEvo.gaAgents.TFSAgent(robot, body_part_mask)
         else: raise AttributeError("Unknown control agent type - " + agent_selected)
 
         population_size = int(window_values["-MAIN_POP_SIZE_IN-"])

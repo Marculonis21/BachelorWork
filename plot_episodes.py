@@ -8,6 +8,7 @@ import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--open", default=False, const=True, nargs='?', type=str, help="Open saved history")
+parser.add_argument("--tick_step", default=10, nargs='?', type=int, help="Step in x ticks")
 
 if __name__ == "__main__":
     args = parser.parse_args([] if "__file__" not in globals() else None)
@@ -26,13 +27,10 @@ if __name__ == "__main__":
 
     history = np.array(history)
     per_gen_values = history.reshape(-1,history.shape[2])
-    # per_gen_values = np.array(history)
 
-    # print(per_gen_values.shape)
-    # quit()
+    tick_step = args.tick_step
+    n_ticks = int(np.ceil(per_gen_values.shape[1]/tick_step))
 
-    n_ticks = 21
-    tick_step = 10
     index = np.arange(n_ticks)*tick_step
     plt.boxplot(per_gen_values[:,index], positions=np.arange(n_ticks))
     plt.plot(np.max(per_gen_values[:,index], axis=0), label="max fitness")

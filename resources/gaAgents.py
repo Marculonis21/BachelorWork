@@ -10,7 +10,7 @@ import lzma
 import resources.gaMethods as gaMethods
 GA = gaMethods.GA()
 
-class AgentType(ABC):
+class BaseAgent(ABC):
     def  __init__(self, robot, body_part_mask):
         self.use_body_parts = any(body_part_mask)
         self.body_part_mask = np.array(body_part_mask)
@@ -26,7 +26,7 @@ class AgentType(ABC):
         self.arguments = {}
 
     @abstractclassmethod
-    def ForGUI(cls): pass
+    def for_GUI(cls): pass
 
     @abstractproperty
     def description(self): pass
@@ -46,12 +46,6 @@ class AgentType(ABC):
     @abstractmethod
     def mutation(self, population): pass
 
-    def save_old(self, individual, path):
-        np.save(path, individual)
-
-    def load_old(self, path):
-        return np.load(path)
-
     @staticmethod
     def save(agent, robot, individual, path):
         with lzma.open(path, "wb") as save_file:
@@ -63,7 +57,7 @@ class AgentType(ABC):
             agent, robot, individual = pickle.load(save_file)
         return agent, robot, individual
 
-class StepCycleHalfAgent(AgentType):
+class StepCycleHalfAgent(BaseAgent):
     def __init__(self, robot, body_part_mask, cycle_repeat, GUI=False):
         if not GUI:
             super(StepCycleHalfAgent, self).__init__(robot, body_part_mask)
@@ -72,7 +66,7 @@ class StepCycleHalfAgent(AgentType):
             self.arguments = {"cycle_repeat":cycle_repeat}
 
     @classmethod
-    def ForGUI(cls):
+    def for_GUI(cls):
         "Return default agent for GUI needs"
         return cls(None, None, None, True)
 
@@ -115,7 +109,7 @@ class StepCycleHalfAgent(AgentType):
     def mutation(self, population):
         return GA.mutation(population, self.action_size, self.use_body_parts, indiv_mutation_prob=0.25, action_mutation_prob=0.03)
 
-class SineFuncFullAgent(AgentType):
+class SineFuncFullAgent(BaseAgent):
     # individual = amplitude, frequency, shift-x, shift-y for each leg
     def __init__(self, robot, body_part_mask, GUI=False):
         if not GUI:
@@ -129,7 +123,7 @@ class SineFuncFullAgent(AgentType):
                                              "MAX": self.arguments["frequency_range"]["MAX"]/2}
 
     @classmethod
-    def ForGUI(cls):
+    def for_GUI(cls):
         "Return default agent for GUI needs"
         return cls(None, None, True)
 
@@ -166,7 +160,7 @@ class SineFuncFullAgent(AgentType):
 
         for _ in range(population_size):
             actions = []
-            for i in range(self.action_size):
+            for _ in range(self.action_size):
                 actions.append(np.random.uniform(self.arguments["amplitude_range"]["MIN"], self.arguments["amplitude_range"]["MAX"])) # amplitude
                 actions.append(np.random.uniform(self.arguments["frequency_range"]["MIN"], self.arguments["frequency_range"]["MAX"])) # frequency
                 actions.append(np.random.uniform(self.arguments["shift_x_range"]["MIN"],   self.arguments["shift_x_range"]["MAX"]))     # shift-x
@@ -225,7 +219,7 @@ class SineFuncFullAgent(AgentType):
 
         return new_population
 
-class SineFuncHalfAgent(AgentType):
+class SineFuncHalfAgent(BaseAgent):
     # individual = amplitude, frequency, shift-x, shift-y for each leg
     def __init__(self, robot, body_part_mask, GUI=False):
         if not GUI:
@@ -240,7 +234,7 @@ class SineFuncHalfAgent(AgentType):
                                              "MAX": self.arguments["frequency_range"]["MAX"]/2}
 
     @classmethod
-    def ForGUI(cls):
+    def for_GUI(cls):
         "Return default agent for GUI needs"
         return cls(None, None, True)
 
@@ -278,7 +272,7 @@ class SineFuncHalfAgent(AgentType):
 
         for _ in range(population_size):
             actions = []
-            for i in range(self.action_size):
+            for _ in range(self.action_size):
                 actions.append(np.random.uniform(self.arguments["amplitude_range"]["MIN"], self.arguments["amplitude_range"]["MAX"])) # amplitude
                 actions.append(np.random.uniform(self.arguments["frequency_range"]["MIN"], self.arguments["frequency_range"]["MAX"])) # frequency
                 actions.append(np.random.uniform(self.arguments["shift_x_range"]["MIN"],   self.arguments["shift_x_range"]["MAX"]))   # shift-x
@@ -337,7 +331,7 @@ class SineFuncHalfAgent(AgentType):
 
         return new_population
 
-class FullRandomAgent(AgentType):
+class FullRandomAgent(BaseAgent):
     def __init__(self, robot, body_part_mask, cycle_repeat, GUI=False):
         if not GUI:
             super(FullRandomAgent, self).__init__(robot, body_part_mask)
@@ -345,7 +339,7 @@ class FullRandomAgent(AgentType):
         self.arguments = {"cycle_repeat":cycle_repeat}
 
     @classmethod
-    def ForGUI(cls):
+    def for_GUI(cls):
         "Return default agent for GUI needs"
         return cls(None,None,None,True)
 
@@ -390,7 +384,7 @@ class FullRandomAgent(AgentType):
 
 # https://ic.unicamp.br/~reltech/PFG/2017/PFG-17-07.pdf
 # https://web.fe.up.pt/~pro09025/papers/Shafii%20N.%20-%202009%20-%20A%20truncated%20fourier%20series%20with%20genetic%20algorithm%20for%20the%20control%20of%20biped%20locomotion.pdf
-class TFSAgent(AgentType):
+class TFSAgent(BaseAgent):
     def __init__(self, robot, body_part_mask, GUI=False):
         if not GUI:
             super(TFSAgent, self).__init__(robot, body_part_mask)
@@ -400,7 +394,7 @@ class TFSAgent(AgentType):
                           "coeficient_range":1}
 
     @classmethod
-    def ForGUI(cls):
+    def for_GUI(cls):
         "Return default agent for GUI needs"
         return cls(None,None,True)
 

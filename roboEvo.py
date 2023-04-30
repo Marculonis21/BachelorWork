@@ -5,9 +5,7 @@ import resources.gymnasiumCustomEnv as _
 
 import resources.gaAgents as gaAgents
 import resources.robots.robots as robots
-from resources.runParams import RunParams
-
-import argparse
+from resources.experiment_params import ExperimentParams
 
 import gymnasium as gym
 from gymnasium.wrappers.time_limit import TimeLimit
@@ -30,15 +28,15 @@ GRAPH_VALUES = [[],[],[]]
 EPISODE_HISTORY = []
 LAST_POP = None
 
-def raisePreview():
+def raise_preview():
     global GUI_PREVIEW
     GUI_PREVIEW = True
 
-def raiseAbort():
+def raise_abort():
     global GUI_ABORT
     GUI_ABORT = True
 
-def simulationRun(env, agent, individual, render=False):
+def __simulation_run(env, agent, individual, render=False):
     steps = -1
     individual_reward = 0
     terminated = False
@@ -55,6 +53,11 @@ def simulationRun(env, agent, individual, render=False):
         if render:
             env.render()
 
+        """
+        Calculating an intricate reward might task user with redefining what
+        information is returned from the custom environment returns - which
+        shouldn't (is not) that hard.
+        """
         if terminated or truncated: # calculate reward after finishing last step
             individual_reward = (info["x_position"]-0.5*abs(info["y_position"]))
             break
@@ -62,7 +65,7 @@ def simulationRun(env, agent, individual, render=False):
     # Optionally for future - return REWARD + some colected information ??? 
     return individual_reward
 
-def renderRun(agent, robot, individual):
+def render_run(agent, robot, individual):
     run_reward = -1 
     file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
     try:
@@ -75,13 +78,13 @@ def renderRun(agent, robot, individual):
                        render_mode="human")
         env = TimeLimit(env, max_episode_steps=500)
 
-        run_reward = simulationRun(env, agent, individual, render=True)
+        run_reward = __simulation_run(env, agent, individual, render=True)
     finally:
         file.close()
 
     return run_reward
 
-def evolution(robot, agent, client, generation_count, population_size, debug=False):
+def __run_evolution(robot, agent, client, generation_count, population_size, debug=False):
     global GRAPH_VALUES, EPISODE_HISTORY, LAST_POP
     global GUI_GEN_NUMBER, GUI_FITNESS, GUI_PREVIEW
 
@@ -110,8 +113,8 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
         env = TimeLimit(env, max_episode_steps=500)
 
         environments.append(env)
-        # there exists only 1 env if we don't need more!
-        if not agent.use_body_parts:
+
+        if not agent.use_body_parts: # there exists only 1 environment if we don't need more!
             break
 
     best_individual = None 
@@ -124,7 +127,7 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
         GUI_GEN_NUMBER = generations
 
         if GUI_PREVIEW: # GUI FORCED PREVIEW
-            renderRun(agent, robot, best_individual)
+            render_run(agent, robot, best_individual)
             GUI_PREVIEW = False
 
         # Get fitness values
@@ -132,10 +135,10 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
         futures = []
         if debug:
             for index, individual in enumerate(population):
-                fitness_values.append(simulationRun(environments[index if agent.use_body_parts else 0], agent, individual))
+                fitness_values.append(__simulation_run(environments[index if agent.use_body_parts else 0], agent, individual))
         else:
             for index, individual in enumerate(population):
-                futures.append(client.submit(simulationRun, environments[index if agent.use_body_parts else 0], agent, individual))
+                futures.append(client.submit(__simulation_run, environments[index if agent.use_body_parts else 0], agent, individual))
 
             fitness_values = client.gather(futures)
 
@@ -224,7 +227,7 @@ def evolution(robot, agent, client, generation_count, population_size, debug=Fal
 ################################################################################
 ################################################################################
 
-def RunEvolution(params, gui=False, debug=False):
+def run_experiment(params:ExperimentParams, gui=False, debug=False):
     global GUI_FLAG
     GUI_FLAG = gui
 
@@ -234,20 +237,20 @@ def RunEvolution(params, gui=False, debug=False):
     # Run evolution
     try:
         print("RUNNING EVOLUTION")
-        best_individual, best_individual_env = evolution(params.robot, 
-                                                         params.agent,
-                                                         client,
-                                                         generation_count=params.ga_generation_count, 
-                                                         population_size=params.ga_population_size, 
-                                                         debug=debug)
+        best_individual, best_individual_env = __run_evolution(params.robot, 
+                                                               params.agent,
+                                                               client,
+                                                               generation_count=params.ga_generation_count, 
+                                                               population_size=params.ga_population_size, 
+                                                               debug=debug)
         print("EVOLUTION DONE")
     finally:
         client.close()
 
     # Set final reward (render best if set)
     best_reward = 0
-    if params.show_best: best_reward = renderRun(params.agent, params.robot, best_individual)
-    else:                best_reward = simulationRun(best_individual_env, params.agent, best_individual, render=False)
+    if params.show_best: best_reward = render_run(params.agent, params.robot, best_individual)
+    else:                best_reward = __simulation_run(best_individual_env, params.agent, best_individual, render=False)
 
     # File saving
     if not os.path.exists(params.save_dir):
@@ -255,7 +258,7 @@ def RunEvolution(params, gui=False, debug=False):
 
     current_time = time.time()
     if params.save_best:
-        gaAgents.AgentType.save(params.agent, params.robot, best_individual, params.save_dir + f"/{params.note}_individual_run{current_time}_rew{best_reward}.save")
+        gaAgents.BaseAgent.save(params.agent, params.robot, best_individual, params.save_dir + f"/{params.note}_individual_run{current_time}_rew{best_reward}.save")
 
     episode_history = np.array(EPISODE_HISTORY)
     last_population = np.array(LAST_POP, dtype=object)

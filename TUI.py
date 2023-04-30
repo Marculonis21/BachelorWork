@@ -22,7 +22,7 @@ def main(args):
     if args.open: 
         try:
             agent, robot, individual = roboEvo.gaAgents.AgentType.load(args.open)
-            run_reward = roboEvo.renderRun(agent, robot, individual)
+            run_reward = roboEvo.render_run(agent, robot, individual)
             print("Run reward: ", run_reward)
         except Exception as e:
             print("Problem occured while loading save file\n")
@@ -48,7 +48,7 @@ def main(args):
                 params = experiments.exp11_TFS_spotlike()
 
             params.note = f"run{i+1}_{params.note}" 
-            roboEvo.RunEvolution(params)
+            roboEvo.run_experiment(params)
 
     # Start single experiment
     else:
@@ -58,7 +58,7 @@ def main(args):
             params = experiments.exp12_SineFull_spotlike()
             params.note = "motors_test_" + params.note
 
-        roboEvo.RunEvolution(params, args.debug)
+        roboEvo.run_experiment(params, args.debug)
     print("Exiting ...")
 
 if __name__ == "__main__":

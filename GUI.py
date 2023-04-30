@@ -17,12 +17,12 @@ robots = {"OpenAI Ant-v3" : roboEvo.robots.AntV3(),
           "Basic Ant"     : roboEvo.robots.StickAnt(),
           "SpotLike dog"  : roboEvo.robots.SpotLike()}
 
-agents : 'dict[str, roboEvo.gaAgents.AgentType]'
-agents = {"Full Random"              : roboEvo.gaAgents.FullRandomAgent.ForGUI(),
-          "Sine Function Full"       : roboEvo.gaAgents.SineFuncFullAgent.ForGUI(),
-          "Sine Function Half"       : roboEvo.gaAgents.SineFuncHalfAgent.ForGUI(),
-          "Step Cycle Half"          : roboEvo.gaAgents.StepCycleHalfAgent.ForGUI(),
-          "Truncated Fourier Series" : roboEvo.gaAgents.TFSAgent.ForGUI()}
+agents : 'dict[str, roboEvo.gaAgents.BaseAgent]'
+agents = {"Full Random"              : roboEvo.gaAgents.FullRandomAgent.for_GUI(),
+          "Sine Function Full"       : roboEvo.gaAgents.SineFuncFullAgent.for_GUI(),
+          "Sine Function Half"       : roboEvo.gaAgents.SineFuncHalfAgent.for_GUI(),
+          "Step Cycle Half"          : roboEvo.gaAgents.StepCycleHalfAgent.for_GUI(),
+          "Truncated Fourier Series" : roboEvo.gaAgents.TFSAgent.for_GUI()}
 
 def single_value_option(key, text, default, disabled=False):
         text = [sg.Text(text)]
@@ -420,12 +420,19 @@ if __name__ == "__main__":
         show_best = window_values["-CB_FINAL-"]
         save_best = window_values["-CB_SAVEBEST-"]
         save_dir = window_values["Browse"]
-        params = roboEvo.RunParams(robot, agent, population_size, generation_count, show_best, save_best, save_dir, "GUIRUN")
+        params = roboEvo.ExperimentParams(robot, 
+                                          agent, 
+                                          population_size, 
+                                          generation_count, 
+                                          show_best, 
+                                          save_best, 
+                                          save_dir, 
+                                          "GUI")
 
         return params
             
     def startRun():
-        roboEvo.RunEvolution(GetParams(), gui=True)
+        roboEvo.run_experiment(GetParams(), gui=True)
 
     working_thread = threading.Thread(target=startRun, daemon=True)
     working_thread.start()
@@ -445,10 +452,10 @@ if __name__ == "__main__":
             break
 
         if event == "-RUN_PREVIEW-":
-            roboEvo.raisePreview()
+            roboEvo.raise_preview()
 
         if event == "-EXIT-":
-            roboEvo.raiseAbort()
+            roboEvo.raise_abort()
             working_thread.join()
             window.close()
 

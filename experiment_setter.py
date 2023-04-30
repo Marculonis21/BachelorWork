@@ -7,7 +7,7 @@ import copy
 
 import resources.gaAgents as gaAgents
 import resources.robots.robots as robots
-from resources.runParams import RunParams
+from resources.experiment_params import ExperimentParams 
 
 class Experiments:
     """
@@ -21,7 +21,7 @@ class Experiments:
     """
 
     __batch_dir = "./saves/batch_runs/@1_run_@2_@3_@4/"
-    __experiments : typing.Dict[str, RunParams]
+    __experiments : typing.Dict[str, ExperimentParams]
 
     def __init__(self):
         self.__experiments = {}
@@ -55,14 +55,14 @@ class Experiments:
 
         batch_dir = self.__create_batch_dir(robot, agent, note)
 
-        params = RunParams(robot, 
-                           agent,
-                           ga_population_size=100,
-                           ga_generation_count=500,
-                           show_best=False,
-                           save_best=True,
-                           save_dir=batch_dir,
-                           note="")
+        params = ExperimentParams(robot, 
+                                  agent,
+                                  ga_population_size=100,
+                                  ga_generation_count=500,
+                                  show_best=False,
+                                  save_best=True,
+                                  save_dir=batch_dir,
+                                  note="")
 
         if run: # print note before starting experiment
             self.__exp_start_note()
@@ -76,14 +76,14 @@ class Experiments:
 
         batch_dir = self.__create_batch_dir(robot, agent, note)
 
-        params = RunParams(robot, 
-                           agent,
-                           ga_population_size=100,
-                           ga_generation_count=200,
-                           show_best=False,
-                           save_best=True,
-                           save_dir=batch_dir,
-                           note="")
+        params = ExperimentParams(robot, 
+                                  agent,
+                                  ga_population_size=100,
+                                  ga_generation_count=200,
+                                  show_best=False,
+                                  save_best=True,
+                                  save_dir=batch_dir,
+                                  note="")
 
         if run: # print note before starting experiment
             self.__exp_start_note()
@@ -97,14 +97,14 @@ class Experiments:
 
         batch_dir = self.__create_batch_dir(robot, agent, note)
 
-        params = RunParams(robot, 
-                           agent,
-                           ga_population_size=100,
-                           ga_generation_count=100,
-                           show_best=False,
-                           save_best=True,
-                           save_dir=batch_dir,
-                           note="")
+        params = ExperimentParams(robot, 
+                                  agent,
+                                  ga_population_size=100,
+                                  ga_generation_count=100,
+                                  show_best=False,
+                                  save_best=True,
+                                  save_dir=batch_dir,
+                                  note="")
 
         if run: # print note before starting experiment
             self.__exp_start_note()
@@ -118,14 +118,14 @@ class Experiments:
 
         batch_dir = self.__create_batch_dir(robot, agent, note)
 
-        params = RunParams(robot, 
-                           agent,
-                           ga_population_size=100,
-                           ga_generation_count=200,
-                           show_best=False,
-                           save_best=True,
-                           save_dir=batch_dir,
-                           note="")
+        params = ExperimentParams(robot, 
+                                  agent,
+                                  ga_population_size=100,
+                                  ga_generation_count=200,
+                                  show_best=False,
+                                  save_best=True,
+                                  save_dir=batch_dir,
+                                  note="")
 
         if run: # print note before starting experiment
             self.__exp_start_note()
@@ -139,14 +139,14 @@ class Experiments:
 
         batch_dir = self.__create_batch_dir(robot, agent, note)
 
-        params = RunParams(robot, 
-                           agent,
-                           ga_population_size=100,
-                           ga_generation_count=100,
-                           show_best=False,
-                           save_best=True,
-                           save_dir=batch_dir,
-                           note="")
+        params = ExperimentParams(robot, 
+                                  agent,
+                                  ga_population_size=100,
+                                  ga_generation_count=100,
+                                  show_best=False,
+                                  save_best=True,
+                                  save_dir=batch_dir,
+                                  note="")
 
         if run: # print note before starting experiment
             self.__exp_start_note()

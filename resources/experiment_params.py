@@ -1,14 +1,14 @@
 import resources.robots.robots as robots
 import resources.gaAgents as gaAgents
 
-class RunParams:
+class ExperimentParams:
     def __init__(self, 
                  robot:robots.BaseRobot, 
-                 agent:gaAgents.AgentType,
+                 agent:gaAgents.BaseAgent,
                  ga_population_size=100,
                  ga_generation_count=150,
                  show_best=False,
-                 save_best=False,
+                 save_best=True,
                  save_dir='./saves/individuals',
                  note=""):
         self.robot               = robot

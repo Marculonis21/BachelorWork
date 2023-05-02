@@ -1,5 +1,3 @@
-%%% Fiktivní kapitola s instrukcemi k PDF/A
-
 \chapter{Experimenty a výsledky}
 
 V této kapitole se podíváme na tři typy experimentů, které s naším systémem
@@ -30,6 +28,14 @@ předvádějící možnost evolučního vývoje jak řízení tak morfologie rob
 
 \section{Vývoj řízení robotů} \label{exp1}
 
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{../img/BIGexperiment1_TFS_10ticks.pdf}
+    \caption{TEST velkého experimentu pro omezení velikosti statistického
+    rozboru, 20 opakování algoritmu po 500 generacích}
+\end{figure}
+
+\pagebreak
 V této sekci se zaměříme na vývoj řízení robotů. Vývoj řízení je ovlivněn
 hlavně zvoleným řídícím agentem, který popisuje zvolený evoluční algoritmus.
 Tento agent z genetických informací kóduje vstupy pro motory (nastavení kloubů)
@@ -62,9 +68,10 @@ robotů.
 Nejprve se pokusíme řízení robota vyvinout pomocí evolučního
 algoritmu, který kóduje nastavení motorů pomocí základních periodických funkcí
 (agent popisující tento algoritmus popsán v implementaci v sekci
-\ref{imp:gaAgents.sinefull}). Každý motor robota má v tomto případě přiřazenou vlastní
-periodickou funkci a genotyp jedinců specifikuje parametry těchto periodických
-funkcí (4 parametry pro každý kloub -- amplituda, frekvence, $x$ a $y$ posun).
+\ref{imp:gaAgents.sinefuncfullagent}). Každý motor robota má v tomto případě
+přiřazenou vlastní periodickou funkci a genotyp jedinců specifikuje parametry
+těchto periodických funkcí (4 parametry pro každý kloub -- amplituda,
+frekvence, $x$ a $y$ posun).
 
 Evoluční algoritmus poběží \textbf{200 generací} se \textbf{100} náhodně
 inicializovanými jedinci. Pro vyhodnocení bude celý běh evolučního algoritmu
@@ -87,10 +94,10 @@ fitness okolo 10 a absolutní většina populace není schopna většího posunu
 
 \paragraph{}
 Pro porovnání volíme pokročilého agenta, kódujícího nastavení motorů pomocí
-omezených Fourierových řad (agent popsán v sekci \ref{imp:gaAgents.TFS}). Tento agent
-je na úkor malého zvětšení genotypu, oproti předchozímu agentovi schopný
-generovat mnohem komplexnější periodické funkce popsané skládáním několika
-funkcí sinus.
+omezených Fourierových řad (agent popsán v sekci \ref{imp:gaAgents.TFSagent}).
+Tento agent je na úkor malého zvětšení genotypu, oproti předchozímu agentovi
+schopný generovat mnohem komplexnější periodické funkce popsané skládáním
+několika funkcí sinus.
 
 Stejně jako v předchozím běhu, algoritmus poběží 200 generací se 100 jedinci a
 bude opět pětkrát zopakován.

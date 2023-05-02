@@ -1,9 +1,14 @@
-\begin{thebibliography}{26}
+\begin{thebibliography}{29}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[pys()]{pysimplegui}
+Python guis for humans.
+\newblock URL \url{https://www.pysimplegui.org/}.
+\newblock Accessed: May 1, 2023.
 
 \bibitem[CoppeliaRobotics()]{coppeliarobotics}
 {\sc CoppeliaRobotics}.
@@ -62,6 +67,12 @@
   synapses.
 \newblock \emph{Journal of Machine Learning Research}, {\bf 9}\penalty0 (5).
 
+\bibitem[Guizzo(2019)]{guizzo2019leaps}
+{\sc Guizzo, E.} (2019).
+\newblock By leaps and bounds: An exclusive look at how boston dynamics is
+  redefining robot agility.
+\newblock \emph{IEEE Spectrum}, {\bf 56}\penalty0 (12), \penalty0 34--39.
+
 \bibitem[Izadi a Bezuijen(2018)]{izadi2018simulating}
 {\sc Izadi, E. {\rm a} Bezuijen, A.} (2018).
 \newblock Simulating direct shear tests with the bullet physics library: A
@@ -96,6 +107,12 @@
 \newblock Cyberbotics ltd. webots™: professional mobile robot simulation.
 \newblock \emph{International Journal of Advanced Robotic Systems}, {\bf
   1}\penalty0 (1), \penalty0 5.
+
+\bibitem[MuJoCo()]{modeling-mujocodocumentation}
+{\sc MuJoCo}.
+\newblock Mujoco modeling.
+\newblock URL \url{https://mujoco.readthedocs.io/en/stable/modeling.html}.
+\newblock Accessed: May 1, 2023.
 
 \bibitem[Nogueira(2014)]{nogueira2014comparative}
 {\sc Nogueira, L.} (2014).

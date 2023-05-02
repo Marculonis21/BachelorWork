@@ -10,6 +10,7 @@ class ExperimentParams:
                  show_best=False,
                  save_best=True,
                  save_dir='./saves/individuals',
+                 show_graph=True,
                  note=""):
         self.robot               = robot
         self.agent               = agent
@@ -18,4 +19,5 @@ class ExperimentParams:
         self.show_best           = show_best
         self.save_best           = save_best
         self.save_dir            = save_dir
+        self.show_graph          = show_graph 
         self.note                = note

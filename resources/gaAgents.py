@@ -5,10 +5,11 @@ import math
 # import gym
 import gymnasium as gym
 import pickle
+import json
 import lzma
 
-import resources.gaMethods as gaMethods
-GA = gaMethods.GA()
+import resources.gaOperators as gaOperators
+Operators = gaOperators.Operators
 
 class BaseAgent(ABC):
     def  __init__(self, robot, body_part_mask):
@@ -101,13 +102,13 @@ class StepCycleHalfAgent(BaseAgent):
         return population
 
     def selection(self, population, fitness_values):
-        return GA.tournament_selection(population, fitness_values, 5)
+        return Operators.tournament_selection(population, fitness_values, 5)
 
     def crossover(self, population):
-        return GA.crossover_uniform(population, self.use_body_parts)
+        return Operators.crossover_uniform(population, self.use_body_parts)
 
     def mutation(self, population):
-        return GA.mutation(population, self.action_size, self.use_body_parts, indiv_mutation_prob=0.25, action_mutation_prob=0.03)
+        return Operators.uniform_mutation(population, self.action_size, self.use_body_parts, indiv_mutation_prob=0.25, action_mutation_prob=0.03)
 
 class SineFuncFullAgent(BaseAgent):
     # individual = amplitude, frequency, shift-x, shift-y for each leg
@@ -178,10 +179,10 @@ class SineFuncFullAgent(BaseAgent):
         return population
 
     def selection(self, population, fitness_values):
-        return GA.tournament_selection(population, fitness_values, 5)
+        return Operators.tournament_selection(population, fitness_values, 5)
 
     def crossover(self, population):
-        return GA.crossover_uniform(population, self.use_body_parts)
+        return Operators.crossover_uniform(population, self.use_body_parts)
 
     def mutation(self, population):
         new_population = []
@@ -290,10 +291,10 @@ class SineFuncHalfAgent(BaseAgent):
         return population
 
     def selection(self, population, fitness_values):
-        return GA.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
+        return Operators.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
 
     def crossover(self, population):
-        return GA.crossover_uniform(population, self.use_body_parts)
+        return Operators.crossover_uniform(population, self.use_body_parts)
 
     def mutation(self, population):
         new_population = []
@@ -374,13 +375,13 @@ class FullRandomAgent(BaseAgent):
         return population
 
     def selection(self, population, fitness_values):
-        return GA.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
+        return Operators.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
 
     def crossover(self, population):
-        return GA.crossover_uniform(population, self.use_body_parts)
+        return Operators.crossover_uniform(population, self.use_body_parts)
 
     def mutation(self, population):
-        return GA.mutation(population, self.action_size, self.use_body_parts, indiv_mutation_prob=0.75, action_mutation_prob=0.1)
+        return Operators.uniform_mutation(population, self.action_size, self.use_body_parts, indiv_mutation_prob=0.75, action_mutation_prob=0.1)
 
 # https://ic.unicamp.br/~reltech/PFG/2017/PFG-17-07.pdf
 # https://web.fe.up.pt/~pro09025/papers/Shafii%20N.%20-%202009%20-%20A%20truncated%20fourier%20series%20with%20genetic%20algorithm%20for%20the%20control%20of%20biped%20locomotion.pdf
@@ -472,10 +473,10 @@ class TFSAgent(BaseAgent):
     def selection(self, population, fitness_values):
         # return GA.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
         # return GA.tournament_selection(population, fitness_values, int(len(population)*0.2))
-        return GA.roulette_selection(population, fitness_values)
+        return Operators.roulette_selection(population, fitness_values)
 
     def crossover(self, population):
-        return GA.crossover_uniform(population, self.use_body_parts)
+        return Operators.crossover_uniform(population, self.use_body_parts)
 
     def mutation(self, population):
         new_population = []

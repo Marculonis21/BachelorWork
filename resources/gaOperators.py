@@ -3,12 +3,12 @@ import copy
 import numpy as np
 import random
 
-class GA:
+class Operators:
     @staticmethod
     def roulette_selection(population, fitness_values): # TOURNAMENT
         num_positive = np.sum([1 if x > 0 else 0 for x in fitness_values])
         if num_positive < len(population)*0.20:
-            return GA.tournament_selection(population, fitness_values, int(len(population)*0.2))
+            return Operators.tournament_selection(population, fitness_values, int(len(population)*0.2))
 
         fitness_values = [x if x > 0 else 0 for x in fitness_values]
         sum = np.sum(fitness_values)
@@ -125,7 +125,7 @@ class GA:
         return new_population
 
     @staticmethod
-    def mutation(population, action_size, use_body_parts, indiv_mutation_prob=0.5, action_mutation_prob=0.1, body_mutation_prob=0.2):
+    def uniform_mutation(population, action_size, use_body_parts, indiv_mutation_prob=0.5, action_mutation_prob=0.1, body_mutation_prob=0.2):
         new_population = []
 
         for individual in population:

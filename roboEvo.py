@@ -79,12 +79,14 @@ def render_run(agent, robot, individual):
         env = TimeLimit(env, max_episode_steps=500)
 
         run_reward = __simulation_run(env, agent, individual, render=True)
+
+        env.close()
     finally:
         file.close()
 
     return run_reward
 
-def __run_evolution(robot, agent, client, generation_count, population_size, debug=False):
+def __run_evolution(robot, agent, client, generation_count, population_size, show_graph, debug=False):
     global GRAPH_VALUES, EPISODE_HISTORY, LAST_POP
     global GUI_GEN_NUMBER, GUI_FITNESS, GUI_PREVIEW
 
@@ -156,17 +158,17 @@ def __run_evolution(robot, agent, client, generation_count, population_size, deb
 
             if not GUI_FLAG:
                 print("Best fitness: ", max(fitness_values))
-
-                # plt.cla()
-                # plt.title('Training')
-                # plt.xlabel('5 Generations')
-                # plt.ylabel('Fitness')
-                # plt.plot(GRAPH_VALUES[0], label='Mean')
-                # plt.plot(GRAPH_VALUES[1], label='Min')
-                # plt.plot(GRAPH_VALUES[2], label='Max')
-                # plt.legend(loc='upper left', fontsize=9)
-                # plt.tight_layout()
-                # plt.pause(0.1)
+                if show_graph:
+                    plt.cla()
+                    plt.title('Training')
+                    plt.xlabel('5 Generations')
+                    plt.ylabel('Fitness')
+                    plt.plot(GRAPH_VALUES[0], label='Mean')
+                    plt.plot(GRAPH_VALUES[1], label='Min')
+                    plt.plot(GRAPH_VALUES[2], label='Max')
+                    plt.legend(loc='upper left', fontsize=9)
+                    plt.tight_layout()
+                    plt.pause(0.1)
 
         # get index of the best individuals for elitism
         elitism_count = int(population_size*0.10) # 10% of pop size
@@ -242,6 +244,7 @@ def run_experiment(params:ExperimentParams, gui=False, debug=False):
                                                                client,
                                                                generation_count=params.ga_generation_count, 
                                                                population_size=params.ga_population_size, 
+                                                               show_graph=params.show_graph,
                                                                debug=debug)
         print("EVOLUTION DONE")
     finally:
@@ -264,3 +267,4 @@ def run_experiment(params:ExperimentParams, gui=False, debug=False):
     last_population = np.array(LAST_POP, dtype=object)
     np.save(params.save_dir + f"/{params.note}_episode_history{current_time}", episode_history)
     np.save(params.save_dir + f"/{params.note}_last_population{current_time}", last_population)
+

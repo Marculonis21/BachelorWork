@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import threading
 import numpy as np
-import math
 
 font = ("Helvetica", 15)
 
@@ -75,24 +74,23 @@ agents_argument_options = {"Full Random"              : sg.Column(options_FullRa
 def main_tab():
     frame_text = [[sg.Text("", font=("Helvetica", 14), size=(58, 8), pad=(10,10), key="-MAIN_SETTINGS_OVERVIEW-")]]
 
-    frame = [sg.Frame("Settings overview", frame_text, size=(800, 300), pad=(10,10))]
+    frame = [sg.Frame("Experiment overview", frame_text, size=(800, 300), pad=(10,10))]
 
     options_l = [[sg.Input("150", size=(5,None), enable_events=True, key="-MAIN_GEN_COUNT_IN-"), sg.Text("Generation count")],
                  [sg.Checkbox("Show final run", key="-CB_FINAL-")],
-                 [sg.Checkbox("Show progress runs", key="-CB_PROGRESS-")],
                  [sg.Sizer(0, 1)]]
 
     options_r = [[sg.Input("100", size=(5,None), enable_events=True, key="-MAIN_POP_SIZE_IN-"), sg.Text("Starting population")],
-                 [sg.Checkbox("Save best agent", default=True, key="-CB_SAVEBEST-")],
-                 [sg.Text("Save directory:"), sg.Text("./saves/individuals/", size=(30,None), font=("Helvetica", 10), key="-SAVE_DIR-")],
-                 [sg.FolderBrowse("Browse", target="-SAVE_DIR-")]]
+                 [sg.Checkbox("Save best agent", default=True, key="-CB_SAVEBEST-")]]
 
     options = [sg.Col([[sg.Col(options_l, element_justification='l', vertical_alignment='t', expand_x=True), sg.Col(options_r, element_justification='l', vertical_alignment='t', expand_x=True)]], expand_x=True, pad=(5,10))]
+    save_dir = [sg.Text("Save directory:", pad=(10,None)), sg.Text("./saves/individuals/", size=(30,None), font=("Helvetica", 10), key="-SAVE_DIR-"), sg.FolderBrowse("Browse", target="-SAVE_DIR-")]
 
     start = [sg.Push(), sg.Button("Start", key="-START-")]
 
     main = [frame,
             options,
+            save_dir,
             [sg.VPush()],
             start]
 
@@ -212,9 +210,8 @@ def robot_select_tab():
             img_overview,
             [sg.VPush()]]
 
-    tab = sg.Tab("Robot Select", main)
+    tab = sg.Tab("Robot select", main)
     return tab;
-
 
 def set_agent(agent_selected):
     TEXT = agents[agent_selected].description
@@ -258,7 +255,7 @@ def evolution_config_tab():
     return tab;
 
 def make_window():
-    tabGroup = [[sg.TabGroup([[main_tab(), robot_select_tab(), agent_select_tab()]], size=(800,600))]]
+    tabGroup = [[sg.TabGroup([[main_tab(), robot_select_tab(), agent_select_tab(), evolution_config_tab()]], size=(800,600))]]
 
     window = sg.Window('Test GUI', tabGroup, size=(800,600), font=font, finalize=True,  use_default_focus=False)
 
@@ -282,7 +279,7 @@ def make_run_window():
     return window
 
 if __name__ == "__main__":
-# Create the Window
+    # Create the Window
     window = make_window()
     _, values = window.read(timeout=0)
 

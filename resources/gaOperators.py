@@ -106,21 +106,21 @@ class Operators:
             child1 = copy.deepcopy(population[2*i])
             child2 = copy.deepcopy(population[2*i+1])
 
-            child1_actions, child1_body = child1
-            child2_actions, child2_body = child2
+            child1_actions, child1_body_parts = child1
+            child2_actions, child2_body_parts = child2
             for a in range(len(child1_actions)):
                 if random.random() <= 0.5:
                     child1_actions[a] = population[2*i+1][0][a]
                     child2_actions[a] = population[2*i][0][a]
 
             if use_body_parts:
-                for b in range(len(child1_body)):
+                for b in range(len(child1_body_parts)):
                     if random.random() <= 0.5:
-                        child1_body[b] = population[2*i+1][1][b]
-                        child2_body[b] = population[2*i][1][b]
+                        child1_body_parts[b] = population[2*i+1][1][b]
+                        child2_body_parts[b] = population[2*i][1][b]
 
-            new_population.append([child1_actions, child1_body])
-            new_population.append([child2_actions, child2_body])
+            new_population.append([child1_actions, child1_body_parts])
+            new_population.append([child2_actions, child2_body_parts])
 
         return new_population
 

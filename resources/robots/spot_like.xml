@@ -1,9 +1,9 @@
 <mujoco model="spotlike">
   <compiler angle="degree" coordinate="local" inertiafromgeom="true"/>
   <option integrator="RK4" timestep="0.01"/>
-  <custom>
-    <numeric data="0.0 0.0 0.55 1.0 0.0 0.0 0.0 0.0 1.0 0.0 -1.0 0.0 -1.0 0.0 1.0" name="init_qpos"/>
-  </custom>
+  <!-- <custom> -->
+  <!--   <numeric data="0.0 0.0 0.55 1.0 0.0 0.0 0.0 0.0 1.0 0.0 -1.0 0.0 -1.0 0.0 1.0" name="init_qpos"/> -->
+  <!-- </custom> -->
 
   <default>
     <joint armature="1" damping="10" frictionloss="0.25" limited="true"/>
@@ -11,29 +11,36 @@
 
     <default class="geom_def">
         <geom type="capsule"/>
+
         <default class="thigh">
-            <geom size="0.125" rgba="0.55 0.55 0.55 1"/>
+            <!-- <geom fromto="0 0 0 -0.9 0 -0.8" size="0.125" rgba="0.55 0.55 0.55 1"/> -->
+            <geom fromto="0 0 0 $THIGH_X(-0.9)$ 0 $THIGH_Z(-0.8)$" size="0.125" rgba="0.55 0.55 0.55 1"/>
 
-            <default class="FRONT_thigh">
-                <geom fromto="0 0 0 -0.9 0 -0.8"/>
-            </default>
-            <default class="BACK_thigh">
-                <geom fromto="0 0 0 -0.9 0 -0.8"/>
-            </default>
+            <!-- <default class="FRONT_thigh"> -->
+            <!--     <geom fromto="0 0 0 -(0.9+1) 0 -(0.8+1)"/> -->
+            <!-- </default> -->
+
+            <!-- <default class="BACK_thigh"> -->
+            <!--     <geom fromto="0 0 0 -0.9 0 -0.8"/> -->
+            <!-- </default> -->
         </default>
+
         <default class="calf">
-            <geom size="0.075" rgba="0.3 0.3 0.3 1"/>
+            <!-- <geom fromto="0 0 0 0.8 0 -1" size="0.075" rgba="0.3 0.3 0.3 1"/> -->
+            <geom fromto="0 0 0 $CALF_X(0.8)$ 0 @-1.8-$THIGH_Z(-0.8)$@" size="0.075" rgba="0.3 0.3 0.3 1"/>
 
-            <default class="FRONT_calf">
-                <geom fromto="0 0 0 0.8 0 -1"/>
-            </default>
-            <default class="BACK_calf">
-                <geom fromto="0 0 0 0.8 0 -1"/>
-            </default>
+            <!-- <default class="FRONT_calf"> -->
+            <!--     <geom fromto="0 0 0 0.8 0 -1"/> -->
+            <!-- </default> -->
+            <!-- <default class="BACK_calf"> -->
+            <!--     <geom fromto="0 0 0 0.8 0 -1"/> -->
+            <!-- </default> -->
         </default>
+
         <default class="foot">
-            <geom pos="0.8 0 -1" size="0.15" type="sphere" rgba="0 1 0 1"/>
+            <geom pos="$CALF_X(0.8)$ 0 @-1.8-$THIGH_Z(-0.8)$@" size="0.15" type="sphere" rgba="0 1 0 1"/>
         </default>
+
     </default>
 
     <default class="knee">
@@ -79,11 +86,12 @@
         <body name="FL_thigh" pos="0 -0.6 0">
           <joint class="L_hip_X" name="FL_hip_X"/>
           <joint class="hip_Y" name="FL_hip_Y"/>
-          <geom class="FRONT_thigh" name="FL_thigh_geom"/>
+          <!-- <geom class="FRONT_thigh" name="FL_thigh_geom"/> -->
+          <geom class="thigh" name="FL_thigh_geom"/>
 
-          <body name="FL_calf" pos="-0.9 0 -0.8">
+          <body name="FL_calf" pos="$THIGH_X(-0.9)$ 0 $THIGH_Z(-0.8)$">
             <joint class="knee" name="FL_knee"/>
-            <geom class="FRONT_calf" name="FL_calf_geom"/>
+            <geom class="calf" name="FL_calf_geom"/>
 
             <geom class="foot"/>
           </body>
@@ -92,11 +100,11 @@
         <body name="FR_thigh" pos="0 +0.6 0">
           <joint class="R_hip_X" name="FR_hip_X"/>
           <joint class="hip_Y" name="FR_hip_Y"/>
-          <geom class="FRONT_thigh" name="FR_thigh_geom"/>
+          <geom class="thigh" name="FR_thigh_geom"/>
 
-          <body name="FR_calf" pos="-0.9 0 -0.8">
+          <body name="FR_calf" pos="$THIGH_X(-0.9)$ 0 $THIGH_Z(-0.8)$">
             <joint class="knee" name="FR_knee"/>
-            <geom class="FRONT_calf" name="FR_calf_geom"/>
+            <geom class="calf" name="FR_calf_geom"/>
 
             <geom class="foot"/>
           </body>
@@ -108,11 +116,11 @@
         <body name="BL_thigh" pos="0 -0.6 0">
           <joint class="L_hip_X" name="BL_hip_X"/>
           <joint class="hip_Y" name="BL_hip_Y"/>
-          <geom class="BACK_thigh" name="BL_thigh_geom"/>
+          <geom class="thigh" name="BL_thigh_geom"/>
 
-          <body name="BL_calf" pos="-0.9 0 -0.8">
+          <body name="BL_calf" pos="$THIGH_X(-0.9)$ 0 $THIGH_Z(-0.8)$">
             <joint class="knee" name="BL_knee"/>
-            <geom class="BACK_calf" name="BL_calf_geom"/>
+            <geom class="calf" name="BL_calf_geom"/>
 
             <geom class="foot"/>
           </body>
@@ -121,11 +129,11 @@
         <body name="BR_thigh" pos="0 +0.6 0">
           <joint class="R_hip_X" name="BR_hip_X"/>
           <joint class="hip_Y" name="BR_hip_Y"/>
-          <geom class="BACK_thigh" name="BR_thigh_geom"/>
+          <geom class="thigh" name="BR_thigh_geom"/>
 
-          <body name="BR_calf" pos="-0.9 0 -0.8">
+          <body name="BR_calf" pos="$THIGH_X(-0.9)$ 0 $THIGH_Z(-0.8)$">
             <joint class="knee" name="BR_knee"/>
-            <geom class="BACK_calf" name="BR_calf_geom"/>
+            <geom class="calf" name="BR_calf_geom"/>
 
             <geom class="foot"/>
           </body>

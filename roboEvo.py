@@ -14,7 +14,6 @@ import numpy as np
 import copy
 from dask.distributed import Client
 import time
-import tempfile
 import os
 
 GUI_FLAG = False
@@ -67,9 +66,8 @@ def __simulation_run(env, agent, individual, render=False):
 
 def render_run(agent, robot, individual):
     run_reward = -1 
-    file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
     try:
-        robot.create(file, agent.body_part_mask, individual)
+        file = robot.create(agent.body_part_mask, individual)
 
         env = gym.make(id=robot.environment_id,
                        xml_file=file.name,
@@ -78,9 +76,11 @@ def render_run(agent, robot, individual):
                        render_mode="human")
         env = TimeLimit(env, max_episode_steps=500)
 
+        print("PREPARED FOR RENDERING...")
+        input()
         run_reward = __simulation_run(env, agent, individual, render=True)
 
-        env.close()
+        # env.close() # TODO
     finally:
         file.close()
 
@@ -101,10 +101,7 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
 
     # create individual source files for different bodies (if needed - body parts evolutions)
     for i in range(len(population)):
-        file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
-
-        robot.create(file, agent.body_part_mask, population[i])
-
+        file = robot.create(agent.body_part_mask, population[i])
         robot_source_files.append(file)
 
         env = gym.make(id=robot.environment_id,
@@ -192,10 +189,14 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
         mutated_children = agent.mutation(children)
         population = mutated_children
 
+        # apply elitism - transfer top individuals
+        for i in range(len(elite_individuals)):
+            population[i] = elite_individuals[i]
+
         # change environments based on possible robot morphology changes
         for i in range(len(population)):
             environments[i].close()
-            robot.create(robot_source_files[i], agent.body_part_mask, population[i])
+            robot.create(agent.body_part_mask, population[i], tmp_file=robot_source_files[i])
 
             if generations != generation_count:
                 env = gym.make(id=robot.environment_id,
@@ -208,12 +209,6 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
 
             if not agent.use_body_parts:
                 break
-
-        # apply elitism
-        for i in range(len(elite_individuals)):
-            population[i] = elite_individuals[i]
-            if agent.use_body_parts:
-                environments[i] = elite_individuals_envs[i]
 
     # after evo close tmp files
     for file in robot_source_files:

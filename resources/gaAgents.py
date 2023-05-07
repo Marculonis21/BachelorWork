@@ -14,10 +14,10 @@ Operators = gaOperators.Operators
 class BaseAgent(ABC):
     def  __init__(self, robot, body_part_mask):
         self.use_body_parts = any(body_part_mask)
-        self.body_part_mask = np.array(body_part_mask)
+        self.body_part_mask = np.array( body_part_mask, dtype=object)
 
         file = robot.create_default()
-        default_env = gym.make('custom/CustomEnv-v0', xml_file=file.name)
+        default_env = gym.make(robot.environment_id, xml_file=file.name)
         file.close()
 
         assert default_env.action_space.shape is not None
@@ -59,9 +59,9 @@ class BaseAgent(ABC):
         return agent, robot, individual
 
 class StepCycleHalfAgent(BaseAgent):
-    def __init__(self, robot, body_part_mask, cycle_repeat, GUI=False):
+    def __init__(self, robot, body_parts, cycle_repeat, GUI=False):
         if not GUI:
-            super(StepCycleHalfAgent, self).__init__(robot, body_part_mask)
+            super(StepCycleHalfAgent, self).__init__(robot, body_parts)
             self.action_size = self.action_size//2
 
             self.arguments = {"cycle_repeat":cycle_repeat}
@@ -88,15 +88,17 @@ class StepCycleHalfAgent(BaseAgent):
         population = []
 
         for _ in range(population_size):
+            actions = []
+            body_parts = [None]*len(self.body_part_mask)
+
             actions = 2*np.random.random(size=(self.arguments["cycle_repeat"], self.action_size,)) - 1
 
-            individual = []
             if self.use_body_parts:
-                body_parts = 1.5*np.random.random(size=(np.sum(self.body_part_mask)))
-                individual = [actions, body_parts]
-            else:
-                individual = [actions, None]
+                for i, value in enumerate(self.body_part_mask):
+                    if value:
+                        body_parts[i] = np.random.uniform(value[0], value[1])
 
+            individual = [actions, body_parts]
             population.append(individual)
 
         return population
@@ -112,9 +114,9 @@ class StepCycleHalfAgent(BaseAgent):
 
 class SineFuncFullAgent(BaseAgent):
     # individual = amplitude, frequency, shift-x, shift-y for each leg
-    def __init__(self, robot, body_part_mask, GUI=False):
+    def __init__(self, robot, body_parts, GUI=False):
         if not GUI:
-            super(SineFuncFullAgent, self).__init__(robot, body_part_mask)
+            super(SineFuncFullAgent, self).__init__(robot, body_parts)
 
         self.arguments = {}
         self.arguments["amplitude_range"] = {"MIN":0.5, "MAX":4}
@@ -161,19 +163,20 @@ class SineFuncFullAgent(BaseAgent):
 
         for _ in range(population_size):
             actions = []
+            body_parts = [None]*len(self.body_part_mask)
+
             for _ in range(self.action_size):
                 actions.append(np.random.uniform(self.arguments["amplitude_range"]["MIN"], self.arguments["amplitude_range"]["MAX"])) # amplitude
                 actions.append(np.random.uniform(self.arguments["frequency_range"]["MIN"], self.arguments["frequency_range"]["MAX"])) # frequency
                 actions.append(np.random.uniform(self.arguments["shift_x_range"]["MIN"],   self.arguments["shift_x_range"]["MAX"]))     # shift-x
                 actions.append(np.random.uniform(self.arguments["shift_y_range"]["MIN"],   self.arguments["shift_y_range"]["MAX"]))     # shift-y
 
-            individual = []
             if self.use_body_parts:
-                body_parts = 1.5*np.random.random(size=(np.sum(self.body_part_mask)))
-                individual = [actions, body_parts]
-            else:
-                individual = [actions, None]
+                for i, value in enumerate(self.body_part_mask):
+                    if value:
+                        body_parts[i] = np.random.uniform(value[0], value[1])
 
+            individual = [actions, body_parts]
             population.append(individual)
 
         return population
@@ -222,9 +225,9 @@ class SineFuncFullAgent(BaseAgent):
 
 class SineFuncHalfAgent(BaseAgent):
     # individual = amplitude, frequency, shift-x, shift-y for each leg
-    def __init__(self, robot, body_part_mask, GUI=False):
+    def __init__(self, robot, body_parts, GUI=False):
         if not GUI:
-            super(SineFuncHalfAgent, self).__init__(robot, body_part_mask)
+            super(SineFuncHalfAgent, self).__init__(robot, body_parts)
             self.action_size = self.action_size//2
 
         self.arguments = {}
@@ -273,19 +276,20 @@ class SineFuncHalfAgent(BaseAgent):
 
         for _ in range(population_size):
             actions = []
+            body_parts = [None]*len(self.body_part_mask)
+
             for _ in range(self.action_size):
                 actions.append(np.random.uniform(self.arguments["amplitude_range"]["MIN"], self.arguments["amplitude_range"]["MAX"])) # amplitude
                 actions.append(np.random.uniform(self.arguments["frequency_range"]["MIN"], self.arguments["frequency_range"]["MAX"])) # frequency
                 actions.append(np.random.uniform(self.arguments["shift_x_range"]["MIN"],   self.arguments["shift_x_range"]["MAX"]))   # shift-x
                 actions.append(np.random.uniform(self.arguments["shift_y_range"]["MIN"],   self.arguments["shift_y_range"]["MAX"]))   # shift-y
 
-            individual = []
             if self.use_body_parts:
-                body_parts = 1.5*np.random.random(size=(np.sum(self.body_part_mask)))
-                individual = [actions, body_parts]
-            else:
-                individual = [actions, None]
+                for i, value in enumerate(self.body_part_mask):
+                    if value:
+                        body_parts[i] = np.random.uniform(value[0], value[1])
 
+            individual = [actions, body_parts]
             population.append(individual)
 
         return population
@@ -333,9 +337,9 @@ class SineFuncHalfAgent(BaseAgent):
         return new_population
 
 class FullRandomAgent(BaseAgent):
-    def __init__(self, robot, body_part_mask, cycle_repeat, GUI=False):
+    def __init__(self, robot, body_parts, cycle_repeat, GUI=False):
         if not GUI:
-            super(FullRandomAgent, self).__init__(robot, body_part_mask)
+            super(FullRandomAgent, self).__init__(robot, body_parts)
 
         self.arguments = {"cycle_repeat":cycle_repeat}
 
@@ -361,15 +365,17 @@ class FullRandomAgent(BaseAgent):
 
         for _ in range(population_size):
             # gen actions
+            actions = []
+            body_parts = [None]*len(self.body_part_mask)
+
             actions = 2*np.random.random(size=(self.arguments["cycle_repeat"], self.action_size,)) - 1
 
-            individual = []
             if self.use_body_parts:
-                body_parts = 1.5*np.random.random(size=(np.sum(self.body_part_mask)))
-                individual = [actions, body_parts]
-            else:
-                individual = [actions, None]
+                for i, value in enumerate(self.body_part_mask):
+                    if value:
+                        body_parts[i] = np.random.uniform(value[0], value[1])
 
+            individual = [actions, body_parts]
             population.append(individual)
 
         return population
@@ -445,6 +451,7 @@ class TFSAgent(BaseAgent):
 
         for _ in range(population_size):
             values = []
+            body_parts = [None]*len(self.body_part_mask)
 
             # for each motor gen TFS coeficients
             for _ in range(self.action_size):
@@ -458,14 +465,12 @@ class TFSAgent(BaseAgent):
 
                 values.append(np.concatenate([amps,shifts]))
 
-            individual = []
-
             if self.use_body_parts:
-                body_parts = 1.5*np.random.random(size=(np.sum(self.body_part_mask)))
-                individual = [values, body_parts]
-            else:
-                individual = [values, None]
+                for i, value in enumerate(self.body_part_mask):
+                    if value:
+                        body_parts[i] = np.random.uniform(value[0], value[1])
 
+            individual = [values, body_parts]
             population.append(individual)
 
         return population
@@ -483,14 +488,11 @@ class TFSAgent(BaseAgent):
 
         individual_mutation_prob = 0.75
         action_mutation_prob = 0.1
-        body_mutation_prob = 0.05
+        body_mutation_prob = 0.1
 
         for individual in population:
             if np.random.random() < individual_mutation_prob:
-                actions = []
-                body = []
-
-                actions, body = individual
+                actions, body_parts = individual
 
                 for i in range(len(actions)):
                     if np.random.random() < action_mutation_prob:
@@ -505,11 +507,11 @@ class TFSAgent(BaseAgent):
                         actions[i] = np.concatenate([amps, shifts])
 
                 if self.use_body_parts:
-                    for i in range(len(body)):
-                        if np.random.random() < body_mutation_prob:
-                            body[i] = 1.5*np.random.random(size=(1))
+                    for i, value in enumerate(self.body_part_mask):
+                        if value and np.random.random() < body_mutation_prob:
+                            body_parts[i] = np.random.uniform(value[0], value[1])
 
-                individual = [actions, body]
+                individual = [actions, body_parts]
 
             new_population.append(individual)
 

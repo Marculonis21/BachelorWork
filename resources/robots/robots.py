@@ -29,10 +29,13 @@ class BaseRobot(ABC):
 
         return regex
 
-    def create(self, file, body_part_mask, individual=([],[])):
+    def create(self, body_part_mask, individual=([],[]), tmp_file=None):
         """
             Writes XML file (in place) - robot specific XML string with changed body part variables
         """
+
+        if tmp_file == None:
+            tmp_file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
 
         _, body_part_adjustments = individual
 
@@ -44,16 +47,22 @@ class BaseRobot(ABC):
             # set to desired body part length if True in mask ELSE set to a default value given by xml source file
             text = re.sub(regex, str(body_part_adjustments[i] if body_part_mask[i] else self.body_parts[key]), text)
 
+        # compute body parts calculations
+        calculations = re.findall(r'@.*@', text)
+        for calc in calculations:
+            _calc = calc.strip('@')
+            text = re.sub(calc, str(eval(_calc)), text)
+
         # clear and change file in place
-        file.seek(0)
-        file.truncate()
-        file.write(text)
-        file.flush()
+        tmp_file.seek(0)
+        tmp_file.truncate()
+        tmp_file.write(text)
+        tmp_file.flush()
+
+        return tmp_file
 
     def create_default(self):
-        tmp_file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
-
-        self.create(tmp_file, body_part_mask=np.zeros([len(self.body_parts)]))
+        tmp_file = self.create(body_part_mask=np.zeros([len(self.body_parts)]))
 
         return tmp_file
 
@@ -62,10 +71,11 @@ class BaseRobot(ABC):
             Get names and default lengths of all changable body parts from XML
             source file
         """
-            
-        part_names = re.findall("\$.*\$", self.source_text)
+
+        part_names = re.findall(r'\$[A-Za-z_]+\([+-]?[0-9]*[.]?[0-9]+\)\$', self.source_text)
         for part in part_names:
-            self.body_parts[part] = float(part[part.find("(")+1 : part.find(")")]) # get between parenthesis
+            if not part in self.body_parts:
+                self.body_parts[part] = float(part[part.find("(")+1 : part.find(")")]) # get between parenthesis
 
     @property
     def body_part_names(self):

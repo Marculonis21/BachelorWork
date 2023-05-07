@@ -30,6 +30,7 @@ class Experiments:
         self.__experiments["exp12_TFS"] = self.exp12_TFS_spotlike(False)
         self.__experiments["exp11_SineFull"] = self.exp11_SineFull_spotlike(False)
         self.__experiments["exp12_SineFull"] = self.exp12_SineFull_spotlike(False)
+        self.__experiments["exp_BODYTEST"] = self.exp_BODYTEST(False)
 
     def __create_batch_dir(self, robot, agent, note):
         batch_dir = self.__batch_dir.replace("@1", note).replace(
@@ -47,6 +48,28 @@ class Experiments:
     def get_experiment(self, name):
         assert name in self.get_experiment_names(), f"Unknown experiment name - list of created experiments {self.get_experiment_names()}"
         return copy.copy(self.__experiments[name])
+
+    def exp_BODYTEST(self, run=True):
+        robot = robots.SpotLike()
+        # agent = gaAgents.TFSAgent(robot, [False]*len(robot.body_parts))
+        agent = gaAgents.TFSAgent(robot, [False, (-0.1, -1), False])
+        note = "bodytest2"
+        
+        batch_dir = self.__create_batch_dir(robot, agent, note)
+
+        params = ExperimentParams(robot, 
+                                  agent,
+                                  ga_population_size=250,
+                                  ga_generation_count=200,
+                                  show_best=True,
+                                  save_best=True,
+                                  save_dir=batch_dir,
+                                  note="")
+
+        if run: # print note before starting experiment
+            self.__exp_start_note()
+
+        return params
 
     def exp10_TFS_spotlike(self, run=True):
         robot = robots.SpotLike()

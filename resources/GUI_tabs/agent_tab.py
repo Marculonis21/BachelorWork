@@ -7,61 +7,79 @@ import roboEvo
 font = ("Helvetica", 15)
 
 agents : 'dict[str, roboEvo.gaAgents.BaseAgent]'
-# TODO: REDO ALL AGENTS WHEN ROBOT CHANGES WITH DEFUALT VALUES - will be much easier to configure
-agents = {"Full Random"              : roboEvo.gaAgents.FullRandomAgent.for_GUI(),
-          "Sine Function Full"       : roboEvo.gaAgents.SineFuncFullAgent.for_GUI(),
-          "Sine Function Half"       : roboEvo.gaAgents.SineFuncHalfAgent.for_GUI(),
-          "Step Cycle Half"          : roboEvo.gaAgents.StepCycleHalfAgent.for_GUI(),
-          "Truncated Fourier Series" : roboEvo.gaAgents.TFSAgent.for_GUI()}
+
+agents = {agent.__class__.__name__ : agent for agent in [
+    roboEvo.gaAgents.FullRandomAgent.for_GUI(),
+    roboEvo.gaAgents.SineFuncFullAgent.for_GUI(),
+    roboEvo.gaAgents.SineFuncHalfAgent.for_GUI(),
+    roboEvo.gaAgents.StepCycleHalfAgent.for_GUI(),
+    roboEvo.gaAgents.TFSAgent.for_GUI()
+]}
 
 agent_names = list(agents.keys())
 
-def single_value_option(key, text, default, disabled=False):
-        text = [sg.Text(text)]
-        input = [sg.Input(default, size=(8,None), enable_events=True, key=key, disabled=disabled)]
+agents_argument_defaults = {}
 
-        return text, input
+def single_value_option(key, text, default, disabled=False):
+    text = [sg.Text(text)]
+    input = [sg.Input(default, size=(8,None), enable_events=True, key=key, disabled=disabled)]
+
+    global agents_argument_defaults
+    agents_argument_defaults[key] = default
+
+    return text, input
 
 def range_value_option(key, text, default_min, default_max, disabled=False):
     text = [sg.Text(text)]
     FONT = ("Helvetica", 12)
     input = [sg.Text("MIN", font=FONT), sg.Input(default_min, size=(8,None), enable_events=True, key=key+"_min", disabled=disabled),
              sg.Text("MAX", font=FONT), sg.Input(default_max, size=(8,None), enable_events=True, key=key+"_max", disabled=disabled)]
+
+    global agents_argument_defaults
+    agents_argument_defaults[key+"_min"] = default_min
+    agents_argument_defaults[key+"_max"] = default_max
+
     return text, input
 
-def options_FullRandomAgent():
-    cycle = single_value_option("cycle_repeat", "Step Count", 25)
+def get_agent_arguments(agent_name):
+    agent = agents[agent_name]
 
-    return [[sg.Column([cycle[0]]), sg.Column([cycle[1]])]]
+    names = []
+    inputs = []
 
-def options_StepCycleHalf():
-    cycle = single_value_option("cycle_repeat", "Step Count", 25)
-    return [[sg.Column([cycle[0]]), sg.Column([cycle[1]])]]
+    for arg in agent.arguments:
+        # RANGE argument
+        if isinstance(agent.arguments[arg], dict):
+            _name, _input = range_value_option(f"{agent_name}|{arg}", str(arg).capitalize(), agent.arguments[arg]["MIN"], agent.arguments[arg]["MAX"])
+            names.append(_name)
+            inputs.append(_input)
 
-def options_SineFunctionFull():
-    amp_range = range_value_option("amplitude_range", "Amplitude range", 0.5, 4)
-    freq_range = range_value_option("frequency_range", "Frequency range", 0.5, 4)
+        # SINGLE VALUE argument
+        else: 
+            _name, _input = single_value_option(f"{agent_name}|{arg}", str(arg).capitalize(), agent.arguments[arg])
+            names.append(_name)
+            inputs.append(_input)
 
-    return [[sg.Column([amp_range[0],freq_range[0]]), sg.Column([amp_range[1],freq_range[1]])]]
+    return [[sg.Column(names), sg.Column(inputs)]]
 
-def options_SineFunctionHalf():
-    amp_range = range_value_option("amplitude_range", "Amplitude range", 0.5, 4)
-    freq_range = range_value_option("frequency_range", "Frequency range", 0.5, 4)
+def reset_agent_arguments(agent_name, window):
+    agent = agents[agent_name]
+    for arg in agent.arguments:
+        if isinstance(agent.arguments[arg], dict):
+            window[f"{agent_name}|{arg}_min"].update(agent.arguments[arg]["MIN"])
+            window[f"{agent_name}|{arg}_max"].update(agent.arguments[arg]["MAX"])
+        else:
+            window[f"{agent_name}|{arg}"].update(agent.arguments[arg])
 
-    return [[sg.Column([amp_range[0],freq_range[0]]), sg.Column([amp_range[1],freq_range[1]])]]
+agents_argument_options = {agent : sg.Column(get_agent_arguments(agent), expand_x=True, element_justification='c', key=f"options_{agent}") for agent in agent_names}
 
-def options_TruncatedFourierSeries():
-    period = single_value_option("period", "Period", 4)
-    series_length = single_value_option("series_length", "Truncated series length", 3)
-    coef_range = single_value_option("coef_range", "Max coeficient value", 1)
+def reload_agents(window, robot, agent):
+    # reload all agents with current body part settings and reset current agent arguments if agent is set
+    for name in agent_names:
+        agents[name] = agents[name].__class__(robot, [False]*len(robot.body_parts) if agent == None else agent.orig_body_part_mask)
 
-    return [[sg.Column([period[0], series_length[0], coef_range[0]]), sg.Column([period[1], series_length[1], coef_range[1]])]]
-
-agents_argument_options = {"Full Random"              : sg.Column(options_FullRandomAgent()       , expand_x=True, element_justification='c', key="options_Full Random"),
-                           "Sine Function Full"       : sg.Column(options_SineFunctionFull()      , expand_x=True, element_justification='c', key="options_Sine Function Full"),
-                           "Sine Function Half"       : sg.Column(options_SineFunctionHalf()      , expand_x=True, element_justification='c', key="options_Sine Function Half"),
-                           "Step Cycle Half"          : sg.Column(options_StepCycleHalf()         , expand_x=True, element_justification='c', key="options_Step Cycle Half"),
-                           "Truncated Fourier Series" : sg.Column(options_TruncatedFourierSeries(), expand_x=True, element_justification='c', key="options_Truncated Fourier Series")}
+        if agent.__class__.__name__ == name:
+            reset_agent_arguments(name, window)
 
 def tab():
     agent_names = list(agents.keys())
@@ -70,7 +88,6 @@ def tab():
 
     frame = [sg.Frame("Agent overview", [[sg.Text(agents[default_name].description, font=("Helvetica", 14), size=(58, 6), pad=(10,10), key="-AGENT_OVERVIEW-")],
                                          [sg.Push(), sg.Button("...", button_color=sg.theme_background_color(), border_width=0, key="-AGENT_OVERVIEW_MORE-")]], expand_x=True, pad=(10,0))]
-
 
     agent_options = []
     for name in agent_names:
@@ -104,7 +121,18 @@ def expand_description(text):
     frame = sg.Frame("Description", [[sg.Text(text, size=(60,None), font=("Helvetica", 14), pad=(10,10))]])
     sg.Window("Description long", [[frame]], font=font, keep_on_top=True, modal=True).read(close=True)
 
+def handle_argument_inputs(window, values, key):
+    out = ""
+    for s in values[key]:
+        if s in '1234567890.':
+            out += s
+    window[key].update(out)
+
 def events(window, event, values):
+    # '|' splits agent arguments
+    if '|' in event: 
+        handle_argument_inputs(window, values, event)
+
     if event == "-AGENT_SELECT-":
         set_agent(values["-AGENT_SELECT-"], window)
         window['-AGENT_SELECT-'].widget.select_clear()

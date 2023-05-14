@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import copy
+from distributed.client import PooledRPCCall
 import numpy as np
 import random
 
@@ -7,8 +8,8 @@ class Operators:
     @staticmethod
     def roulette_selection(population, fitness_values): # TOURNAMENT
         num_positive = np.sum([1 if x > 0 else 0 for x in fitness_values])
-        if num_positive < len(population)*0.20:
-            return Operators.tournament_selection(population, fitness_values, int(len(population)*0.2))
+        if num_positive < len(population)/3:
+            return Operators.tournament_selection(population, fitness_values, int(len(population)*0.1))
 
         fitness_values = [x if x > 0 else 0 for x in fitness_values]
         sum = np.sum(fitness_values)
@@ -16,8 +17,9 @@ class Operators:
         selection_probability = fitness_values/sum
 
         new_population_indexes = np.random.choice(len(population), size=len(population), p=selection_probability)
-        population = np.array(population, dtype=object)
 
+        population = np.array(population, dtype=object)
+        
         return population[new_population_indexes]
 
     @staticmethod
@@ -26,17 +28,13 @@ class Operators:
         Runs tournamnets between randomly chosen individuals and selects the best from each tournament.
         """
 
-        population = np.array(population, dtype=object)
         fitness_values = np.array(fitness_values)
 
         new_population = []
-        for _ in range(0,len(population)):
+        for _ in range(len(population)):
             idx = np.random.choice(len(population), size=k)
-
-            individuals = population[idx]
             fitnesses = fitness_values[idx]
-
-            new_population.append(individuals[np.argmax(fitnesses)])
+            new_population.append(population[np.argmax(fitnesses)])
 
         return new_population
 
@@ -68,7 +66,7 @@ class Operators:
         return new_population
 
     @staticmethod
-    def crossover_single_point(population, use_body_parts):
+    def crossover_single_point(population, evolve_control, evolve_body):
         new_population = []
 
         for i in range(0,len(population)//2):
@@ -79,14 +77,15 @@ class Operators:
             indiv2_actions, indiv2_body = indiv2
 
             # crossover for actions
-            crossover_point_actions = random.randint(1, len(indiv1_actions))
-            end2 = copy.deepcopy(indiv2_actions[:crossover_point_actions])
+            if evolve_control:
+                crossover_point_actions = random.randint(1, len(indiv1_actions))
+                end2 = copy.deepcopy(indiv2_actions[:crossover_point_actions])
 
-            indiv2_actions[:crossover_point_actions] = indiv1_actions[:crossover_point_actions]
-            indiv1_actions[:crossover_point_actions] = end2
+                indiv2_actions[:crossover_point_actions] = indiv1_actions[:crossover_point_actions]
+                indiv1_actions[:crossover_point_actions] = end2
 
             # crossover for body
-            if use_body_parts:
+            if evolve_body:
                 crossover_point_body = random.randint(1, len(indiv1_body))
                 end2 = copy.deepcopy(indiv2_body[:crossover_point_body])
 
@@ -99,7 +98,7 @@ class Operators:
         return new_population
 
     @staticmethod
-    def crossover_uniform(population, use_body_parts):
+    def crossover_uniform(population, evolve_control, evolve_body):
         new_population = []
 
         for i in range(len(population)//2):
@@ -108,12 +107,14 @@ class Operators:
 
             child1_actions, child1_body_parts = child1
             child2_actions, child2_body_parts = child2
-            for a in range(len(child1_actions)):
-                if random.random() <= 0.5:
-                    child1_actions[a] = population[2*i+1][0][a]
-                    child2_actions[a] = population[2*i][0][a]
 
-            if use_body_parts:
+            if evolve_control:
+                for a in range(len(child1_actions)):
+                    if random.random() <= 0.5:
+                        child1_actions[a] = population[2*i+1][0][a]
+                        child2_actions[a] = population[2*i][0][a]
+
+            if evolve_body:
                 for b in range(len(child1_body_parts)):
                     if random.random() <= 0.5:
                         child1_body_parts[b] = population[2*i+1][1][b]
@@ -125,24 +126,57 @@ class Operators:
         return new_population
 
     @staticmethod
-    def uniform_mutation(population, action_size, use_body_parts, indiv_mutation_prob=0.5, action_mutation_prob=0.1, body_mutation_prob=0.2):
+    def uniform_mutation(population, agent):
         new_population = []
 
         for individual in population:
-            if random.random() < indiv_mutation_prob:
-                actions = []
-                body = []
-
+            if random.random() < agent.individual_mutation_prob:
                 actions, body = individual
 
-                for a in range(len(actions)):
-                    if random.random() < action_mutation_prob:
-                        actions[a] = 2*np.random.random(size=(action_size,)) - 1
+                if agent.evolve_control:
+                    for a in range(len(actions)):
+                        if random.random() < agent.action_mutation_prob:
+                            new_action = np.array([])
 
-                if use_body_parts:
+                            for part in range(len(agent.action_range)):
+                                new_action = np.concatenate([new_action, np.random.uniform(agent.action_range[part][0], agent.action_range[part][1], size=agent.action_range[part][2])])
+                                    
+                            actions[a] = new_action
+
+                if agent.evolve_body:
                     for b in range(len(body)):
-                        if random.random() < body_mutation_prob:
-                            body[b] = 1.5*np.random.random(size=(1))
+                        if random.random() < agent.body_mutation_prob:
+                            body[b] = np.random.uniform(agent.body_range[b][0], agent.body_range[b][1])
+
+                individual = [actions, body]
+
+            new_population.append(individual)
+
+        return new_population
+
+    @staticmethod
+    def uniform_shift_mutation(population, agent):
+        new_population = []
+
+        for individual in population:
+            if np.random.random() < agent.individual_mutation_prob:
+                actions, body = individual
+
+                if agent.evolve_control:
+                    for a in range(len(actions)):
+                        if np.random.random() < agent.action_mutation_prob:
+                            action_shift = np.array([])
+
+                            for part in range(len(agent.action_range)):
+                                # max 5% shift
+                                action_shift = np.concatenate([action_shift, np.random.uniform(agent.action_range[part][0]*0.05, agent.action_range[part][1]*0.05, size=agent.action_range[part][2])])
+
+                            actions[a] += action_shift
+
+                if agent.evolve_body:
+                    for b in range(len(body)):
+                        if random.random() < agent.body_mutation_prob:
+                            body[b] = np.random.uniform(agent.body_range[b][0], agent.body_range[b][1])
 
                 individual = [actions, body]
 

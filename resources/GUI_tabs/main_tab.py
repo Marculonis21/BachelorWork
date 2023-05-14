@@ -8,7 +8,7 @@ experiments = Experiments()
 font = ("Helvetica", 15)
 
 def tab():
-    frame_text = [[sg.Text("", font=("Helvetica", 14), size=(58, 8), pad=(10,10), key="-MAIN_SETTINGS_OVERVIEW-")]]
+    frame_text = [[sg.Text("", font=("Helvetica", 14), size=(58, None), pad=(10,10), key="-MAIN_SETTINGS_OVERVIEW-")]]
 
     frame = [sg.Frame("Experiment overview", frame_text, size=(800, 300), pad=(10,10))]
     load_experiment = [sg.Push(), sg.Button("Load experiment", key="-LOAD_EXPERIMENT-")]
@@ -68,7 +68,7 @@ def set_overview_text(window, values, robot_tab, agent_tab):
     for i, part in enumerate(_robot.body_parts):
         if i == 0:
             TEXT += "    - Body parts for GA:\n"
-        TEXT += "        - {} ... {}\n".format(part, _agent.body_part_mask[i] if _agent.body_part_mask[i] else "locked")
+        TEXT += "        - {} ... {}\n".format(part, _agent.orig_body_part_mask[i] if _agent.orig_body_part_mask[i] else "locked")
 
     TEXT += "\n"
 
@@ -76,21 +76,18 @@ def set_overview_text(window, values, robot_tab, agent_tab):
 
     window["-MAIN_SETTINGS_OVERVIEW-"].update(TEXT)
 
+def correct_int_inputs(window, values, key):
+    out = ""
+    for s in values[key]:
+        if s in '1234567890':
+            out += s
+    window[key].update(out)
+
 def events(window, event, values, robot_tab, agent_tab):
-    if (event == '-MAIN_GEN_COUNT_IN-' and values['-MAIN_GEN_COUNT_IN-']) or \
-       (event == '-MAIN_POP_SIZE_IN-'  and values['-MAIN_POP_SIZE_IN-']): 
-        gen_count = ""
-        pop_size = ""
-        for s in values['-MAIN_GEN_COUNT_IN-']:
-            if s in '1234567890':
-                gen_count += s
-
-        for s in values['-MAIN_POP_SIZE_IN-']:
-            if s in '1234567890':
-                pop_size += s
-
-        window['-MAIN_GEN_COUNT_IN-'].update(gen_count)
-        window['-MAIN_POP_SIZE_IN-'].update(pop_size)
+    if event == '-MAIN_GEN_COUNT_IN-': 
+        correct_int_inputs(window, values, '-MAIN_GEN_COUNT_IN-')
+    if event == '-MAIN_POP_SIZE_IN-':
+        correct_int_inputs(window, values, '-MAIN_POP_SIZE_IN-')
 
     if event == "-LOAD_EXPERIMENT-":
         experiment_params = popup_experiments()
@@ -110,7 +107,7 @@ def events(window, event, values, robot_tab, agent_tab):
 
             window["-ROBOT_SELECT-"].update(robot_name)
             window["-AGENT_SELECT-"].update(agent_name)
-            robot_tab.set_robot(robot_name, window, agent_tab.agents, experiment_params.agent)
+            robot_tab.set_robot(robot_name, window, experiment_params.agent)
             agent_tab.set_agent(agent_name, window)
             agent_tab.agents[agent_name] = experiment_params.agent
 

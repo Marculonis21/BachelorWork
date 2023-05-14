@@ -1,28 +1,42 @@
 #!/usr/bin/env python
 
-import gym
-import gaAgent
 import sys
+import os
+ 
+# getting the name of the directory
+# where the this file is present.
+current = os.path.dirname(os.path.realpath(__file__))
+ 
+# Getting the parent directory name
+# where the current directory is present.
+parent = os.path.dirname(current)
+ 
+# adding the parent directory to
+# the sys.path.
+sys.path.append(parent)
+
+import roboEvo
+
 import numpy as np
 
 import os
 import tempfile
 import re
 
-def simulationRun(agent, actions, render=False, render_start_paused=False):
-    global step_cycle
-
+def simulationRun(agent, individual):
     steps = -1
     individual_reward = 0
-    done = False
-    observation = env.reset()
-    while not done:
-        steps += 1
+    env.reset()
+    while True:
+        if steps == 1:
+            print("Press any key in console to start render")
+            input()
 
-        action = agent.get_action(actions, steps)
+        steps += 1
+        action = agent.get_action(individual, steps).squeeze()
 
         # https://www.youtube.com/watch?v=7Wm6vy7yBNA&ab_channel=BostonDynamics
-        # action = np.zeros([len(action)])
+        action = np.zeros([len(action)])
         # lay down
         # action[0]  = -0.95
         # action[3]  = -0.95
@@ -50,39 +64,34 @@ def simulationRun(agent, actions, render=False, render_start_paused=False):
         # action[8]  = 1
         # action[11] = 1
 
-        observation, reward, done, info = env.step(action)
-        if render:
-            env.render(start_paused=render_start_paused)
+        _, _, terminated, truncated, info = env.step(action)
+        env.render()
 
-        if done:
+        if terminated or truncated:
             # sim end
             individual_reward = info["x_position"] # x-distance
+            break
 
     return individual_reward
 
 ###################################################
 ###################################################
 
-from robots.robots import *
-
 if __name__ == "__main__":
-    robot = SpotLike()
-    agent = gaAgent.TFSAgent(robot, [False for _ in range(len(robot.body_parts))])
-    indiv = agent.generate_population(1)[0]
+    robot = roboEvo.robots.SpotLike()
+    agent = roboEvo.gaAgents.TFSAgent(robot, [False, (-0.1, -1), False])
+    individual = agent.generate_population(1)[0]
 
-    file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
-    if agent.use_body_parts:
-        robot.create(file, agent.body_part_mask, indiv)
-    else:
-        robot.create(file, agent.body_part_mask)
+    file = robot.create(agent.body_part_mask, individual)
 
-    env = gym.make('CustomAntLike-v1',
-                    xml_file=file.name,
-                    reset_noise_scale=0.0,
-                    terminate_when_unhealthy=False)
-    env._max_episode_steps = 500
+    env = roboEvo.gym.make(robot.environment_id,
+                           xml_file=file.name,
+                           reset_noise_scale=0.0,
+                           disable_env_checker=True,
+                           terminate_when_unhealthy=False)
+    env = roboEvo.TimeLimit(env, max_episode_steps=500)
 
-    simulationRun(agent, indiv, render=True, render_start_paused=True)
+    simulationRun(agent, individual)
     file.close()
     env.close()
     input()

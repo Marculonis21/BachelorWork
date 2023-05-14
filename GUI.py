@@ -6,34 +6,18 @@ import resources.GUI_tabs.main_tab as main_tab
 import resources.GUI_tabs.robot_tab as robot_tab
 import resources.GUI_tabs.agent_tab as agent_tab 
 import resources.GUI_tabs.run_window as run_window
+import resources.GUI_tabs.evo_tab as evo_tab
 
 import PySimpleGUI as sg
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import threading
 
 font = ("Helvetica", 15)
 
-# def robot_select_callback(var, index, mode):
-#     assert window['-ROBOT_SELECT-'].TKStringVar is not None
-#     window.write_event_value('-ROBOT_SELECT_EVENT-', window['-ROBOT_SELECT-'].TKStringVar.get())
-
-# def agent_select_callback(var, index, mode):
-#     assert window['-AGENT_SELECT-'].TKStringVar is not None
-#     window.write_event_value('-AGENT_SELECT_EVENT-', window['-AGENT_SELECT-'].TKStringVar.get())
-
-def evolution_config_tab():
-    tab = sg.Tab("Evolution config", [[]])
-    return tab;
-
 def make_window():
-    tabGroup = [[sg.TabGroup([[main_tab.tab(), robot_tab.tab(), agent_tab.tab(), evolution_config_tab()]], size=(800,600))]]
+    tabGroup = [[sg.TabGroup([[main_tab.tab(), robot_tab.tab(), agent_tab.tab(), evo_tab.tab()]], size=(800,600))]]
 
     window = sg.Window('Test GUI', tabGroup, size=(800,600), font=font, finalize=True,  use_default_focus=False)
 
-    # assert window['-ROBOT_SELECT-'].TKStringVar and window['-AGENT_SELECT-'].TKStringVar is not None
-    # window['-ROBOT_SELECT-'].TKStringVar.trace("w", robot_select_callback)
-    # window['-AGENT_SELECT-'].TKStringVar.trace("w", agent_select_callback)
     window['-AGENT_OVERVIEW_MORE-'].block_focus()
     window['-ROBOT_OVERVIEW_MORE-'].block_focus()
     window['-AGENT_SELECT-'].block_focus()
@@ -47,7 +31,7 @@ if __name__ == "__main__":
     _, values = window.read(timeout=0)
 
     agent_tab.set_agent(agent_tab.agent_names[0], window)
-    robot_tab.set_robot(robot_tab.robot_names[0], window, agent_tab.agents)
+    robot_tab.set_robot(robot_tab.robot_names[0], window)
 
     main_tab.set_overview_text(window, values, robot_tab, agent_tab)
 
@@ -57,16 +41,14 @@ if __name__ == "__main__":
     while True:
         event, values = window.read()
 
-        # print(event)
+        if event == sg.WIN_CLOSED or event == 'Exit':
+            quit()
 
         robot_tab.events(window, event, values, agents=agent_tab.agents)
         agent_tab.events(window, event, values)
         main_tab.events(window, event, values, robot_tab=robot_tab, agent_tab=agent_tab)
 
         main_tab.set_overview_text(window, values, robot_tab, agent_tab)
-
-        if event == sg.WIN_CLOSED or event == 'Exit':
-            quit()
 
         if event == "-START-":
             window_values = values

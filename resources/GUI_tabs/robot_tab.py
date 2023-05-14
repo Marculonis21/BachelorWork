@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import roboEvo
+import resources.GUI_tabs.agent_tab as agent_tab
 
 import PySimpleGUI as sg
 from PIL import Image, ImageTk
@@ -9,14 +10,15 @@ import numpy as np
 font = ("Helvetica", 15)
 
 robots : 'dict[str, roboEvo.robots.BaseRobot]'
-robots = {"OpenAI Ant-v3" : roboEvo.robots.AntV3(),
-          "Basic Ant"     : roboEvo.robots.StickAnt(),
-          "SpotLike dog"  : roboEvo.robots.SpotLike()}
+robots = {robot.__class__.__name__ : robot for robot in [
+    roboEvo.robots.AntV3(),
+    roboEvo.robots.StickAnt(),
+    roboEvo.robots.SpotLike(),
+]}
 
 robot_names = list(robots.keys())
 
 def tab():
-    # options_menu = [sg.Text("Select robot: "), sg.OptionMenu(robot_names, robot_names[0], pad=(0,10), key="-ROBOT_SELECT-")]
     options_menu = [sg.Text("Select robot: "), sg.Combo(robot_names, robot_names[0], pad=(0,10), readonly=True, enable_events=True, key="-ROBOT_SELECT-")]
 
     img = sg.Image(source="", size=(400, 400), key="-ROBOT_IMAGE-")
@@ -27,7 +29,6 @@ def tab():
 
     body_changes = sg.Button("Select body parts for GA", key="-ROBOT_PARTS-")
 
-    # img_overview = [sg.Column([[img, overview,]], background_color='red', expand_x=True, expand_y=True)]
     img_overview = [sg.Column([[img]]), sg.Column([[overview],[body_changes]], expand_x=True, expand_y=True)]
 
     main = [[sg.VPush()],
@@ -38,7 +39,7 @@ def tab():
     tab = sg.Tab("Robot select", main)
     return tab
 
-def set_robot(robot_selected, window, agents, agent=None):
+def set_robot(robot_selected, window, agent=None):
     robot = robots[robot_selected]
 
     im = Image.open(robot.picture_path)
@@ -57,66 +58,76 @@ def set_robot(robot_selected, window, agents, agent=None):
     window["-ROBOT_OVERVIEW-"].update(TEXT)
     window["-ROBOT_PARTS-"].update(disabled = not (len(robot.body_parts) > 0)) # if robot has specified vars in XML, enable button
 
-    agents["Full Random"]              = roboEvo.gaAgents.FullRandomAgent(   robot, [False]*len(robot.body_parts) if agent == None else agent.body_part_mask, 25)
-    agents["Sine Function Full"]       = roboEvo.gaAgents.SineFuncFullAgent( robot, [False]*len(robot.body_parts) if agent == None else agent.body_part_mask)
-    agents["Sine Function Half"]       = roboEvo.gaAgents.SineFuncHalfAgent( robot, [False]*len(robot.body_parts) if agent == None else agent.body_part_mask)
-    agents["Step Cycle Half"]          = roboEvo.gaAgents.StepCycleHalfAgent(robot, [False]*len(robot.body_parts) if agent == None else agent.body_part_mask, 20)
-    agents["Truncated Fourier Series"] = roboEvo.gaAgents.TFSAgent(          robot, [False]*len(robot.body_parts) if agent == None else agent.body_part_mask)
+    agent_tab.reload_agents(window, robot, agent)
 
     if agent != None:
         pass
 
-def popup_robot_parts(robot_selected, agents, agent_selected):
+def popup_robot_parts(robot_selected, agents, agent_selected, window):
     robot = robots[robot_selected]
     agent = agents[agent_selected]
     body_parts = np.array(list(robot.body_parts.keys()))
 
-    unlocked_body_parts = np.array(agent.body_part_mask)
+    # unlocked_body_parts = np.array(agent.orig_body_part_mask)
+    unlocked_mask = [True if mask else False for mask in agent.orig_body_part_mask]
 
-    title = sg.Text("Unlock body parts to enable their changes during GA run", size=(None,2))
+    title = sg.Text("Unlock body parts to enable their changes during GA run and select their allowed range of values", size=(60,2))
 
-    left   = [[sg.Text("Locked body parts")],
-              [sg.Listbox(body_parts[~unlocked_body_parts], select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, font=("Helvetica", 12), expand_x=True, expand_y=True, no_scrollbar=True, pad=(10,10), key="LOCKED")]]
-    middle = [[sg.VPush()],
-              [sg.Button(">>>", key="ADD")],
-              [sg.Button("<<<", key="REMOVE")],
-              [sg.VPush()]]
-    right  = [[sg.Text("Unlocked body parts")],
-              [sg.Listbox(body_parts[unlocked_body_parts], select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, font=("Helvetica", 12), expand_x=True, expand_y=True, no_scrollbar=True, pad=(10,10), key="UNLOCKED")]]
+    names = []
+    buttons = []
+    inputs = []
+    for i, body_part in enumerate(body_parts):
+        unlocked = unlocked_mask[i]
+
+        default_min = agent.orig_body_part_mask[i][0] if unlocked else robot.body_parts[body_part]
+        default_max = agent.orig_body_part_mask[i][1] if unlocked else robot.body_parts[body_part]
+
+        input = [sg.Text("MIN", font=("Helvetica", 12),pad=(10,8)), sg.Input(default_min, size=(6,None),pad=(10,8), enable_events=True, key=body_part+"_min", disabled=not unlocked),
+                 sg.Text("MAX", font=("Helvetica", 12),pad=(10,8)), sg.Input(default_max, size=(6,None),pad=(10,8), enable_events=True, key=body_part+"_max", disabled=not unlocked)]
+
+        names.append([sg.Text(body_part,pad=(0,8))])
+        buttons.append([sg.Button("" if unlocked else "", key=f"{body_part}|switch")])
+        inputs.append(input)
+
+    column_layout = [[sg.Column(names), sg.Column(buttons), sg.Column(inputs)]]
 
     layout = [[title],
-              [sg.Column(left, expand_x=True, expand_y=True, element_justification='c'), 
-               sg.Column(middle, expand_y=True, element_justification='c'),
-               sg.Column(right, expand_x=True, expand_y=True, element_justification='c')]]
+              [sg.Column(column_layout, expand_x=True, element_justification='c')]]
 
     popup = sg.Window("Select body parts for GA", layout, size=(700,400), font=font, keep_on_top=True, modal=True)
+    popup_values = None
     while True:
         event, values = popup.read()
-
         if event == sg.WIN_CLOSED or event == 'Exit':
             break
 
-        if event == "ADD":
-            selected = values["LOCKED"]
-            if len(selected) == 0:
-                continue
+        if "switch" in event:
+            bp = event.split('|').pop(0)
+            index = int(np.argwhere(body_parts == bp))
+            unlocked_mask[index] = not unlocked_mask[index]
 
-            indexes = np.isin(body_parts, selected)
+            popup[event].update("" if unlocked_mask[index] else "")
+            popup[f"{bp}_min"].update(disabled = not unlocked_mask[index])
+            popup[f"{bp}_max"].update(disabled = not unlocked_mask[index])
 
-            unlocked_body_parts[indexes] = True
+        popup_values = values
 
-        if event == "REMOVE":
-            selected = values["UNLOCKED"]
-            if len(selected) == 0:
-                continue
-
-            indexes = np.isin(body_parts, selected)
-
-            unlocked_body_parts[indexes] = False
-
-        popup["LOCKED"].update(body_parts[~unlocked_body_parts])
-        popup["UNLOCKED"].update(body_parts[unlocked_body_parts])
         popup.refresh()
+
+    if popup_values == None:
+        return
+
+    body_part_mask = []
+    for i, bp in enumerate(body_parts):
+        if unlocked_mask[i]:
+            min = popup_values[f"{bp}_min"]
+            max = popup_values[f"{bp}_max"]
+            body_part_mask.append((float(min),float(max)))
+        else:
+            body_part_mask.append(False)
+
+    agent = agent.__class__(robot, body_part_mask)
+    agent_tab.reload_agents(window, robot, agent)
 
 def expand_description(text):
     frame = sg.Frame("Description", [[sg.Text(text, size=(60,None), font=("Helvetica", 14), pad=(10,10))]])
@@ -124,12 +135,12 @@ def expand_description(text):
 
 def events(window, event, values, agents):
     if event == "-ROBOT_SELECT-":
-        set_robot(values['-ROBOT_SELECT-'], window, agents)
+        set_robot(values['-ROBOT_SELECT-'], window)
         window['-ROBOT_SELECT-'].widget.select_clear()
         window.refresh()
 
     if event == "-ROBOT_PARTS-":
-        popup_robot_parts(values['-ROBOT_SELECT-'], agents, values['-AGENT_SELECT-'])
+        popup_robot_parts(values['-ROBOT_SELECT-'], agents, values['-AGENT_SELECT-'], window)
             
     if event == "-ROBOT_OVERVIEW_MORE-": 
         expand_description(robots[values['-ROBOT_SELECT-']].description)

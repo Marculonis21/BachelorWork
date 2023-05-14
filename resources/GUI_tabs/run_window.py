@@ -16,8 +16,8 @@ def window():
     layout = [[sg.Canvas(key='-FIG-')],
               [sg.Text("Gen Number: "), sg.Text("", key="-GENNUM-")],
               [sg.Text("Max Fit: "), sg.Text("", key="-MAXFIT-")], 
-              [sg.Text("Min Fit: "), sg.Text("", key="-MINFIT-")], 
-              [sg.Text("Mean Fit: "), sg.Text("", key="-MEANFIT-"), sg.Push(), sg.Button("Preview best", key="-RUN_PREVIEW-"), sg.Button("Exit", button_color='red', mouseover_colors='orange red', key="-EXIT-")]]
+              [sg.Text("Mean Fit: "), sg.Text("", key="-MEANFIT-")], 
+              [sg.Text("Min Fit: "), sg.Text("", key="-MINFIT-"), sg.Push(), sg.Button("Preview best", key="-RUN_PREVIEW-"), sg.Button("Exit", button_color='red', mouseover_colors='orange red', key="-EXIT-")]]
 
     window = sg.Window('Process running', layout, font=font, finalize=True, keep_on_top=True)
 
@@ -48,7 +48,6 @@ def update_chart(window):
 
     figure_aggregate.get_tk_widget().forget()
     plt.clf()
-    # plt.cla()
     plt.title('Training')
     plt.xlabel('Episode')
     plt.ylabel('Fitness')
@@ -64,12 +63,22 @@ def get_params(values, robot_tab, agent_tab):
     robot = robot_tab.robots[values["-ROBOT_SELECT-"]] 
     agent = agent_tab.agents[values["-AGENT_SELECT-"]]
 
-    # if agent_selected == "Full Random":                agent = roboEvo.gaAgents.FullRandomAgent(robot, body_part_mask, 25)
-    # elif agent_selected == "Sine Function Full":       agent = roboEvo.gaAgents.SineFuncFullAgent(robot, body_part_mask)
-    # elif agent_selected == "Sine Function Half":       agent = roboEvo.gaAgents.SineFuncHalfAgent(robot, body_part_mask)
-    # elif agent_selected == "Step Cycle Half":          agent = roboEvo.gaAgents.StepCycleHalfAgent(robot, body_part_mask, 20)
-    # elif agent_selected == "Truncated Fourier Series": agent = roboEvo.gaAgents.TFSAgent(robot, body_part_mask)
-    # else: raise AttributeError("Unknown control agent type - " + agent_selected)
+    agent_arguments = {}
+    for key in values:
+        if values["-AGENT_SELECT-"] in str(key):
+            arg_name = key.split("|").pop()
+            arg_value = values[key]
+
+            if arg_name.endswith("_min"):
+                arg_name = arg_name.rstrip("_min")
+                agent_arguments[arg_name] = {"MIN":arg_value}
+            elif arg_name.endswith("_max"):
+                arg_name = arg_name.rstrip("_max")
+                agent_arguments[arg_name]["MAX"] = arg_value
+            else:
+                agent_arguments[arg_name] = arg_value
+
+    agent.arguments = agent_arguments
 
     population_size = int(values["-MAIN_POP_SIZE_IN-"])
     generation_count = int(values["-MAIN_GEN_COUNT_IN-"])

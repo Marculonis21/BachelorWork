@@ -41,11 +41,16 @@ class BaseRobot(ABC):
 
         text = copy.deepcopy(self.source_text)
         
-        # adjust body variables
+        # adjust body part variables
+        idx = 0
         for i, key in enumerate(self.body_parts):
             regex = self.__key_to_regex(key)
             # set to desired body part length if True in mask ELSE set to a default value given by xml source file
-            text = re.sub(regex, str(body_part_adjustments[i] if body_part_mask[i] else self.body_parts[key]), text)
+            if body_part_mask[i]:
+                text = re.sub(regex, str(body_part_adjustments.flatten()[idx]), text)
+                idx += 1
+            else:
+                text = re.sub(regex, str(self.body_parts[key]), text)
 
         # compute body parts calculations
         calculations = re.findall(r'@.*@', text)
@@ -72,7 +77,7 @@ class BaseRobot(ABC):
             source file
         """
 
-        part_names = re.findall(r'\$[A-Za-z_]+\([+-]?[0-9]*[.]?[0-9]+\)\$', self.source_text)
+        part_names = re.findall(r'\$[A-Za-z0-9_]+\([+-]?[0-9]*[.]?[0-9]+\)\$', self.source_text)
         for part in part_names:
             if not part in self.body_parts:
                 self.body_parts[part] = float(part[part.find("(")+1 : part.find(")")]) # get between parenthesis

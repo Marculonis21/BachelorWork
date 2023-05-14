@@ -1,5 +1,6 @@
 import resources.robots.robots as robots
 import resources.gaAgents as gaAgents
+from enum import Enum
 
 class ExperimentParams:
     def __init__(self, 
@@ -10,6 +11,7 @@ class ExperimentParams:
                  show_best=False,
                  save_best=True,
                  save_dir='./saves/individuals',
+                 pop_load_dir=None,
                  show_graph=True,
                  note=""):
         self.robot               = robot
@@ -20,4 +22,5 @@ class ExperimentParams:
         self.save_best           = save_best
         self.save_dir            = save_dir
         self.show_graph          = show_graph 
+        self.pop_load_dir        = pop_load_dir
         self.note                = note

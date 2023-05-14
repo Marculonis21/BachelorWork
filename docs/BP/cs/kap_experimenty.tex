@@ -15,7 +15,7 @@ následující rovnice:
 \end{equation}
 
 Každý jedinec začíná svůj simulační běh v prostředí v počátku na souřadnicích
-$(x,y) = (0,0)$, tedy v rovnici \label{fitness_calc} jsou $x$ a $y$ vzdálenosti
+$(x,y) = (0,0)$, tedy v rovnici \ref{fitness_calc} jsou $x$ a $y$ vzdálenosti
 od počátku, které jedinec v simulovaném prostředí urazil (buď do vypršení
 limitovaného času na simulaci, nebo do dosažení podmínky předčasně ukončující
 simulační běh -- např. pád robota).
@@ -186,7 +186,50 @@ které ho rozpohybují v opačném směru (jedinec z definice hodnotící funkce
 obdrží záporné ohodnocení).
 
 \section{Vývoj řízení a morfologie robotů} \label{exp2}
-\subsection{Oddělený vývoj řízení a morfologie}
-\subsection{Simultánní vývoj řízení a morfologie}
+
+V této sekci předvedeme dva další typy experimentů, které naše knihovna
+podporuje -- simultánní vývoj (podsekce \ref{exp2:para_evo}) a oddělený
+vývoj (podsekce \ref{exp2:split_evo}) řízení a morfologie.
+
+Tyto experimenty se od předchozích liší tím, že evolučnímu algoritmu povolíme
+vyvíjet i zvolené části těla robota. To teoreticky umožní z těla původního
+robota vyvinout optimálnější morfologii pro zadaný problém.
+
+Vývoj těla je implementací umožněn díky speciálním značkám v XML konfiguračních
+souborech (popsaných v konfiguraci vlastního robota v sekci \ref{imp:robots}),
+pomocí kterých roboti mohou upravovat konfiguraci svého těla.
+
+\subsection{Simultánní vývoj řízení a morfologie} \label{exp2:para_evo}
+
+V prvním příkladu předvedeme experiment, ve kterém provedeme současný vývoj jak
+řízení, tak morfologie těla robota.
+
+Kvalita jedinců bude v tomto experimentu hodnocena stejně jako v předchozích.
+Cílem pro jedince je tedy dojít co nejdál v určeném směru. Přesný výpočet
+fitness je popsán rovnicí \ref{fitness_calc}. Experiment předvedeme s robotem
+\emph{AntV3} (popsán v implementaci v sekci \ref{imp:robots.Ant})
+
+\paragraph{Vývoj robota \emph{AntV3}}
+V první ukázce použijeme robota \emph{AntV3} ovládaného agentem
+\emph{SineFuncHalfAgent} (popsaného v sekci
+\ref{imp:gaAgents.sinefunchalfagent}). \emph{AntV3} je robot se složitější
+morfologií nohou, pomocí kterých se pohybuje, a tudíž se hodí pro základní
+pokusy s vývojem těla. 
+
+Tento experiment je dostupný v modulu \emph{experiment\_setter} pod názvem
+\texttt{exp20\_AntV3}.
+
+%TODO: DATA
+
+% KECI O DATECH
+
+\subsection{Oddělený vývoj řízení a morfologie} \label{exp2:split_evo}
+
+V tomto příkladu předvedeme experiment vyvíjející řízení a morfologii robota,
+nicméně tyto části vývoje jsou od sebe oddělené. Doba vývoje se prodlouží, ale
+tím jedinci dostanou možnost nejprve vyvinout samotný pohyb (bez změn
+morfologie robota) a následně zafixovat pohyb a evolučním vývojem optimalizovat
+tělo robota pro specifický pohyb. Tímto přístupem by teoreticky jedinci měli
+být schopni dosáhnout lepších výsledků, než při vývoji samotného řízení.
 
 \section{Diskuze výsledků}

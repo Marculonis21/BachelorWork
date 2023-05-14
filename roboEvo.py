@@ -65,6 +65,8 @@ def __simulation_run(env, agent, individual, render=False):
     return individual_reward
 
 def render_run(agent, robot, individual):
+    print(individual)
+
     run_reward = -1 
     try:
         file = robot.create(agent.body_part_mask, individual)
@@ -76,17 +78,16 @@ def render_run(agent, robot, individual):
                        render_mode="human")
         env = TimeLimit(env, max_episode_steps=500)
 
-        print("PREPARED FOR RENDERING...")
+        print("PREPARED FOR RENDERING... Press ENTER to start")
         input()
         run_reward = __simulation_run(env, agent, individual, render=True)
 
-        # env.close() # TODO
     finally:
         file.close()
 
     return run_reward
 
-def __run_evolution(robot, agent, client, generation_count, population_size, show_graph, debug=False):
+def __run_evolution(robot, agent, client, generation_count, population_size, show_graph, load_population=[], debug=False):
     global GRAPH_VALUES, EPISODE_HISTORY, LAST_POP
     global GUI_GEN_NUMBER, GUI_FITNESS, GUI_PREVIEW
 
@@ -95,8 +96,14 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
     EPISODE_HISTORY = []
 
     population = agent.generate_population(population_size)
+
+    # for serial conrol + body evolution
+    if load_population != []:
+        # reassign actions from the previous loaded gen - keep only newly generated body values
+        for i in range(len(population)):
+            population[i][0] = load_population[i][0] 
+
     robot_source_files = []
-        
     environments = []
 
     # create individual source files for different bodies (if needed - body parts evolutions)
@@ -113,7 +120,7 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
 
         environments.append(env)
 
-        if not agent.use_body_parts: # there exists only 1 environment if we don't need more!
+        if not agent.evolve_body: # there exists only 1 environment if we don't need more!
             break
 
     best_individual = None 
@@ -134,10 +141,10 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
         futures = []
         if debug:
             for index, individual in enumerate(population):
-                fitness_values.append(__simulation_run(environments[index if agent.use_body_parts else 0], agent, individual))
+                fitness_values.append(__simulation_run(environments[index if agent.evolve_body else 0], agent, individual))
         else:
             for index, individual in enumerate(population):
-                futures.append(client.submit(__simulation_run, environments[index if agent.use_body_parts else 0], agent, individual))
+                futures.append(client.submit(__simulation_run, environments[index if agent.evolve_body else 0], agent, individual))
 
             fitness_values = client.gather(futures)
 
@@ -178,7 +185,7 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
         elite_individuals_envs = []
         for top_i in sorted_top_indices:
             elite_individuals.append(copy.deepcopy(population[top_i]))
-            elite_individuals_envs.append(copy.deepcopy(environments[top_i if agent.use_body_parts else 0]))
+            elite_individuals_envs.append(copy.deepcopy(environments[top_i if agent.evolve_body else 0]))
 
         best_individual = copy.deepcopy(elite_individuals[0])
         best_individual_env = copy.deepcopy(elite_individuals_envs[0])
@@ -207,12 +214,19 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
                 env = TimeLimit(env, max_episode_steps=500)
                 environments[i] = env
 
-            if not agent.use_body_parts:
+            if not agent.evolve_body:
                 break
 
     # after evo close tmp files
     for file in robot_source_files:
         file.close()
+
+    # CONTINUE EVO = serial control + body evolution - switching vars to body evo
+    if agent.continue_evo: 
+        print("switching evo")
+        agent.switch_evo_phase()
+        best_individual, best_individual_env = __run_evolution(robot, agent, client, generation_count, population_size, show_graph, load_population=population, debug=debug)
+        print("switch evo done")
 
     if not GUI_FLAG:
         plt.close()

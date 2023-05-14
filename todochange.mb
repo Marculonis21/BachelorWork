@@ -1,0 +1,9 @@
+gaagent - body_part_mask -> body_parts 
+        - make them to be list of tuples | Nones
+
+gaOperators + gaAgent - added evolve type - evolve_control + evolve_body to agent and operators
+    - ADDED uniform_shift_mutation
+
+robots - impl. XML @TAT@
+
+prace - zmínit, k jakému experimentu patří experimenty z experiment_setter

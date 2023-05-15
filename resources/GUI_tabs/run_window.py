@@ -80,11 +80,11 @@ def get_params(values, robot_tab, agent_tab):
 
     agent.arguments = agent_arguments
 
-    population_size = int(values["-MAIN_POP_SIZE_IN-"])
-    generation_count = int(values["-MAIN_GEN_COUNT_IN-"])
+    population_size = int(values["-POP_SIZE-"])
+    generation_count = int(values["-GEN_COUNT-"])
 
-    show_best = values["-CB_SHOWBEST-"]
-    save_best = values["-CB_SAVEBEST-"]
+    show_best = values["-SHOW_BEST-"]
+    save_best = values["-SAVE_BEST-"]
     save_dir = values["Browse"]
     params = roboEvo.ExperimentParams(robot, 
                                       agent, 

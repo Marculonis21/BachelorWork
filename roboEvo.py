@@ -91,10 +91,6 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
     global GRAPH_VALUES, EPISODE_HISTORY, LAST_POP
     global GUI_GEN_NUMBER, GUI_FITNESS, GUI_PREVIEW
 
-    GUI_FITNESS = []
-    GRAPH_VALUES = [[],[],[]]
-    EPISODE_HISTORY = []
-
     population = agent.generate_population(population_size)
 
     # for serial conrol + body evolution
@@ -239,21 +235,28 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
 ################################################################################
 
 def run_experiment(params:ExperimentParams, gui=False, debug=False):
+    global GUI_FITNESS, GRAPH_VALUES, EPISODE_HISTORY
     global GUI_FLAG
     GUI_FLAG = gui
+
+    GUI_FITNESS = []
+    GRAPH_VALUES = [[],[],[]]
+    EPISODE_HISTORY = []
 
     # Start threading client
     client = Client(n_workers=11,threads_per_worker=1,scheduler_port=0)
 
+    _params = copy.deepcopy(params)
+
     # Run evolution
     try:
         print("RUNNING EVOLUTION")
-        best_individual, best_individual_env = __run_evolution(params.robot, 
-                                                               params.agent,
+        best_individual, best_individual_env = __run_evolution(_params.robot, 
+                                                               _params.agent,
                                                                client,
-                                                               generation_count=params.ga_generation_count, 
-                                                               population_size=params.ga_population_size, 
-                                                               show_graph=params.show_graph,
+                                                               generation_count=_params.ga_generation_count, 
+                                                               population_size=_params.ga_population_size, 
+                                                               show_graph=_params.show_graph,
                                                                debug=debug)
         print("EVOLUTION DONE")
     finally:
@@ -261,19 +264,19 @@ def run_experiment(params:ExperimentParams, gui=False, debug=False):
 
     # Set final reward (render best if set)
     best_reward = 0
-    if params.show_best: best_reward = render_run(params.agent, params.robot, best_individual)
-    else:                best_reward = __simulation_run(best_individual_env, params.agent, best_individual, render=False)
+    if _params.show_best: best_reward = render_run(_params.agent, _params.robot, best_individual)
+    else:                best_reward = __simulation_run(best_individual_env, _params.agent, best_individual, render=False)
 
     # File saving
-    if not os.path.exists(params.save_dir):
-        os.makedirs(params.save_dir)
+    if not os.path.exists(_params.save_dir):
+        os.makedirs(_params.save_dir)
 
     current_time = time.time()
-    if params.save_best:
-        gaAgents.BaseAgent.save(params.agent, params.robot, best_individual, params.save_dir + f"/{params.note}_individual_run{current_time}_rew{best_reward}.save")
+    if _params.save_best:
+        gaAgents.BaseAgent.save(_params.agent, _params.robot, best_individual, _params.save_dir + f"/{_params.note}_individual_run{current_time}_rew{best_reward}.save")
 
     episode_history = np.array(EPISODE_HISTORY)
     last_population = np.array(LAST_POP, dtype=object)
-    np.save(params.save_dir + f"/{params.note}_episode_history{current_time}", episode_history)
-    np.save(params.save_dir + f"/{params.note}_last_population{current_time}", last_population)
+    np.save(_params.save_dir + f"/{_params.note}_episode_history{current_time}", episode_history)
+    np.save(_params.save_dir + f"/{_params.note}_last_population{current_time}", last_population)
 

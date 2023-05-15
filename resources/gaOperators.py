@@ -66,39 +66,41 @@ class Operators:
         return new_population
 
     @staticmethod
-    def crossover_single_point(population, evolve_control, evolve_body):
+    def crossover_single_point(population, agent):
         new_population = []
 
         for i in range(0,len(population)//2):
             indiv1 = copy.deepcopy(population[2*i])
             indiv2 = copy.deepcopy(population[2*i+1])
 
-            indiv1_actions, indiv1_body = indiv1
-            indiv2_actions, indiv2_body = indiv2
+            child1_actions, child1_body_parts = indiv1
+            child2_actions, child2_body_parts = indiv2
+            child1_body_parts = child1_body_parts.flatten()
+            child2_body_parts = child2_body_parts.flatten()
 
             # crossover for actions
-            if evolve_control:
-                crossover_point_actions = random.randint(1, len(indiv1_actions))
-                end2 = copy.deepcopy(indiv2_actions[:crossover_point_actions])
+            if agent.evolve_control:
+                crossover_point_actions = random.randint(1, len(child1_actions))
+                end2 = copy.deepcopy(child2_actions[:crossover_point_actions])
 
-                indiv2_actions[:crossover_point_actions] = indiv1_actions[:crossover_point_actions]
-                indiv1_actions[:crossover_point_actions] = end2
+                child2_actions[:crossover_point_actions] = child1_actions[:crossover_point_actions]
+                child1_actions[:crossover_point_actions] = end2
 
             # crossover for body
-            if evolve_body:
-                crossover_point_body = random.randint(1, len(indiv1_body))
-                end2 = copy.deepcopy(indiv2_body[:crossover_point_body])
+            if agent.evolve_body:
+                crossover_point_body = random.randint(1, len(child1_body_parts))
+                end2 = copy.deepcopy(child2_body_parts[:crossover_point_body])
 
-                indiv2_body[:crossover_point_body] = indiv1_body[:crossover_point_body]
-                indiv1_body[:crossover_point_body] = end2
+                child2_body_parts[:crossover_point_body] = child1_body_parts[:crossover_point_body]
+                child1_body_parts[:crossover_point_body] = end2
 
-            new_population.append([indiv1_actions, indiv1_body])
-            new_population.append([indiv2_actions, indiv2_body])
+            new_population.append([child1_actions, np.array([child1_body_parts])])
+            new_population.append([child2_actions, np.array([child2_body_parts])])
 
         return new_population
 
     @staticmethod
-    def crossover_uniform(population, evolve_control, evolve_body):
+    def crossover_uniform(population, agent):
         new_population = []
 
         for i in range(len(population)//2):
@@ -107,21 +109,23 @@ class Operators:
 
             child1_actions, child1_body_parts = child1
             child2_actions, child2_body_parts = child2
+            child1_body_parts = child1_body_parts.flatten()
+            child2_body_parts = child2_body_parts.flatten()
 
-            if evolve_control:
+            if agent.evolve_control:
                 for a in range(len(child1_actions)):
                     if random.random() <= 0.5:
                         child1_actions[a] = population[2*i+1][0][a]
                         child2_actions[a] = population[2*i][0][a]
 
-            if evolve_body:
+            if agent.evolve_body:
                 for b in range(len(child1_body_parts)):
                     if random.random() <= 0.5:
-                        child1_body_parts[b] = population[2*i+1][1][b]
-                        child2_body_parts[b] = population[2*i][1][b]
+                        child1_body_parts[b] = population[2*i+1][1].flatten()[b]
+                        child2_body_parts[b] = population[2*i][1].flatten()[b]
 
-            new_population.append([child1_actions, child1_body_parts])
-            new_population.append([child2_actions, child2_body_parts])
+            new_population.append([child1_actions, np.array([child1_body_parts])])
+            new_population.append([child2_actions, np.array([child2_body_parts])])
 
         return new_population
 
@@ -132,6 +136,7 @@ class Operators:
         for individual in population:
             if random.random() < agent.individual_mutation_prob:
                 actions, body = individual
+                body = body.flatten()
 
                 if agent.evolve_control:
                     for a in range(len(actions)):
@@ -148,7 +153,7 @@ class Operators:
                         if random.random() < agent.body_mutation_prob:
                             body[b] = np.random.uniform(agent.body_range[b][0], agent.body_range[b][1])
 
-                individual = [actions, body]
+                individual = [actions, np.array([body])]
 
             new_population.append(individual)
 
@@ -161,6 +166,7 @@ class Operators:
         for individual in population:
             if np.random.random() < agent.individual_mutation_prob:
                 actions, body = individual
+                body = body.flatten()
 
                 if agent.evolve_control:
                     for a in range(len(actions)):
@@ -178,7 +184,7 @@ class Operators:
                         if random.random() < agent.body_mutation_prob:
                             body[b] = np.random.uniform(agent.body_range[b][0], agent.body_range[b][1])
 
-                individual = [actions, body]
+                individual = [actions, np.array([body])]
 
             new_population.append(individual)
 

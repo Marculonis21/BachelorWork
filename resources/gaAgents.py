@@ -252,7 +252,7 @@ class SineFuncFullAgent(BaseAgent):
                 for value in self.body_part_mask:
                     if value:
                         assert isinstance(value, tuple) or isinstance(value, list)
-                        _part = np.random.uniform(value[0], value[1],size=1)
+                        _part = np.random.uniform(value[0], value[1], size=1)
                         body_parts = np.concatenate([body_parts,_part])
             body_parts = np.array([body_parts])
 

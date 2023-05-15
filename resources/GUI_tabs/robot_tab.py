@@ -19,7 +19,7 @@ robots = {robot.__class__.__name__ : robot for robot in [
 robot_names = list(robots.keys())
 
 def tab():
-    options_menu = [sg.Text("Select robot: "), sg.Combo(robot_names, robot_names[0], pad=(0,10), readonly=True, enable_events=True, key="-ROBOT_SELECT-")]
+    options_menu = [sg.Text("Select robot: ", pad=(10,None)), sg.Combo(robot_names, robot_names[0], pad=(0,10), readonly=True, enable_events=True, key="-ROBOT_SELECT-")]
 
     img = sg.Image(source="", size=(400, 400), key="-ROBOT_IMAGE-")
 

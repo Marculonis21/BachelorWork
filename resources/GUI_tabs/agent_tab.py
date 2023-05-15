@@ -3,11 +3,11 @@
 import PySimpleGUI as sg
 
 import roboEvo
+from typing import Dict
 
 font = ("Helvetica", 15)
 
-agents : 'dict[str, roboEvo.gaAgents.BaseAgent]'
-
+agents : Dict[str, roboEvo.gaAgents.BaseAgent]
 agents = {agent.__class__.__name__ : agent for agent in [
     roboEvo.gaAgents.FullRandomAgent.for_GUI(),
     roboEvo.gaAgents.SineFuncFullAgent.for_GUI(),
@@ -84,7 +84,7 @@ def reload_agents(window, robot, agent):
 def tab():
     agent_names = list(agents.keys())
     default_name = agent_names[0]
-    options_menu = [sg.Text("Select agent type: "), sg.Combo(agent_names, default_name, pad=(0,20,0,20), readonly=True, enable_events=True, key="-AGENT_SELECT-")]
+    options_menu = [sg.Text("Select agent type: ", pad=(10,None)), sg.Combo(agent_names, default_name, pad=(0,20,0,20), readonly=True, enable_events=True, key="-AGENT_SELECT-")]
 
     frame = [sg.Frame("Agent overview", [[sg.Text(agents[default_name].description, font=("Helvetica", 14), size=(58, 6), pad=(10,10), key="-AGENT_OVERVIEW-")],
                                          [sg.Push(), sg.Button("...", button_color=sg.theme_background_color(), border_width=0, key="-AGENT_OVERVIEW_MORE-")]], expand_x=True, pad=(10,0))]

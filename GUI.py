@@ -46,6 +46,7 @@ if __name__ == "__main__":
 
         robot_tab.events(window, event, values, agents=agent_tab.agents)
         agent_tab.events(window, event, values)
+        evo_tab.events(window, event, values)
         main_tab.events(window, event, values, robot_tab=robot_tab, agent_tab=agent_tab)
 
         main_tab.set_overview_text(window, values, robot_tab, agent_tab)

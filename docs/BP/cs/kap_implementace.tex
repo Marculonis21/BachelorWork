@@ -269,13 +269,18 @@ pro experimenty:
 
         kde $N$ je pevný počet sinus funkcí, na které součet omezíme, $T$ je
         pevně zvolená perioda, $A_1,...,A_N$ jsou amplitudy sčítaných
-        sinusoid a $\delta_i,...,\delta_N$ jsou jejich posuny.
+        sinusoid a $\delta_i,...,\delta_N$ jsou jejich posuny,
+    \item \textbf{\emph{NEATAgent}} -- agent, implementující algoritmus
+        neuroevoluce -- NEAT (\emph{NeuroEvolution of Augmenting Topologies}),
+        popsaný v základních pojmech v sekci \ref{NN - NEAT}. Naše implementace
+        využívá python knihovnu pro NEAT -- \emph{neat-python}
+        \citet{McIntyre_neat-python}.
 \end{itemize}
 
-Kromě zcela náhodného agenta, se agenti snaží pro urychlení evolučního vývoje
-předpokládat, že vhodné řešení bude v podobě nějakého periodického pohybu a
-generují tedy výstupy pro nastavení aktuátorů podle nějakých periodických
-funkcí. 
+Kromě zcela náhodného agenta a agenta využívajícího NEAT, se agenti snaží pro
+urychlení evolučního vývoje předpokládat, že vhodné řešení bude v podobě
+nějakého periodického pohybu a generují tedy výstupy pro nastavení aktuátorů
+podle nějakých periodických funkcí. 
 
 \subsection{Modul gaOperators} \label{imp:gaOperators}
 Modul \emph{gaOperators} slouží pro usnadnění tvorby evolučních algoritmů
@@ -476,6 +481,35 @@ to těžší vyvinout stabilní pohyb, který ho udrží nepadat.
     \label{imp:fig:robots.SpotLike}
 \end{figure}
 
+\paragraph{}
+(Příklady robotů přímo z Gymnasium určených pro neuroevoluci)
+\paragraph{Robot \emph{Walker2D}} \label{imp:robots.Walker}
+
+% \begin{figure}[!htb]
+%     \centering
+%     \includegraphics[width=0.4\textwidth]{../img/crop_SpotLike.jpg}
+%     \caption{Robot \emph{Walker2D}}
+%     \label{imp:fig:robots.Walker2D}
+% \end{figure}
+
+\paragraph{Robot \emph{InvertedPendulum}} \label{imp:robots.InvertedPendulum}
+
+% \begin{figure}[!htb]
+%     \centering
+%     \includegraphics[width=0.4\textwidth]{../img/crop_SpotLike.jpg}
+%     \caption{Robot \emph{InvertedPendulum}}
+%     \label{imp:fig:robots.InvertedPendulum}
+% \end{figure}
+
+\paragraph{Robot \emph{InvertedDoublePendulum}} \label{imp:robots.InvertedDoublePendulum}
+
+% \begin{figure}[!htb]
+%     \centering
+%     \includegraphics[width=0.4\textwidth]{../img/crop_SpotLike.jpg}
+%     \caption{Robot \emph{InvertedDoublePendulum}}
+%     \label{imp:fig:robots.InvertedDoublePendulum}
+% \end{figure}
+
 \section{Třída experimentů} \label{imp:experimentsetter}
 Pro usnadnění vytváření, ukládání a výběru experimentů jsme v modulu
 \emph{experiment\_setter} implementovali vlastní jednoduchou třídu
@@ -603,18 +637,18 @@ různými vstupními argumenty. Těmito argumenty jsou následující:
     \item \texttt{-{}-experiment} -- argument, který obdrží textový vstup
         specifikující jméno jednoho nebo více experimentu (oddělených mezerou),
         jehož parametry chceme načíst a spustit (pracující s modulem
-        \texttt{experiment\_setter} popsaného v oddíle
+        \emph{experiment\_setter} popsaného v oddíle
         \ref{imp:experimentsetter}),
     \item \texttt{-{}-experiment\_names} -- při výběru tohoto argumentu při
         spuštění programu program vypíše názvy všech dostupných vytvořených
-        experimentů z modulu \texttt{experiment\_setter} a následně se ukončí,
+        experimentů z modulu \emph{experiment\_setter} a následně se ukončí,
     \item \texttt{-{}-batch} -- argument číselné hodnoty, specifikující
         kolikrát se má nakonfigurovaný experiment opakovaně spustit (používané
         pro statistické vyhodnocení výsledků experimentů),
     \item \texttt{-{}-batch\_note} -- textový argument umožňující připojit
         vlastní poznámku k názvu složky, do které se experimenty z
         několikanásobného spuštění ukládají (argument nemá žádný efekt pro
-        experimenty z modulu \texttt{experiment\_setter}),
+        experimenty z modulu \emph{experiment\_setter}),
     \item \texttt{-{}-open} -- textový argument, který obdrží cestu k uloženým
         datům nejlepšího jedince z libovolného předchozího experimentu,
         umožňující vizualizaci řešení daného jedince,
@@ -623,7 +657,44 @@ různými vstupními argumenty. Těmito argumenty jsou následující:
         generacích.
 \end{itemize}
 
-TODO: TUI příklady
+\paragraph{Ukázky možných vstupů}
+Textové rozhraní úzce spolupracuje s modulem \emph{experiment\_setter}, který
+udržuje definované experimenty. Jedním z užitečných parametrů je
+\texttt{-{}-experiment\_names}, který TUI nechá vypsat názvy všech definovaných
+experimentů.
+
+\begin{code}
+>>> TUI.py --experiment_names
+<<< List of created experiments:
+     - exp10_TFS
+     - exp11_TFS_spot
+     - exp12_TFS_ant
+     ...
+\end{code}
+
+Pokud již máme vybraný jeden nebo více experimentů, které chceme spustit,
+můžeme je spustit výběrem parametru \texttt{-{}-experiment} a vypsáním seznamu 
+zvolených experimentů odděleného mezerou.
+
+\begin{code}
+>>> TUI.py --experiment exp11_TFS_spot exp_12_TFS_ant
+<<< Starting experiment - exp11_TFS_spot 
+    ...
+\end{code}
+
+Ve spojení s parametrem \texttt{-{}-experiment} můžeme vybrat další. Těmi mohou
+být například parametr \texttt{-{}-batch} (\texttt{-{}-batch 5} bude opakovat
+běh všech zvolených experimentů 5krát), nebo parametr \texttt{-{}-no\_graph},
+který zabrání průběžnému vykreslování grafů z běhu experimentu.
+
+\paragraph{}
+Posledním často používaným parametrem je \texttt{-{}-open}, pomocí kterého
+si můžeme v simulačním prostředí přehrát běh nejlepšího jedince ze zvoleného
+předchozího experimentu.
+\begin{code}
+>>> TUI.py --open saved_files/runs/run1/individual.save
+<<< (Simulace zvoleného jedince)
+\end{code}
 
 \paragraph{Implementace TUI}
 Samotná implementace rozhraní je již velmi jednoduchá. Zpracovává uživatelské

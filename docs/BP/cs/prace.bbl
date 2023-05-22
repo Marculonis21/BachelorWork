@@ -1,4 +1,4 @@
-\begin{thebibliography}{29}
+\begin{thebibliography}{30}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -101,6 +101,12 @@ Python guis for humans.
 \newblock \emph{Scholarpedia}, {\bf 8}\penalty0 (6), \penalty0 30977.
 \newblock \doi{10.4249/scholarpedia.30977}.
 \newblock revision \#137053.
+
+\bibitem[McIntyre a~kol.()McIntyre, Kallada, Miguel, Feher~de Silva a
+  Netto]{McIntyre_neat-python}
+{\sc McIntyre, A., Kallada, M., Miguel, C.~G., Feher~de Silva, C. {\rm a}
+  Netto, M.~L.}
+\newblock {neat-python}.
 
 \bibitem[Michel(2004)]{michel2004cyberbotics}
 {\sc Michel, O.} (2004).

@@ -9,14 +9,17 @@ import numpy as np
 
 class BaseRobot(ABC):
     def __init__(self, source_file, picture_path, env_id):
-        self.picture_path = picture_path
-        with open(source_file) as file:
-            lines = file.readlines()
-            self.source_text = "".join(lines)
-
         self.environment_id = env_id # defined in custom evn script
+        self.picture_path = picture_path
+
         self.body_parts = {}
-        self.__collect_body_parts()
+        self.source_file = source_file
+        if source_file != None:
+            with open(source_file) as file:
+                lines = file.readlines()
+                self.source_text = "".join(lines)
+
+            self.__collect_body_parts()
 
     @abstractproperty
     def description(self):
@@ -36,6 +39,10 @@ class BaseRobot(ABC):
 
         if tmp_file == None:
             tmp_file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
+
+        # if self.source_file == None:
+        #     tmp_file.close()
+        #     return None
 
         _, body_part_adjustments = individual
 
@@ -89,8 +96,8 @@ class BaseRobot(ABC):
 class StickAnt(BaseRobot):
     def __init__(self):
         DIR = os.path.dirname(__file__)
-        source_file = DIR+"/custom_stick_ant.xml"
-        picture_path = DIR+"/Basic-Ant"
+        source_file = DIR+"/assets/custom_stick_ant.xml"
+        picture_path = DIR+"/assets/Basic-Ant"
         environment_id = "custom/CustomEnv-v0"
 
         super(StickAnt, self).__init__(source_file, picture_path, environment_id)
@@ -105,8 +112,8 @@ The simplest robot with body consisting of a single sphere and 4 one-part legs. 
 class AntV3(BaseRobot):
     def __init__(self):
         DIR = os.path.dirname(__file__)
-        source_file = DIR+"/ant.xml"
-        picture_path = DIR+"/Ant-v3"
+        source_file = DIR+"/assets/ant.xml"
+        picture_path = DIR+"/assets/Ant-v3"
         environment_id = "custom/CustomEnv-v0"
 
         super(AntV3, self).__init__(source_file, picture_path, environment_id)
@@ -118,8 +125,8 @@ class AntV3(BaseRobot):
 class SpotLike(BaseRobot):
     def __init__(self):
         DIR = os.path.dirname(__file__)
-        source_file = DIR+"/spot_like.xml"
-        picture_path = DIR+"/SpotLike"
+        source_file = DIR+"/assets/spot_like.xml"
+        picture_path = DIR+"/assets/SpotLike"
         environment_id = "custom/CustomEnv-v0"
 
         super(SpotLike, self).__init__(source_file, picture_path, environment_id)
@@ -130,3 +137,42 @@ class SpotLike(BaseRobot):
 "Homage to the greatest Spot from BostonDynamics.\n\
 The robot has 4 legs made of 2 parts each (thigh and calf ended with fixed foot). \n\
 Altogether there are 12 joints (12 actuators) - 2 for each hip free to rotate along X and Y axis and 1 for each knee along Y axis\n"
+
+class Walker2D(BaseRobot):
+    def __init__(self):
+        DIR = os.path.dirname(__file__)
+        source_file = None
+        picture_path = DIR+"/assets/SpotLike"
+        environment_id = "Walker2d-v4"
+
+        super(Walker2D, self).__init__(source_file, picture_path, environment_id)
+
+    @property
+    def description(self):
+        return ""
+
+class DoublePendulum(BaseRobot):
+    def __init__(self):
+        DIR = os.path.dirname(__file__)
+        source_file = None
+        picture_path = DIR+"/assets/SpotLike"
+        environment_id = "InvertedDoublePendulum-v4"
+
+        super(DoublePendulum, self).__init__(source_file, picture_path, environment_id)
+
+    @property
+    def description(self):
+        return ""
+
+class Pendulum(BaseRobot):
+    def __init__(self):
+        DIR = os.path.dirname(__file__)
+        source_file = None
+        picture_path = DIR+"/assets/SpotLike"
+        environment_id = "InvertedPendulum-v4"
+
+        super(Pendulum, self).__init__(source_file, picture_path, environment_id)
+
+    @property
+    def description(self):
+        return ""

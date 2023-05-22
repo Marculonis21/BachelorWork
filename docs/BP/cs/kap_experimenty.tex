@@ -15,7 +15,6 @@ vypočtena dle následující rovnice:
 \begin{equation} \label{fitness_calc}
     fitness = x - 0.5\cdot|y|
 \end{equation}
-
 kde $(x,y)$ jsou souřadnice bodu v simulovaném prostředí, do kterého jedinec
 dorazil (buď do vypršení limitovaného času na simulaci, nebo do dosažení
 podmínky předčasně ukončující simulační běh -- např. pád robota).
@@ -62,8 +61,9 @@ periodické hodnoty pro motory robotů.
 Pro tento typ experimentu inicializujeme populaci se \textbf{100 jedinci}.
 Abychom zjistili, kolik generací je potřeba pro rozumné výsledky, necháme
 nejprve proběhnout velký experiment, ve kterém vývoj evolučního algoritmu
-poběží po \textbf{500 generací}. Pro větší objem dat pro vyhodnocení je celý
-běh algoritmu \textbf{20krát} nezávisle opakován.
+poběží po \textbf{500 generací}. Abychom vyloučili vliv náhodné inicializace
+populace jedinců v genetickém algoritmu, pro vyhodnocení je celý
+běh algoritmu \textbf{20krát} nezávisle opakován a výsledky prezentujeme
 
 \begin{figure}[!htb]
     \centering
@@ -74,19 +74,22 @@ běh algoritmu \textbf{20krát} nezávisle opakován.
 
 \paragraph{Krabicový graf}
 Pro vizualizaci dat využíváme krabicový graf (boxplot). Tento graf vizualizuje
-data pomocí kvartilů. Uprostřed se nachází \emph{krabice}, který je shora
-ohraničena 3. kvartilem a zespodu 1. kvartilem. Uvnitř \emph{krabice} se
+data pomocí kvartilů. Uprostřed se nachází \emph{krabice} (obdélník), který je
+shora ohraničena 3. kvartilem a zespodu 1. kvartilem. Uvnitř \emph{krabice} se
 nachází (v našich grafech oranžovou barvou) linie, naznačující hodnotu mediánu.
 Dále krabicové grafy nad a pod střední \emph{krabicí} vykreslují tzv.
 \emph{vousy}, což vizualizuje variabilitu dat nad 3. a pod 1. kvartilem. Dále
 se v grafu mohou nacházet odlehlé body (\emph{outliers}), které jsou vykresleny
-jako samostatné body.
+jako samostatné kroužky.
 
 V našich grafech pro přehlednost dále vykreslujeme hodnotu maximální a
 minimální fitness v dané generaci.
 
 Grafy vznikají složením dat z průběhů fitness hodnot několika opakování daného
-evolučního algoritmu.
+evolučního algoritmu. Jeden krabicový diagram pro danou generaci zobrazuje
+rozložení hodnot fitness všech jedinců dané generace ze všech běhů. V grafu
+\ref{fig:exp_big} je to celkem 2000 hodnot. V poslední generaci dále červené
+značky označují hodnotu maximální fitness v jednotlivých bězích. 
 
 Krabicový graf na obrázku \ref{fig:exp_big} zobrazuje vyhodnocení popsaného
 velkého experimentu. Z grafu můžeme vidět, že největší růst fitness proběhl
@@ -106,16 +109,16 @@ provést v řádech desítek minut.
 \paragraph{První experiment}
 Nejprve se pokusíme řízení robota vyvinout pomocí evolučního
 algoritmu, který kóduje nastavení motorů pomocí základních periodických funkcí
-(agent popisující tento algoritmus popsán v implementaci v sekci
+(agent popisující tento algoritmus je popsán v implementaci v sekci
 \ref{imp:gaAgents.sinefuncfullagent}). Každý motor robota má v tomto případě
 přiřazenou vlastní periodickou funkci a genotyp jedinců specifikuje parametry
 těchto periodických funkcí (4 parametry pro každý kloub -- amplituda,
-frekvence, $x$ a $y$ posun). Funkce popsány rovnicí \ref{sinefunc} v sekci
-implementace agentů.
+frekvence, $x$ a $y$ posun). Funkce jsou popsány rovnicí (\ref{sinefunc}) v
+sekci implementace agentů.
 
 Evoluční algoritmus poběží \textbf{200 generací} se \textbf{100} náhodně
 inicializovanými jedinci. Pro vyhodnocení bude celý běh evolučního algoritmu
-bude pětkrát opakován vždy s novou náhodně vygenerovanou první populací.
+pětkrát opakován vždy s novou náhodně vygenerovanou počáteční populací.
 
 \begin{figure}[!h]
     \centering
@@ -182,12 +185,12 @@ stabilnější. Navržená jednoduchá úprava hodnotící funkce by měla být 
 toto lokální optimum penalizovat a tedy přinutit estetičtější pohyb.
 
 \paragraph{}
-Ve srovnání s předchozími pokusy se nyní pokusíme pomocí vyvinout řízení
-jednoduššího robota označeného jako \emph{Ant} (zobrazeného na obrázku
-\ref{fig:robot:ant}, blíže popsán v implementaci v sekci \ref{imp:robots.Ant}).
-Můžeme ho brát jako jednoduššího, protože obsahuje menší počet kloubů (8 stupňů
-volnosti) v porovnání s robotem \emph{SpotLike}. Zároveň jeho morfologie
-umožňuje snazší pohyb všemi směry s menším rizikem pádu.
+Ve srovnání s předchozími pokusy se nyní pokusíme pomocí stejných agentů
+vyvinout řízení jednoduššího robota označeného jako \emph{Ant} (zobrazeného na
+obrázku \ref{fig:robot:ant}, blíže popsán v implementaci v sekci
+\ref{imp:robots.Ant}). Můžeme ho brát jako jednoduššího, protože obsahuje menší
+počet kloubů (8 stupňů volnosti) v porovnání s robotem \emph{SpotLike}. Zároveň
+jeho morfologie umožňuje snazší pohyb všemi směry s menším rizikem pádu.
 
 \begin{figure}[!htb]
     \centering
@@ -219,7 +222,7 @@ schopnost agentů vyvinout řízení rychleji, zkrátíme délku evoluci na
 Z vývoje fitness (v grafu \ref{exp:first2_sinefull} a \ref{exp:first2_TFS})
 můžeme pozorovat, že oba agenti byli schopní u tohoto jednoduššího robota
 dosáhnout přijatelných výsledků i s omezeným počtem generací. Přijatelné
-výsledky jsou částečně podpořeny faktem, že i náhodně konfigurace mají dobrou
+výsledky jsou částečně podpořeny faktem, že i náhodné konfigurace mají dobrou
 šanci tohoto robota rozpohybovat v požadovaném směru a tedy již velmi brzy
 získat dobré ohodnocení. To se zároveň projevuje i na minimální fitness. Pro
 tohoto robota je totiž stejně jednoduché dostat takovou konfiguraci motorů,
@@ -254,7 +257,7 @@ těla otevřených pro evoluční vývoj.
 
 Kvalita jedinců bude v tomto experimentu hodnocena stejně jako v předchozích
 experimentech. Cílem pro jedince je tedy dojít co nejdále v určeném směru.
-Přesný výpočet fitness je popsán rovnicí \ref{fitness_calc}. 
+Přesný výpočet fitness je popsán rovnicí (\ref{fitness_calc}). 
 
 Pro experiment volíme robota \emph{AntV3} (popsán v implementaci v sekci
 \ref{imp:robots.Ant}). Tento typ experimentů je ale samozřejmě povolen pro
@@ -293,26 +296,32 @@ morfologie (graf na obrázku \ref{exp:first2_TFS}). Můžeme tedy odhadovat, že
 mohou existovat optimálnější konfigurace končetin tohoto robota, než jaká je
 výchozí.
 
-% \begin{figure}[!htb]
-%     \centering
-%     \begin{minipage}{0.5\textwidth}
-%         \centering
-%         \includegraphics[width=1\textwidth]{../img/graph_sigmoid.pdf}
-%         \label{fig:exp2_para_body1}
-%     \end{minipage}%
-%     \begin{minipage}{0.5\textwidth}
-%         \centering
-%         \includegraphics[width=1\textwidth]{../img/graph_tanh.pdf}
-%         \label{fig:exp2_para_body2}
-%     \end{minipage}
-%     \includegraphics[width=0.5\textwidth]{../img/graph_relu.pdf}
-%     % \caption{Funkce \emph{ReLU}}
-%     \label{fig:exp2_para_body3}
-% \end{figure}
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.75\textwidth]{../img/crop_exp2_para_side1.jpg}
+    \end{minipage}%
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.75\textwidth]{../img/crop_exp2_para_top1.jpg}
+    \end{minipage}
+    \caption{Příklad z výsledků současného vývoje řízení a morfologie robota
+    \emph{AntV3}}
+    \label{fig:exp2_para_body_show}
+\end{figure}
 
-% Pomocí možnosti načtení nejlepších řešení jednotlivých běhů algoritmu můžeme
-% zároveň prozkoumat, k jakým konfiguracím vývoj dospěl. Vybrané konfigurace
-% zobrazujeme na obrázcích \ref{}, \ref{} a \ref{}.
+\pagebreak
+Díky možnosti přehrávání nejlepších řešení jednotlivých běhů algoritmu můžeme
+zároveň prozkoumat, k jakým konfiguracím vývoj dospěl. Ukázalo se, že vývoj
+dospěl buď k robotům s velmi dlouhými končetinami, nebo (jak je na obrázcích
+\ref{fig:exp2_para_body_show}) k robotům s několika dlouhými
+(\emph{odrazovými}) končetinami a jednou kratší končetinou (sloužící jako
+\emph{kormidlo}). 
+
+Obrázky \ref{fig:exp2_para_body_show} ukazují nejúspěšnějšího robota z
+předvedeného experimentu, který je schopný své tělo díky kratší zadní noze
+naklonit, a je tak schopný poměrně rychle skákat vpřed.
 
 \subsection{Oddělený vývoj řízení a morfologie} \label{exp2:split_evo}
 
@@ -347,5 +356,20 @@ robota. Ten začne vygenerováním zcela náhodných konfigurací těla robota (
 povoleném rozsahu délek končetin), a tedy může chvilkově vést k horším
 výsledkům. Časem ale vidíme, že evoluce byla schopná optimalizovat tělo robota
 pro již vyvinutý pohyb a tak celkově vylepšit výsledky jedinců.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.4\textwidth]{../img/crop_exp2_serial_top1.jpg}
+    \caption{Příklad z výsledků odděleného vývoje řízení a morfologie robota
+    \emph{AntV3}}
+    \label{fig:exp2_serial_body_show}
+\end{figure}
+
+Na obrázku \ref{fig:exp2_serial_body_show} můžeme vidět nejlepšího jedince z
+experimentu s odděleným vývojem řízení a morfologie. Jedná se zároveň o dobrý
+příklad morfologie, ke které se řešení často blížila. Pro tento typ pohybu se 
+robotům hodilo mít mnohem delší části končetin vedoucí přímo od těla
+(\emph{stehno}), které tedy svém pohybu jsou schopny posunout robota o to
+dál a tak optimalizovat uraženou vzdálenost.
 
 \section{Diskuze výsledků}

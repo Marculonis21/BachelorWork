@@ -10,3 +10,6 @@ dependencies:
   - dask=2022.01.0
   - pysimplegui=4.60.4
   - fonts-anaconda
+  - pip
+  - pip:
+    - neat-python

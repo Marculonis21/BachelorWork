@@ -1,10 +1,37 @@
 #!/usr/bin/env python
 import copy
-from distributed.client import PooledRPCCall
 import numpy as np
 import random
+from inspect import signature
 
 class Operators:
+    @staticmethod
+    def __ops_dir__():
+        methods = [(m, "Operators."+m) for m in dir(Operators) if not m.startswith("__")]
+
+        filter = ["population", "agent", "fitness_values"]
+
+        selection = {}
+        crossover = {}
+        mutation  = {}
+
+        for name, method in methods:
+            sig = signature(eval(method))
+            params = [p for p in list(sig.parameters) if p not in filter]
+            defaults = eval(method).__defaults__
+
+            # save `delegate` and his special params 
+            if "selection" in name:
+                selection[name] = (eval(method), params, defaults)
+            elif "crossover" in name:
+                crossover[name] = (eval(method), params, defaults)
+            elif "mutation" in name:
+                mutation[name] = (eval(method), params, defaults)
+
+        return {"selection":selection, 
+                "crossover":crossover,
+                "mutation" :mutation}
+
     @staticmethod
     def roulette_selection(population, fitness_values): # TOURNAMENT
         num_positive = np.sum([1 if x > 0 else 0 for x in fitness_values])
@@ -27,6 +54,7 @@ class Operators:
         """
         Runs tournamnets between randomly chosen individuals and selects the best from each tournament.
         """
+        print("K ... ", k)
 
         fitness_values = np.array(fitness_values)
 
@@ -160,7 +188,7 @@ class Operators:
         return new_population
 
     @staticmethod
-    def uniform_shift_mutation(population, agent):
+    def uniform_shift_mutation(population, agent, max_shift_percentage=0.05):
         new_population = []
 
         for individual in population:
@@ -175,7 +203,7 @@ class Operators:
 
                             for part in range(len(agent.action_range)):
                                 # max 5% shift
-                                action_shift = np.concatenate([action_shift, np.random.uniform(agent.action_range[part][0]*0.05, agent.action_range[part][1]*0.05, size=agent.action_range[part][2])])
+                                action_shift = np.concatenate([action_shift, np.random.uniform(agent.action_range[part][0]*max_shift_percentage, agent.action_range[part][1]*max_shift_percentage, size=agent.action_range[part][2])])
 
                             actions[a] += action_shift
 

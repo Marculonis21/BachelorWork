@@ -25,24 +25,24 @@ class BaseRobot(ABC):
     def description(self):
         return ""
 
-    def __key_to_regex(self, key):
-        regex = key.replace("$", "\$")
-        regex = regex.replace("(", "\(")
-        regex = regex.replace(")", "\)")
-
-        return regex
 
     def create(self, body_part_mask, individual=([],[]), tmp_file=None):
         """
             Writes XML file (in place) - robot specific XML string with changed body part variables
         """
 
+        def key_to_regex(key):
+            regex = key.replace("$", "\$")
+            regex = regex.replace("(", "\(")
+            regex = regex.replace(")", "\)")
+
+            return regex
+
+        if self.source_file == None:
+            return None
+
         if tmp_file == None:
             tmp_file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
-
-        # if self.source_file == None:
-        #     tmp_file.close()
-        #     return None
 
         _, body_part_adjustments = individual
 
@@ -51,7 +51,7 @@ class BaseRobot(ABC):
         # adjust body part variables
         idx = 0
         for i, key in enumerate(self.body_parts):
-            regex = self.__key_to_regex(key)
+            regex = key_to_regex(key)
             # set to desired body part length if True in mask ELSE set to a default value given by xml source file
             if body_part_mask[i]:
                 text = re.sub(regex, str(body_part_adjustments.flatten()[idx]), text)
@@ -142,7 +142,7 @@ class Walker2D(BaseRobot):
     def __init__(self):
         DIR = os.path.dirname(__file__)
         source_file = None
-        picture_path = DIR+"/assets/SpotLike"
+        picture_path = DIR+"/assets/Walker2D"
         environment_id = "Walker2d-v4"
 
         super(Walker2D, self).__init__(source_file, picture_path, environment_id)
@@ -155,7 +155,7 @@ class DoublePendulum(BaseRobot):
     def __init__(self):
         DIR = os.path.dirname(__file__)
         source_file = None
-        picture_path = DIR+"/assets/SpotLike"
+        picture_path = DIR+"/assets/double_invertedPendulum"
         environment_id = "InvertedDoublePendulum-v4"
 
         super(DoublePendulum, self).__init__(source_file, picture_path, environment_id)
@@ -168,7 +168,7 @@ class Pendulum(BaseRobot):
     def __init__(self):
         DIR = os.path.dirname(__file__)
         source_file = None
-        picture_path = DIR+"/assets/SpotLike"
+        picture_path = DIR+"/assets/invertedPendulum"
         environment_id = "InvertedPendulum-v4"
 
         super(Pendulum, self).__init__(source_file, picture_path, environment_id)

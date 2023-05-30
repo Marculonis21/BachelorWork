@@ -5,7 +5,7 @@ import time
 import sys
 import copy
 
-import resources.gaAgents as gaAgents
+import resources.agents.gaAgents as gaAgents
 import resources.robots.robots as robots
 from resources.experiment_params import ExperimentParams 
 
@@ -43,6 +43,8 @@ class Experiments:
         self.__experiments["c"] = self.exp_c(False)
         self.__experiments["d"] = self.exp_d(False)
 
+        self.__experiments["neat_test"] = self.neat_test(False)
+
     def __create_batch_dir(self, robot, agent, note):
         batch_dir = self.__batch_dir.replace("@1", note).replace(
                                              "@2", type(robot).__name__).replace(
@@ -59,6 +61,27 @@ class Experiments:
     def get_experiment(self, name):
         assert name in self.get_experiment_names(), f"Unknown experiment name `{name}` - list of created experiments {self.get_experiment_names()}"
         return copy.copy(self.__experiments[name])
+
+    def neat_test(self, run=True):
+        robot = robots.Pendulum()
+        agent = gaAgents.NEATAgent(robot, [])
+        note = "neat_robots_test"
+
+        batch_dir = self.__create_batch_dir(robot, agent, note)
+
+        params = ExperimentParams(robot, 
+                                  agent,
+                                  ga_population_size=150,
+                                  ga_generation_count=100,
+                                  show_best=False,
+                                  save_best=True,
+                                  save_dir=batch_dir,
+                                  note="")
+
+        if run: # print note before starting experiment
+            self.__exp_start_note()
+
+        return params
 
     def exp2_body_para(self, run=True):
         robot = robots.AntV3()

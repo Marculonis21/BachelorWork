@@ -1,14 +1,19 @@
 #!/usr/bin/env python
 
 # creating and registering custom environment
-import resources.gymnasiumCustomEnv as _
+import resources.agents.gymnasiumCustomEnv as _
 
-import resources.gaAgents as gaAgents
+# import all modules to be reachable from central roboEvo
+import resources.agents.gaAgents as gaAgents
+import resources.agents.gaOperators as gaOperators
 import resources.robots.robots as robots
 from resources.experiment_params import ExperimentParams
 
 import gymnasium as gym
 from gymnasium.wrappers.time_limit import TimeLimit
+
+import neat
+
 import matplotlib.pyplot as plt
 import numpy as np
 import copy
@@ -41,13 +46,13 @@ def __simulation_run(env, agent, individual, render=False):
     terminated = False
     truncated = False
 
-    env.reset()
+    obs = env.reset()
     while True:
         steps += 1
         action = agent.get_action(individual, steps).squeeze()
         
         # obs, reward, terminated, truncated, info
-        _, _, terminated, truncated, info = env.step(action)
+        obs, reward, terminated, truncated, info = env.step(action)
 
         if render:
             env.render()
@@ -68,9 +73,8 @@ def render_run(agent, robot, individual):
     print(individual)
 
     run_reward = -1 
+    file = robot.create(agent.body_part_mask, individual)
     try:
-        file = robot.create(agent.body_part_mask, individual)
-
         env = gym.make(id=robot.environment_id,
                        xml_file=file.name,
                        reset_noise_scale=0.0,
@@ -243,10 +247,13 @@ def run_experiment(params:ExperimentParams, gui=False, debug=False):
     GRAPH_VALUES = [[],[],[]]
     EPISODE_HISTORY = []
 
+    _params = copy.deepcopy(params)
+    if isinstance(_params.agent,gaAgents.NEATAgent):
+        _params.agent.evo_override(_params)
+        return
+
     # Start threading client
     client = Client(n_workers=11,threads_per_worker=1,scheduler_port=0)
-
-    _params = copy.deepcopy(params)
 
     # Run evolution
     try:
@@ -265,7 +272,7 @@ def run_experiment(params:ExperimentParams, gui=False, debug=False):
     # Set final reward (render best if set)
     best_reward = 0
     if _params.show_best: best_reward = render_run(_params.agent, _params.robot, best_individual)
-    else:                best_reward = __simulation_run(best_individual_env, _params.agent, best_individual, render=False)
+    else:                 best_reward = __simulation_run(best_individual_env, _params.agent, best_individual, render=False)
 
     # File saving
     if not os.path.exists(_params.save_dir):
@@ -280,3 +287,5 @@ def run_experiment(params:ExperimentParams, gui=False, debug=False):
     np.save(_params.save_dir + f"/{_params.note}_episode_history{current_time}", episode_history)
     np.save(_params.save_dir + f"/{_params.note}_last_population{current_time}", last_population)
 
+if __name__ == "__main__":
+    pass

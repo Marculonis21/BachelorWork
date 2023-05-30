@@ -14,6 +14,7 @@ parent = os.path.dirname(current)
 # adding the parent directory to
 # the sys.path.
 sys.path.append(parent)
+import gymnasium as gym
 
 import roboEvo
 
@@ -78,18 +79,18 @@ def simulationRun(agent, individual):
 ###################################################
 
 if __name__ == "__main__":
-    robot = roboEvo.robots.SpotLike()
-    agent = roboEvo.gaAgents.TFSAgent(robot, [False, (-0.1, -1), False])
+    robot = roboEvo.robots.Walker2D()
+    agent = roboEvo.gaAgents.FullRandomAgent(robot, [])
     individual = agent.generate_population(1)[0]
 
     file = robot.create(agent.body_part_mask, individual)
 
-    env = roboEvo.gym.make(robot.environment_id,
-                           xml_file=file.name,
-                           reset_noise_scale=0.0,
-                           disable_env_checker=True,
-                           terminate_when_unhealthy=False)
-    env = roboEvo.TimeLimit(env, max_episode_steps=500)
+    if file == None:
+        env = gym.make(robot.environment_id, render_mode="human")
+    else:
+        env = gym.make(robot.environment_id, render_mode="human", xml_file=file.name)
+        file.close()
+    # env = roboEvo.TimeLimit(env, max_episode_steps=500)
 
     simulationRun(agent, individual)
     file.close()

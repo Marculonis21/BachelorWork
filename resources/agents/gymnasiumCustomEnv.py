@@ -105,5 +105,5 @@ class CustomEnv(MujocoEnv, utils.EzPickle):
 from gymnasium.envs.registration import register
 register(
      id="custom/CustomEnv-v0",
-     entry_point="resources.gymnasiumCustomEnv:CustomEnv",
+     entry_point="resources.agents.gymnasiumCustomEnv:CustomEnv",
 )

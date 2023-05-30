@@ -8,8 +8,44 @@ import pickle
 import lzma
 from enum import Enum
 
-import resources.gaOperators as gaOperators
+import neat
+import re
+import tempfile
+import copy
+
+import resources.agents.gaOperators as gaOperators
 Operators = gaOperators.Operators
+
+# DECORATORS - if gui was used, then operator selected by gui is used with selected arguments
+#            - otherwise the orig function is used -> selected by code
+def selection_deco( func ):
+    def wrapper(self, population, fitness_values):
+        if self.gui:
+            method, arguments = self.genetic_operators["selection"] 
+            return method(population, fitness_values, *arguments)
+        else:
+            return func( self, population, fitness_values)
+    return wrapper
+
+def crossover_deco( func ):
+    def wrapper(self, population):
+        if self.gui:
+            method, arguments = self.genetic_operators["crossover"] 
+            return method(population, *arguments)
+        else:
+            return func( self, population)
+    return wrapper
+
+def mutation_deco( func ):
+    def wrapper(self, population):
+        if self.gui:
+            method, arguments = self.genetic_operators["mutation"] 
+            return method(population, *arguments)
+        else:
+            return func( self, population)
+    return wrapper
+
+
 
 class EvoType(Enum):
     CONTROL = 0
@@ -18,7 +54,7 @@ class EvoType(Enum):
     CONTROL_BODY_SERIAL = 3
 
 class BaseAgent(ABC):
-    def  __init__(self, robot, body_part_mask, evo_type=EvoType.CONTROL):
+    def  __init__(self, robot, body_part_mask, evo_type=EvoType.CONTROL, gui=False):
 
         # find out if evolution should continue after first evolution ended - (control evolution
         # changes to body evolution)
@@ -46,14 +82,21 @@ class BaseAgent(ABC):
         self.body_range   = [] 
        
         file = robot.create_default()
-        default_env = gym.make(robot.environment_id, xml_file=file.name)
-        file.close()
+        if file == None:
+            default_env = gym.make(robot.environment_id)
+        else:
+            default_env = gym.make(robot.environment_id, xml_file=file.name)
+            file.close()
 
-        assert default_env.action_space.shape is not None
         self.action_size = default_env.action_space.shape[0]
+        self.observation_size = default_env.observation_space.shape[0]
         default_env.close()
 
+        self.gui = gui
         self.arguments = {}
+        self.arguments_tooltips = {}
+        # for gui selected operators 
+        self.genetic_operators = {} 
 
         # to be rewritten in child classes
         self.individual_mutation_prob = 0 
@@ -69,9 +112,6 @@ class BaseAgent(ABC):
 
         self.action_range = [] 
         self.body_range   = [] 
-
-    @abstractclassmethod
-    def for_GUI(cls): pass
 
     @abstractproperty
     def description(self): pass
@@ -104,21 +144,16 @@ class BaseAgent(ABC):
         return agent, robot, individual
 
 class StepCycleHalfAgent(BaseAgent):
-    def __init__(self, robot, body_parts, evo_type=EvoType.CONTROL, GUI=False):
-        if not GUI:
-            super(StepCycleHalfAgent, self).__init__(robot, body_parts, evo_type)
-            self.action_size = self.action_size//2
+    def __init__(self, robot, body_parts, evo_type=EvoType.CONTROL, gui=False):
+        super(StepCycleHalfAgent, self).__init__(robot, body_parts, evo_type, gui)
+        self.action_size = self.action_size//2
 
         self.arguments = {"cycle_repeat": 25}
+        self.arguments_tooltips = {"cycle_repeat":"Length of the step sequence"}
 
         self.individual_mutation_prob = 0.75
         self.action_mutation_prob     = 0.1
         self.body_mutation_prob       = 0.1
-
-    @classmethod
-    def for_GUI(cls):
-        "Return default agent for GUI needs"
-        return cls(None, None, GUI=True)
 
     @property
     def description(self):
@@ -134,6 +169,7 @@ class StepCycleHalfAgent(BaseAgent):
         return full_action
 
     def generate_population(self, population_size):
+
         population = []
 
         for _ in range(population_size):
@@ -154,33 +190,33 @@ class StepCycleHalfAgent(BaseAgent):
             individual = [actions, body_parts]
             population.append(individual)
 
+        # set ranges for actions and body parts
+        self.action_range = [(-1.0,1.0,self.action_size)] 
+        self.body_range    = [] 
+        for value in self.body_part_mask:
+            if value:
+                assert isinstance(value, tuple)
+                self.body_range.append((value[0], value[1]))
+
         return np.array(population, dtype=object)
 
+    @selection_deco
     def selection(self, population, fitness_values):
         return Operators.tournament_selection(population, fitness_values, 5)
 
+    @crossover_deco
     def crossover(self, population):
-        return Operators.crossover_uniform(population, self.evolve_control, self.evolve_body)
+        return Operators.crossover_uniform(population, self)
 
+    @mutation_deco
     def mutation(self, population):
-        if self.action_range == []:
-            self.action_range = [(-1.0,1.0,self.action_size)] 
-            self.body_range    = [] 
-
-            for value in self.body_part_mask:
-                if value:
-                    assert isinstance(value, tuple)
-                    self.body_range.append((value[0], value[1]))
-
         return Operators.uniform_mutation(population, self)
 
 class SineFuncFullAgent(BaseAgent):
     # individual = amplitude, period, shift-x, shift-y for each leg
-    def __init__(self, robot, body_parts, evo_type=EvoType.CONTROL, GUI=False):
-        if not GUI:
-            super(SineFuncFullAgent, self).__init__(robot, body_parts, evo_type)
+    def __init__(self, robot, body_parts, evo_type=EvoType.CONTROL, gui=False):
+        super(SineFuncFullAgent, self).__init__(robot, body_parts, evo_type, gui)
 
-        self.arguments = {}
         self.arguments = {"amplitude_range" : {"MIN":0.1,  "MAX":2},
                           "period_range"    : {"MIN":1,    "MAX":2},
                           "shift_x_range"   : {"MIN":0,    "MAX":2*math.pi}}
@@ -190,11 +226,6 @@ class SineFuncFullAgent(BaseAgent):
         self.individual_mutation_prob = 0.75
         self.action_mutation_prob     = 0.1
         self.body_mutation_prob       = 0.1
-
-    @classmethod
-    def for_GUI(cls):
-        "Return default agent for GUI needs"
-        return cls(None, None, GUI=True)
 
     @property
     def description(self):
@@ -259,38 +290,38 @@ class SineFuncFullAgent(BaseAgent):
             individual = [values, body_parts]
             population.append(individual)
 
+        # set ranges for actions and body parts
+        self.action_range  = [(self.arguments["amplitude_range"]["MIN"], self.arguments["amplitude_range"]["MAX"], 1), 
+                              (self.arguments["period_range"]["MIN"],    self.arguments["period_range"]["MAX"],    1),
+                              (self.arguments["shift_x_range"]["MIN"],   self.arguments["shift_x_range"]["MAX"],   1),
+                              (self.arguments["shift_y_range"]["MIN"],   self.arguments["shift_y_range"]["MAX"],   1)]
+        self.body_range    = [] 
+
+        for value in self.body_part_mask:
+            if value:
+                assert isinstance(value, tuple)
+                self.body_range.append((value[0], value[1]))
+
         return np.array(population, dtype=object)
 
+    @selection_deco
     def selection(self, population, fitness_values):
         return Operators.tournament_selection(population, fitness_values, int(len(population)*0.1))
         # return Operators.roulette_selection(population, fitness_values)
 
+    @crossover_deco
     def crossover(self, population):
-        return Operators.crossover_uniform(population, self.evolve_control, self.evolve_body)
+        return Operators.crossover_uniform(population, self)
 
     def mutation(self, population):
-        if self.action_range == []:
-            self.action_range  = [(self.arguments["amplitude_range"]["MIN"], self.arguments["amplitude_range"]["MAX"], 1), 
-                                  (self.arguments["period_range"]["MIN"],    self.arguments["period_range"]["MAX"],    1),
-                                  (self.arguments["shift_x_range"]["MIN"],   self.arguments["shift_x_range"]["MAX"],   1),
-                                  (self.arguments["shift_y_range"]["MIN"],   self.arguments["shift_y_range"]["MAX"],   1)]
-            self.body_range    = [] 
-
-            for value in self.body_part_mask:
-                if value:
-                    assert isinstance(value, tuple)
-                    self.body_range.append((value[0], value[1]))
-
         return Operators.uniform_mutation(population, self)
 
 class SineFuncHalfAgent(BaseAgent):
     # individual = amplitude, frequency, shift-x, shift-y for each leg
-    def __init__(self, robot, body_parts, evo_type=EvoType.CONTROL, GUI=False):
-        if not GUI:
-            super(SineFuncHalfAgent, self).__init__(robot, body_parts, evo_type)
-            self.action_size = self.action_size//2
+    def __init__(self, robot, body_parts, evo_type=EvoType.CONTROL, gui=False):
+        super(SineFuncHalfAgent, self).__init__(robot, body_parts, evo_type, gui)
+        self.action_size = self.action_size//2
 
-        self.arguments = {}
         self.arguments = {"amplitude_range" : {"MIN":0.1,  "MAX":2},
                           "period_range"    : {"MIN":1,    "MAX":2},
                           "shift_x_range"   : {"MIN":0,    "MAX":2*math.pi}}
@@ -300,11 +331,6 @@ class SineFuncHalfAgent(BaseAgent):
         self.individual_mutation_prob = 0.75
         self.action_mutation_prob     = 0.1
         self.body_mutation_prob       = 0.1
-
-    @classmethod
-    def for_GUI(cls):
-        "Return default agent for GUI needs"
-        return cls(None, None, GUI=True)
 
     @property
     def description(self):
@@ -371,46 +397,43 @@ class SineFuncHalfAgent(BaseAgent):
             individual = [values, body_parts]
             population.append(individual)
 
+        # set ranges for actions and body parts
+        self.action_range  = [(self.arguments["amplitude_range"]["MIN"], self.arguments["amplitude_range"]["MAX"], 1), 
+                              (self.arguments["period_range"]["MIN"],    self.arguments["period_range"]["MAX"],    1),
+                              (self.arguments["shift_x_range"]["MIN"],   self.arguments["shift_x_range"]["MAX"],   1),
+                              (self.arguments["shift_y_range"]["MIN"],   self.arguments["shift_y_range"]["MAX"],   1)]
+        self.body_range    = [] 
+
+        for value in self.body_part_mask:
+            if value:
+                assert isinstance(value, tuple)
+                self.body_range.append((value[0], value[1]))
+
         return np.array(population, dtype=object)
 
+    @selection_deco
     def selection(self, population, fitness_values):
         # return Operators.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
         return Operators.roulette_selection(population, fitness_values)
 
+    @crossover_deco
     def crossover(self, population):
-        return Operators.crossover_uniform(population, self.evolve_control, self.evolve_body)
+        return Operators.crossover_uniform(population, self)
 
+    @mutation_deco
     def mutation(self, population):
-        if self.action_range == []:
-            self.action_range  = [(self.arguments["amplitude_range"]["MIN"], self.arguments["amplitude_range"]["MAX"], 1), 
-                                  (self.arguments["period_range"]["MIN"],    self.arguments["period_range"]["MAX"],    1),
-                                  (self.arguments["shift_x_range"]["MIN"],   self.arguments["shift_x_range"]["MAX"],   1),
-                                  (self.arguments["shift_y_range"]["MIN"],   self.arguments["shift_y_range"]["MAX"],   1)]
-            self.body_range    = [] 
-
-            for value in self.body_part_mask:
-                if value:
-                    assert isinstance(value, tuple)
-                    self.body_range.append((value[0], value[1]))
-
-        # return Operators.uniform_shift_mutation(population, self)
         return Operators.uniform_mutation(population, self)
 
 class FullRandomAgent(BaseAgent):
-    def __init__(self, robot, body_parts, evo_type=EvoType.CONTROL, GUI=False):
-        if not GUI:
-            super(FullRandomAgent, self).__init__(robot, body_parts, evo_type)
+    def __init__(self, robot, body_parts, evo_type=EvoType.CONTROL, gui=False):
+        super(FullRandomAgent, self).__init__(robot, body_parts, evo_type, gui)
 
         self.arguments = {"cycle_repeat": 25}
+        self.arguments_tooltips = {"cycle_repeat":"Length of the step sequence"}
 
         self.individual_mutation_prob = 0.75
         self.action_mutation_prob     = 0.1
         self.body_mutation_prob       = 0.1
-
-    @classmethod
-    def for_GUI(cls):
-        "Return default agent for GUI needs"
-        return cls(None,None,GUI=True)
 
     @property
     def description(self):
@@ -446,34 +469,35 @@ class FullRandomAgent(BaseAgent):
             individual = [actions, body_parts]
             population.append(individual)
 
+        # set ranges for actions and body parts
+        self.action_range = [(-1.0,1.0,self.action_size)] 
+        self.body_range    = [] 
+
+        for value in self.body_part_mask:
+            if value:
+                assert isinstance(value, tuple)
+                self.body_range.append((value[0], value[1]))
+
         return np.array(population, dtype=object)
 
+    @selection_deco
     def selection(self, population, fitness_values):
         return Operators.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
 
+    @crossover_deco
     def crossover(self, population):
-        return Operators.crossover_uniform(population, self.evolve_control, self.evolve_body)
+        return Operators.crossover_uniform(population, self)
 
+    @mutation_deco
     def mutation(self, population):
-        if self.action_range == []:
-            self.action_range = [(-1.0,1.0,self.action_size)] 
-            self.body_range    = [] 
-
-            for value in self.body_part_mask:
-                if value:
-                    assert isinstance(value, tuple)
-                    self.body_range.append((value[0], value[1]))
-
         return Operators.uniform_mutation(population, self)
 
 # https://ic.unicamp.br/~reltech/PFG/2017/PFG-17-07.pdf
 # https://web.fe.up.pt/~pro09025/papers/Shafii%20N.%20-%202009%20-%20A%20truncated%20fourier%20series%20with%20genetic%20algorithm%20for%20the%20control%20of%20biped%20locomotion.pdf
 class TFSAgent(BaseAgent):
-    def __init__(self, robot, body_part_mask, evo_type=EvoType.CONTROL, GUI=False):
-        if not GUI:
-            super(TFSAgent, self).__init__(robot, body_part_mask, evo_type)
+    def __init__(self, robot, body_part_mask, evo_type=EvoType.CONTROL, gui=False):
+        super(TFSAgent, self).__init__(robot, body_part_mask, evo_type, gui)
 
-        self.arguments = {}
         self.arguments = {"period":4,
                           "series_length":3,
                           "coeficient_range":1}
@@ -481,11 +505,6 @@ class TFSAgent(BaseAgent):
         self.individual_mutation_prob = 0.75
         self.action_mutation_prob     = 0.1
         self.body_mutation_prob       = 0.1
-
-    @classmethod
-    def for_GUI(cls):
-        "Return default agent for GUI needs"
-        return cls(None,None,GUI=True)
 
     @property
     def description(self):
@@ -552,25 +571,195 @@ class TFSAgent(BaseAgent):
             individual = [values, body_parts]
             population.append(individual)
 
+        # set ranges for actions and body parts
+        self.action_range = [(-self.arguments["coeficient_range"], self.arguments["coeficient_range"], self.arguments["series_length"]), 
+                             (-2*np.pi, 2*np.pi, self.arguments["series_length"])]
+        self.body_range    = [] 
+
+        for value in self.body_part_mask:
+            if value:
+                assert isinstance(value, tuple)
+                self.body_range.append((value[0], value[1]))
+
         return np.array(population, dtype=object)
 
+    @selection_deco
     def selection(self, population, fitness_values):
-        # return GA.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
-        # return GA.tournament_selection(population, fitness_values, int(len(population)*0.2))
         return Operators.roulette_selection(population, fitness_values)
 
+    @crossover_deco
     def crossover(self, population):
-        return Operators.crossover_uniform(population, self.evolve_control, self.evolve_body)
+        return Operators.crossover_uniform(population, self)
 
+    @mutation_deco
     def mutation(self, population):
-        if self.action_range == []:
-            self.action_range = [(-self.arguments["coeficient_range"], self.arguments["coeficient_range"], self.arguments["series_length"]), 
-                                 (-2*np.pi, 2*np.pi, self.arguments["series_length"])]
-            self.body_range    = [] 
-
-            for value in self.body_part_mask:
-                if value:
-                    assert isinstance(value, tuple)
-                    self.body_range.append((value[0], value[1]))
-
         return Operators.uniform_shift_mutation(population, self)
+
+class NEATAgent(BaseAgent):
+    def __init__(self, robot, body_part_mask, evo_type=EvoType.CONTROL, gui=False):
+        super(NEATAgent, self).__init__(robot, body_part_mask, evo_type, gui)
+
+        self.config_source_file = ""
+        with open("resources/agents/config_neat.txt") as file:
+            lines = file.readlines()
+            self.config_source_file= "".join(lines)
+
+        raw_arguments = re.findall(r'\$[A-Za-z0-9_]+\([+-]?[0-9]*[.]?[0-9]+\)\$', self.config_source_file)
+        for arg in raw_arguments:
+            name = arg[1:arg.find("(")] #)
+            self.arguments[name] = float(arg[arg.find("(")+1 : arg.find(")")])
+            if name == "NET_NUM_OUTPUTS":
+                self.arguments[name] = self.action_size 
+            if name == "NET_NUM_INPUTS":
+                self.arguments[name] = self.observation_size
+
+    @property
+    def description(self):
+        return "NEATAgent\n    Agent using neuroevolution algorithm - NEAT"
+
+    def evo_override(self, experiment_params):
+        from dask.distributed import Client
+        from gymnasium.wrappers.time_limit import TimeLimit
+
+        def custom_eval(env, agent, net, render=False):
+            steps = -1
+            individual_reward = 0
+            terminated = False
+            truncated = False
+
+            obs = env.reset()
+            obs = obs[0]
+            while True:
+                steps += 1
+                action = net.activate(obs)
+                
+                obs, reward, terminated, truncated, info = env.step(action)
+
+                individual_reward += reward
+
+                if render:
+                    env.render()
+
+                if terminated or truncated:
+                    break
+
+            return individual_reward
+
+        def eval_genomes(genomes, config):
+            client = Client(n_workers=1,threads_per_worker=1,scheduler_port=0)
+
+            robot = experiment_params.robot
+            agent = experiment_params.agent
+
+            file = robot.create(agent.body_part_mask)
+            env = None
+            if file == None:
+                env = gym.make(id=robot.environment_id,
+                               render_mode=None)
+            else:
+                env = gym.make(id=robot.environment_id,
+                               xml_file=file.name,
+                               reset_noise_scale=0.0,
+                               disable_env_checker=True,
+                               render_mode=None)
+                env = TimeLimit(env, max_episode_steps=1000)
+                file.close()
+
+            futures = []
+            for genome_id, genome in genomes:
+                net = neat.nn.FeedForwardNetwork.create(genome, config) 
+                futures.append(client.submit(custom_eval, env, None, net))
+
+            fitness_values = client.gather(futures)
+
+            for i in range(len(genomes)):
+                genome_id, genome = genomes[i]
+                genome.fitness = fitness_values[i]
+
+            client.close()
+
+        population = self.generate_population(experiment_params.ga_population_size)
+        winner = population.run(eval_genomes, experiment_params.ga_generation_count)
+
+        file = experiment_params.robot.create(experiment_params.agent.body_part_mask)
+        env = None
+        if file == None:
+            env = gym.make(id=experiment_params.robot.environment_id,
+                           render_mode="human")
+        else:
+            env = gym.make(id=experiment_params.robot.environment_id,
+                            xml_file=file.name,
+                            reset_noise_scale=0.0,
+                            disable_env_checker=True,
+                            render_mode="human")
+            env = TimeLimit(env, max_episode_steps=1000)
+            file.close()
+
+        net = neat.nn.FeedForwardNetwork.create(winner, self.config) 
+        print("READY FOR RENDER ... ")
+        input()
+        print(custom_eval(env, experiment_params.agent, net, True))
+
+    def get_action(self, net, obs):
+        return net.activate(obs)
+
+    def generate_population(self, population_size):
+
+        def key_to_regex(key):
+            regex = key.replace("$", "\$")
+            regex = regex.replace("(", "\(")
+            regex = regex.replace(")", "\)")
+
+            return regex
+
+        tmp_file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
+        text = copy.deepcopy(self.config_source_file)
+
+        raw_arguments = re.findall(r'\$[A-Za-z0-9_]+\([+-]?[0-9]*[.]?[0-9]+\)\$', self.config_source_file)
+        argument_values = list(self.arguments.values())
+        for i, key in enumerate(raw_arguments):
+            if "POP_SIZE" in key:
+                argument_values[i] = population_size
+
+            regex = key_to_regex(key)
+            # to check for int/float values
+            orig_value = eval(key[key.find("(")+1 : key.find(")")])
+            new_value = int(argument_values[i]) if isinstance(orig_value, int) else float(argument_values[i])
+            text = re.sub(regex, str(new_value), text)
+
+        tmp_file.seek(0)
+        tmp_file.truncate()
+        tmp_file.write(text)
+        tmp_file.flush()
+
+        print(text)
+        quit()
+
+        self.config = neat.Config(neat.DefaultGenome, 
+                                  neat.DefaultReproduction,
+                                  neat.DefaultSpeciesSet,
+                                  neat.DefaultStagnation,
+                                  tmp_file.name)
+        tmp_file.close()
+
+        pop = neat.Population(config)
+        pop.add_reporter(neat.StdOutReporter(show_species_detail=True))
+        stats = neat.StatisticsReporter()
+        pop.add_reporter(stats)
+
+        return pop
+
+    @selection_deco
+    def selection(self, population, fitness_values):
+        pass
+        # return Operators.roulette_selection(population, fitness_values)
+
+    @crossover_deco
+    def crossover(self, population):
+        pass
+        # return Operators.crossover_uniform(population, self)
+
+    @mutation_deco
+    def mutation(self, population):
+        pass
+        # return Operators.uniform_shift_mutation(population, self)

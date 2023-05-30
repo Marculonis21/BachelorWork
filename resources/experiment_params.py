@@ -1,5 +1,5 @@
 import resources.robots.robots as robots
-import resources.gaAgents as gaAgents
+import resources.agents.gaAgents as gaAgents
 from enum import Enum
 
 class ExperimentParams:

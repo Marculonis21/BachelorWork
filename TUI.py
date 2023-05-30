@@ -29,13 +29,13 @@ def main(args):
 
     # Run selected saved individual
     if args.open: 
-        try:
-            agent, robot, individual = roboEvo.gaAgents.BaseAgent.load(args.open)
-            run_reward = roboEvo.render_run(agent, robot, individual)
-            print("Run reward: ", run_reward)
-        except Exception as e:
-            print("Problem occured while loading save file\n")
-            print(e)
+        # try:
+        agent, robot, individual = roboEvo.gaAgents.BaseAgent.load(args.open)
+        run_reward = roboEvo.render_run(agent, robot, individual)
+        print("Run reward: ", run_reward)
+        # except Exception as e:
+        #     print("Problem occured while loading save file\n")
+        #     print(e)
         sys.exit()
 
     # Show names of all created experiments

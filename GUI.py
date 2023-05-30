@@ -31,7 +31,10 @@ if __name__ == "__main__":
     _, values = window.read(timeout=0)
 
     agent_tab.set_agent(agent_tab.agent_names[0], window)
-    robot_tab.set_robot(robot_tab.robot_names[0], window)
+    robot_tab.set_robot(robot_tab.robot_names[0], window, values)
+    evo_tab.set_operator(list(evo_tab.ga_operators["selection"].keys())[0], window)
+    evo_tab.set_operator(list(evo_tab.ga_operators["crossover"].keys())[0], window)
+    evo_tab.set_operator(list(evo_tab.ga_operators["mutation"].keys())[0], window)
 
     main_tab.set_overview_text(window, values, robot_tab, agent_tab)
 

@@ -10,17 +10,10 @@ font = ("Helvetica", 15)
 def tab():
     frame_text = [[sg.Text("", font=("Helvetica", 14), size=(58, None), pad=(10,10), key="-MAIN_SETTINGS_OVERVIEW-")]]
 
-    frame = [sg.Frame("Experiment overview", frame_text, size=(800, 300), pad=(10,10))]
+    frame = [sg.Frame("Experiment overview", frame_text, size=(800, 350), pad=(10,10))]
     options = [sg.Checkbox("Save best individual", default=True, key="-SAVE_BEST-"), sg.Checkbox("Show final run", key="-SHOW_BEST-"), sg.Push(), sg.Button("Load experiment", key="-LOAD_EXPERIMENT-")]
 
-    # options_l = [[sg.Input("150", size=(5,None), enable_events=True, key="-MAIN_GEN_COUNT_IN-"), sg.Text("Generation count")],
-    #              [sg.Checkbox("Show final run", key="-CB_SHOWBEST-")],
-    #              [sg.Sizer(0, 1)]]
-
-    # options_r = [[sg.Input("100", size=(5,None), enable_events=True, key="-MAIN_POP_SIZE_IN-"), sg.Text("Starting population")],
-    #              [sg.Checkbox("Save best agent", default=True, key="-CB_SAVEBEST-")]]
-
-    save_dir = [sg.Text("Save directory:", pad=(10,30)), sg.Text("./saves/individuals/", size=(45,None), font=("Helvetica", 10), key="-SAVE_DIR_TEXT-"), sg.Push(), sg.FolderBrowse("Browse", target="-SAVE_DIR_TEXT-")]
+    save_dir = [sg.Text("Save directory:", pad=(10,30)), sg.Text("./saves/individuals/", size=(40,None), font=("Helvetica", 10), key="-SAVE_DIR_TEXT-"), sg.Push(), sg.FolderBrowse("Browse", target="-SAVE_DIR_TEXT-")]
 
     start = [sg.Push(), sg.Button("Start", key="-START-")]
 
@@ -105,7 +98,7 @@ def events(window, event, values, robot_tab, agent_tab):
 
             window["-ROBOT_SELECT-"].update(robot_name)
             window["-AGENT_SELECT-"].update(agent_name)
-            robot_tab.set_robot(robot_name, window, experiment_params.agent)
+            robot_tab.set_robot(robot_name, window, values, experiment_params.agent)
             agent_tab.set_agent(agent_name, window)
             agent_tab.agents[agent_name] = experiment_params.agent
 

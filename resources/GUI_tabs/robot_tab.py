@@ -14,6 +14,9 @@ robots = {robot.__class__.__name__ : robot for robot in [
     roboEvo.robots.AntV3(),
     roboEvo.robots.StickAnt(),
     roboEvo.robots.SpotLike(),
+    roboEvo.robots.Walker2D(),
+    roboEvo.robots.Pendulum(),
+    roboEvo.robots.DoublePendulum(),
 ]}
 
 robot_names = list(robots.keys())
@@ -39,7 +42,7 @@ def tab():
     tab = sg.Tab("Robot select", main)
     return tab
 
-def set_robot(robot_selected, window, agent=None):
+def set_robot(robot_selected, window, values, agent=None):
     robot = robots[robot_selected]
 
     im = Image.open(robot.picture_path)
@@ -58,7 +61,7 @@ def set_robot(robot_selected, window, agent=None):
     window["-ROBOT_OVERVIEW-"].update(TEXT)
     window["-ROBOT_PARTS-"].update(disabled = not (len(robot.body_parts) > 0)) # if robot has specified vars in XML, enable button
 
-    agent_tab.reload_agents(window, robot, agent)
+    agent_tab.reload_agents(window, values, robot, agent)
 
     if agent != None:
         pass
@@ -127,7 +130,7 @@ def popup_robot_parts(robot_selected, agents, agent_selected, window):
             body_part_mask.append(False)
 
     agent = agent.__class__(robot, body_part_mask)
-    agent_tab.reload_agents(window, robot, agent)
+    agent_tab.reload_agents(window, values, robot, agent)
 
 def expand_description(text):
     frame = sg.Frame("Description", [[sg.Text(text, size=(60,None), font=("Helvetica", 14), pad=(10,10))]])
@@ -135,7 +138,7 @@ def expand_description(text):
 
 def events(window, event, values, agents):
     if event == "-ROBOT_SELECT-":
-        set_robot(values['-ROBOT_SELECT-'], window)
+        set_robot(values['-ROBOT_SELECT-'], window, values)
         window['-ROBOT_SELECT-'].widget.select_clear()
         window.refresh()
 

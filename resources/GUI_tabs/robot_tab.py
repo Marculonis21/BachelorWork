@@ -2,6 +2,7 @@
 
 import roboEvo
 import resources.GUI_tabs.agent_tab as agent_tab
+import resources.GUI_tabs.evo_tab as evo_tab 
 
 import PySimpleGUI as sg
 from PIL import Image, ImageTk
@@ -63,10 +64,7 @@ def set_robot(robot_selected, window, values, agent=None):
 
     agent_tab.reload_agents(window, values, robot, agent)
 
-    if agent != None:
-        pass
-
-def popup_robot_parts(robot_selected, agents, agent_selected, window):
+def popup_robot_parts(robot_selected, agents, agent_selected, window, values):
     robot = robots[robot_selected]
     agent = agents[agent_selected]
     body_parts = np.array(list(robot.body_parts.keys()))
@@ -98,9 +96,9 @@ def popup_robot_parts(robot_selected, agents, agent_selected, window):
               [sg.Column(column_layout, expand_x=True, element_justification='c')]]
 
     popup = sg.Window("Select body parts for GA", layout, size=(700,400), font=font, keep_on_top=True, modal=True)
-    popup_values = None
+    out_popup_values = None
     while True:
-        event, values = popup.read()
+        event, popup_values = popup.read()
         if event == sg.WIN_CLOSED or event == 'Exit':
             break
 
@@ -113,23 +111,23 @@ def popup_robot_parts(robot_selected, agents, agent_selected, window):
             popup[f"{bp}_min"].update(disabled = not unlocked_mask[index])
             popup[f"{bp}_max"].update(disabled = not unlocked_mask[index])
 
-        popup_values = values
+        out_popup_values = popup_values
 
         popup.refresh()
 
-    if popup_values == None:
+    if out_popup_values == None:
         return
 
     body_part_mask = []
     for i, bp in enumerate(body_parts):
         if unlocked_mask[i]:
-            min = popup_values[f"{bp}_min"]
-            max = popup_values[f"{bp}_max"]
+            min = out_popup_values[f"{bp}_min"]
+            max = out_popup_values[f"{bp}_max"]
             body_part_mask.append((float(min),float(max)))
         else:
             body_part_mask.append(False)
 
-    agent = agent.__class__(robot, body_part_mask)
+    agent = agent.__class__(robot, body_part_mask, evo_tab.evo_types[values["-EVO_TYPE_SELECT-"]], gui=True)
     agent_tab.reload_agents(window, values, robot, agent)
 
 def expand_description(text):
@@ -143,7 +141,7 @@ def events(window, event, values, agents):
         window.refresh()
 
     if event == "-ROBOT_PARTS-":
-        popup_robot_parts(values['-ROBOT_SELECT-'], agents, values['-AGENT_SELECT-'], window)
+        popup_robot_parts(values['-ROBOT_SELECT-'], agents, values['-AGENT_SELECT-'], window, values)
             
     if event == "-ROBOT_OVERVIEW_MORE-": 
         expand_description(robots[values['-ROBOT_SELECT-']].description)

@@ -13,6 +13,7 @@ class BaseRobot(ABC):
         self.picture_path = picture_path
 
         self.body_parts = {}
+
         self.source_file = source_file
         if source_file != None:
             with open(source_file) as file:
@@ -83,7 +84,6 @@ class BaseRobot(ABC):
             Get names and default lengths of all changable body parts from XML
             source file
         """
-
         part_names = re.findall(r'\$[A-Za-z0-9_]+\([+-]?[0-9]*[.]?[0-9]+\)\$', self.source_text)
         for part in part_names:
             if not part in self.body_parts:

@@ -29,7 +29,7 @@ def tab():
 def popup_experiments():
     title = [sg.Text("Select experiment to be loaded in", size=(None,2), pad=(10,10))]
 
-    main = [[sg.Listbox(experiments.get_experiment_names(), select_mode=sg.SELECT_MODE_SINGLE, font=("Helvetica", 12), expand_x=True, expand_y=True, no_scrollbar=True, pad=(10,5), key="SELECTED_EXPERIMENT")],
+    main = [[sg.Listbox(experiments.get_experiment_names(), select_mode=sg.SELECT_MODE_SINGLE, font=("Helvetica", 12), expand_x=True, expand_y=True, pad=(10,5), key="SELECTED_EXPERIMENT")],
             [sg.Button("Load", key="LOAD")]]
 
     layout = [title,
@@ -83,21 +83,13 @@ def events(window, event, values, robot_tab, agent_tab):
     if event == "-LOAD_EXPERIMENT-":
         experiment_params = popup_experiments()
 
-        robot_name = ""
-        agent_name = ""
         if experiment_params != None: 
-            for name in robot_tab.robot_names:
-                if robot_tab.robots[name].__class__ == experiment_params.robot.__class__:
-                    robot_name = name
-                    break
-
-            for name in agent_tab.agent_names:
-                if agent_tab.agents[name].__class__ == experiment_params.agent.__class__:
-                    agent_name = name
-                    break
+            robot_name = experiment_params.robot.__class__.__name__
+            agent_name = experiment_params.agent.__class__.__name__
 
             window["-ROBOT_SELECT-"].update(robot_name)
             window["-AGENT_SELECT-"].update(agent_name)
+            window["-EVO_TYPE_SELECT-"].update(experiment_params.agent.evo_type.name)
             robot_tab.set_robot(robot_name, window, values, experiment_params.agent)
             agent_tab.set_agent(agent_name, window)
             agent_tab.agents[agent_name] = experiment_params.agent

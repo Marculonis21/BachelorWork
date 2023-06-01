@@ -2,6 +2,8 @@
 
 import roboEvo
 
+import resources.GUI_tabs.evo_tab as evo_tab
+
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
@@ -60,9 +62,11 @@ def update_chart(window):
     figure_aggregate = draw_figure(window['-FIG-'].TKCanvas, figure)
 
 def get_params(values, robot_tab, agent_tab):
+    # set robot and agent
     robot = robot_tab.robots[values["-ROBOT_SELECT-"]] 
     agent = agent_tab.agents[values["-AGENT_SELECT-"]]
 
+    # get all agent arguments
     agent_arguments = {}
     for key in values:
         if values["-AGENT_SELECT-"] in str(key):
@@ -80,12 +84,30 @@ def get_params(values, robot_tab, agent_tab):
 
     agent.arguments = agent_arguments
 
+    # get genetic operators selected in evo_tab
+    agents_gen_ops = {op_type : (evo_tab.ga_operators[op_type][values[f"-OP_{op_type.upper()}_TYPE-"]][0], []) for op_type in ["selection", "crossover", "mutation"]}
+    agents_gen_ops_names = [values[f"-OP_{op_type.upper()}_TYPE-"] for op_type in ["selection", "crossover", "mutation"]]
+
+    for name, op_type in zip(agents_gen_ops_names, list(agents_gen_ops.keys())):
+        for key in values.keys():
+            if not isinstance(key, int) and name in key:
+                agents_gen_ops[op_type][1].append(values[key])
+
+    agent.genetic_operators = agents_gen_ops
+
+    # mutation probabilities from evo_tab
+    agent.individual_mutation_prob = values["-INDIV_MUT_PROB-"] 
+    agent.action_mutation_prob     = values["-ACT_MUT_PROB-"]
+    agent.body_mutation_prob       = values["-BODY_MUT_PROB-"]
+
     population_size = int(values["-POP_SIZE-"])
     generation_count = int(values["-GEN_COUNT-"])
 
     show_best = values["-SHOW_BEST-"]
     save_best = values["-SAVE_BEST-"]
     save_dir = values["Browse"]
+
+    # returning experiment parameters
     params = roboEvo.ExperimentParams(robot, 
                                       agent, 
                                       population_size, 

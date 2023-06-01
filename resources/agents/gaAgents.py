@@ -58,6 +58,7 @@ class BaseAgent(ABC):
 
         # find out if evolution should continue after first evolution ended - (control evolution
         # changes to body evolution)
+        self.evo_type = evo_type
         self.continue_evo = False
         if evo_type == EvoType.CONTROL_BODY_SERIAL:
             self.continue_evo = True
@@ -72,6 +73,7 @@ class BaseAgent(ABC):
 
         # apply body_mask only if we actually want to evolve body
         # when not evolving body - robot stays with its default body values
+        # (can be changed by GUI)
         self.orig_body_part_mask = body_part_mask
         if self.evolve_body:
             self.body_part_mask = body_part_mask
@@ -313,6 +315,7 @@ class SineFuncFullAgent(BaseAgent):
     def crossover(self, population):
         return Operators.crossover_uniform(population, self)
 
+    @mutation_deco
     def mutation(self, population):
         return Operators.uniform_mutation(population, self)
 
@@ -482,6 +485,7 @@ class FullRandomAgent(BaseAgent):
 
     @selection_deco
     def selection(self, population, fitness_values):
+        # FUCK YOU
         return Operators.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
 
     @crossover_deco

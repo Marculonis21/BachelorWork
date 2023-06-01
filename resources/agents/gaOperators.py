@@ -54,7 +54,6 @@ class Operators:
         """
         Runs tournamnets between randomly chosen individuals and selects the best from each tournament.
         """
-        print("K ... ", k)
 
         fitness_values = np.array(fitness_values)
 

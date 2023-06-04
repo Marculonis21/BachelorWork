@@ -32,7 +32,6 @@ if __name__ == "__main__":
 
     agent_tab.set_agent(agent_tab.agent_names[0], window)
     robot_tab.set_robot(robot_tab.robot_names[0], window, values)
-
     main_tab.set_overview_text(window, values, robot_tab, agent_tab)
 
     window_values = {}

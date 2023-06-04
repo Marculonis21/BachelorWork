@@ -22,6 +22,9 @@ robots = {robot.__class__.__name__ : robot for robot in [
 
 robot_names = list(robots.keys())
 
+# for checking combo box changes
+__current_robot = "AntV3"
+
 def tab():
     options_menu = [sg.Text("Select robot: ", pad=(10,None)), sg.Combo(robot_names, robot_names[0], pad=(0,10), readonly=True, enable_events=True, key="-ROBOT_SELECT-")]
 
@@ -136,8 +139,11 @@ def expand_description(text):
 
 def events(window, event, values, agents):
     if event == "-ROBOT_SELECT-":
-        set_robot(values['-ROBOT_SELECT-'], window, values)
-        window['-ROBOT_SELECT-'].widget.select_clear()
+        global __current_robot
+        if values[event] == __current_robot: return
+        __current_robot = values[event]
+        set_robot(values[event], window, values)
+        window[event].widget.select_clear()
         window.refresh()
 
     if event == "-ROBOT_PARTS-":

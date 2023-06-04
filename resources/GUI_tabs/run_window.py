@@ -106,6 +106,8 @@ def get_params(values, robot_tab, agent_tab):
     show_best = values["-SHOW_BEST-"]
     save_best = values["-SAVE_BEST-"]
     save_dir = values["Browse"]
+    if save_dir == '':
+        save_dir = "./saves/individuals/"
 
     # returning experiment parameters
     params = roboEvo.ExperimentParams(robot, 

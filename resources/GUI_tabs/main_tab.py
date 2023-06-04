@@ -3,6 +3,8 @@
 import PySimpleGUI as sg
 
 from experiment_setter import Experiments
+import resources.GUI_tabs.run_window as run_window 
+
 experiments = Experiments()
 
 font = ("Helvetica", 15)
@@ -11,11 +13,16 @@ def tab():
     frame_text = [[sg.Text("", font=("Helvetica", 14), size=(58, None), pad=(10,10), key="-MAIN_SETTINGS_OVERVIEW-")]]
 
     frame = [sg.Frame("Experiment overview", frame_text, size=(800, 350), pad=(10,10))]
-    options = [sg.Checkbox("Save best individual", default=True, key="-SAVE_BEST-"), sg.Checkbox("Show final run", key="-SHOW_BEST-"), sg.Push(), sg.Button("Load experiment", key="-LOAD_EXPERIMENT-")]
+    options = [sg.Checkbox("Save best individual", default=True, key="-SAVE_BEST-"), sg.Checkbox("Show final run", key="-SHOW_BEST-"), 
+               sg.Push(), 
+               sg.Button("Save experiment",size=(14,1), pad=((5,0),None), key="-SAVE_EXPERIMENT-"), 
+               sg.Button("Load experiment", size=(14,1), pad=((2,10),None), key="-LOAD_EXPERIMENT-")]
 
-    save_dir = [sg.Text("Save directory:", pad=(10,30)), sg.Text("./saves/individuals/", size=(40,None), font=("Helvetica", 10), key="-SAVE_DIR_TEXT-"), sg.Push(), sg.FolderBrowse("Browse", target="-SAVE_DIR_TEXT-")]
+    save_dir = [sg.Text("Save directory:", pad=(10,30)), sg.Text("./saves/individuals/", size=(40,None), font=("Helvetica", 10), key="-SAVE_DIR_TEXT-"), 
+                sg.Push(), 
+                sg.FolderBrowse("Browse", initial_folder="./saves/individuals", pad=(10,None), target="-SAVE_DIR_TEXT-")]
 
-    start = [sg.Push(), sg.Button("Start", key="-START-")]
+    start = [sg.Push(), sg.Button("Start", size=(5,1), pad=(10,5), key="-START-")]
 
     main = [frame,
             options,
@@ -26,7 +33,37 @@ def tab():
     tab = sg.Tab("Main", main)
     return tab
 
-def popup_experiments():
+def popup_save_experiments():
+    title = [sg.Text("Set experiment name for saving:", size=(None,1), pad=(10,10))]
+
+    input = [sg.Input("experiment_name", size=(None,None), pad=(10,None), enable_events=True, key="NAME_INPUT")]
+    save_button = [sg.Button("Save", pad=(10,10), key="SAVE")]
+
+    main = [input,
+            save_button]
+
+    layout = [title,
+              main]
+
+    name = None
+    popup = sg.Window("Experiment name", layout, font=font, keep_on_top=True, modal=True)
+    while True:
+        event, values = popup.read()
+
+        if event == sg.WIN_CLOSED or event == 'Exit':
+            break
+
+        if event == "SAVE":
+            name = values["NAME_INPUT"]
+            break
+
+        popup.refresh()
+    popup.close()
+    return name
+
+def popup_load_experiments():
+    experiments = Experiments()
+
     title = [sg.Text("Select experiment to be loaded in", size=(None,2), pad=(10,10))]
 
     main = [[sg.Listbox(experiments.get_experiment_names(), select_mode=sg.SELECT_MODE_SINGLE, font=("Helvetica", 12), expand_x=True, expand_y=True, pad=(10,5), key="SELECTED_EXPERIMENT")],
@@ -80,8 +117,17 @@ def events(window, event, values, robot_tab, agent_tab):
     if event == '-MAIN_POP_SIZE_IN-':
         correct_int_inputs(window, values, '-MAIN_POP_SIZE_IN-')
 
+    window["-SAVE_EXPERIMENT-"].update("Save experiment")
+    if event == "-SAVE_EXPERIMENT-":
+        experiment_name = popup_save_experiments()
+        if experiment_name != None:
+            params = run_window.get_params(values, robot_tab, agent_tab)
+            experiments.save_experiment(experiment_name, params)
+            window["-SAVE_EXPERIMENT-"].update("SAVED!")
+
+
     if event == "-LOAD_EXPERIMENT-":
-        experiment_params = popup_experiments()
+        experiment_params = popup_load_experiments()
 
         if experiment_params != None: 
             robot_name = experiment_params.robot.__class__.__name__

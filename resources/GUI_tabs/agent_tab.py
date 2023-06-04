@@ -133,7 +133,6 @@ def tab():
     agent_options = []
     for name in agent_names:
         agent_options.append(agents_argument_options[name])
-    print("agent,", agent_options)
 
     tab = sg.Tab("Agent config", [options_menu, 
                                   frame,

@@ -4,6 +4,9 @@ import typing
 import time
 import sys
 import copy
+import pickle
+import lzma
+import os
 
 import resources.agents.gaAgents as gaAgents
 import resources.robots.robots as robots
@@ -25,25 +28,27 @@ class Experiments:
 
     def __init__(self):
         self.__experiments = {}
-        self.__experiments["exp10_TFS"] = self.exp10_TFS_spotlike(False)
-        self.__experiments["exp11_TFS_spot"] = self.exp11_TFS_spotlike(False)
-        self.__experiments["exp12_TFS_ant"] = self.exp12_TFS_ant(False)
-        self.__experiments["exp11_SineFull_spot"] = self.exp11_SineFull_spotlike(False)
-        self.__experiments["exp12_SineFull_ant"] = self.exp12_SineFull_ant(False)
+        self.__experiments["exp10_TFS"] = self.exp10_TFS_spotlike()
+        self.__experiments["exp11_TFS_spot"] = self.exp11_TFS_spotlike()
+        self.__experiments["exp12_TFS_ant"] = self.exp12_TFS_ant()
+        self.__experiments["exp11_SineFull_spot"] = self.exp11_SineFull_spotlike()
+        self.__experiments["exp12_SineFull_ant"] = self.exp12_SineFull_ant()
 
-        self.__experiments["exp2_body_para"] = self.exp2_body_para(False)
-        self.__experiments["exp2_body_serial"] = self.exp2_body_serial(False)
+        self.__experiments["exp2_body_para"] = self.exp2_body_para()
+        self.__experiments["exp2_body_serial"] = self.exp2_body_serial()
 
-        self.__experiments["test_exp"] = self.test_exp_AntV3(False)
+        self.__experiments["test_exp"] = self.test_exp_AntV3()
 
-        self.__experiments["exp_BODYTEST"] = self.exp_BODYTEST(False)
+        self.__experiments["exp_BODYTEST"] = self.exp_BODYTEST()
 
-        self.__experiments["a"] = self.exp_a(False)
-        self.__experiments["b"] = self.exp_b(False)
-        self.__experiments["c"] = self.exp_c(False)
-        self.__experiments["d"] = self.exp_d(False)
+        self.__experiments["a"] = self.exp_a()
+        self.__experiments["b"] = self.exp_b()
+        self.__experiments["c"] = self.exp_c()
+        self.__experiments["d"] = self.exp_d()
 
-        self.__experiments["neat_test"] = self.neat_test(False)
+        self.__experiments["neat_test"] = self.neat_test()
+
+        self.load_saved_experiments()
 
     def __create_batch_dir(self, robot, agent, note):
         batch_dir = self.__batch_dir.replace("@1", note).replace(
@@ -55,6 +60,27 @@ class Experiments:
     def __exp_start_note(self):
         print(f"Starting experiment - {sys._getframe(1).f_code.co_name}")
 
+    def save_experiment(self, name, params):
+        path = "experiment_params"
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        with lzma.open(f"{path}/{name}.expp", "wb") as save_file:
+            pickle.dump(params, save_file)
+
+    def load_saved_experiments(self):
+        path = "experiment_params"
+        if not os.path.exists(path): return 
+
+        saved_experiments = [x[:-5] for x in os.listdir(path) if x.endswith(".expp")]
+        print(saved_experiments)
+
+        for name in saved_experiments:
+            with lzma.open(f"{path}/{name}.expp", "rb") as save_file:
+                params = pickle.load(save_file)
+                self.__experiments[name] = params
+                print(f"Loaded exp: {name} - {path}/{name}.expp")
+
     def get_experiment_names(self):
         return list(self.__experiments.keys());
 
@@ -62,7 +88,7 @@ class Experiments:
         assert name in self.get_experiment_names(), f"Unknown experiment name `{name}` - list of created experiments {self.get_experiment_names()}"
         return copy.copy(self.__experiments[name])
 
-    def neat_test(self, run=True):
+    def neat_test(self, run=False):
         robot = robots.Pendulum()
         agent = gaAgents.NEATAgent(robot, [])
         note = "neat_robots_test"
@@ -83,7 +109,7 @@ class Experiments:
 
         return params
 
-    def exp2_body_para(self, run=True):
+    def exp2_body_para(self, run=False):
         robot = robots.AntV3()
         agent = gaAgents.TFSAgent(robot, [(0.1, 0.5), (0.15,0.5), (0.1, 0.5), (0.15,0.5), (0.1, 0.5), (0.15,0.5), (0.1, 0.5), (0.15,0.5)], evo_type=gaAgents.EvoType.CONTROL_BODY_PARALEL)
         note = "exp2_body_para"
@@ -104,7 +130,7 @@ class Experiments:
 
         return params
 
-    def exp2_body_serial(self, run=True):
+    def exp2_body_serial(self, run=False):
         robot = robots.AntV3()
         agent = gaAgents.TFSAgent(robot, [(0.1, 0.5), (0.15,0.5), (0.1, 0.5), (0.15,0.5), (0.1, 0.5), (0.15,0.5), (0.1, 0.5), (0.15,0.5)], evo_type=gaAgents.EvoType.CONTROL_BODY_SERIAL)
         note = "exp2_body_serial"
@@ -125,7 +151,7 @@ class Experiments:
 
         return params
 
-    def exp_a(self, run=True):
+    def exp_a(self, run=False):
         robot = robots.StickAnt()
         agent = gaAgents.SineFuncFullAgent(robot, [(0.1, 0.5)]*len(robot.body_parts), evo_type=gaAgents.EvoType.CONTROL_BODY_SERIAL)
         note = "exp_a"
@@ -146,7 +172,7 @@ class Experiments:
 
         return params
 
-    def exp_b(self, run=True):
+    def exp_b(self, run=False):
         robot = robots.StickAnt()
         agent = gaAgents.TFSAgent(robot, [(0.1, 0.5)]*len(robot.body_parts), evo_type=gaAgents.EvoType.CONTROL_BODY_SERIAL)
         note = "exp_b"
@@ -167,7 +193,7 @@ class Experiments:
 
         return params
 
-    def exp_c(self, run=True):
+    def exp_c(self, run=False):
         robot = robots.StickAnt()
         agent = gaAgents.SineFuncHalfAgent(robot, [(0.1, 0.5)]*len(robot.body_parts), evo_type=gaAgents.EvoType.CONTROL_BODY_SERIAL)
         note = "exp_c"
@@ -188,7 +214,7 @@ class Experiments:
 
         return params
 
-    def exp_d(self, run=True):
+    def exp_d(self, run=False):
         robot = robots.StickAnt()
         agent = gaAgents.StepCycleHalfAgent(robot, [(1.1, 0.5)]*len(robot.body_parts), evo_type=gaAgents.EvoType.CONTROL_BODY_SERIAL)
         note = "exp_d"
@@ -209,7 +235,7 @@ class Experiments:
 
         return params
 
-    def test_exp_AntV3(self, run=True):
+    def test_exp_AntV3(self, run=False):
         robot = robots.AntV3()
         agent = gaAgents.SineFuncFullAgent(robot, [(0.1, 0.5),(0.15,0,5), (0.1, 0.5),(0.15,0,5), (0.1, 0.5),(0.15,0,5), (0.1, 0.5),(0.15,0,5)], evo_type=gaAgents.EvoType.CONTROL)
         # agent = gaAgents.TFSAgent(robot, [(0.1, 0.5),(0.15,0,5), (0.1, 0.5),(0.15,0,5), (0.1, 0.5),(0.15,0,5), (0.1, 0.5),(0.15,0,5)], evo_type=gaAgents.EvoType.CONTROL)
@@ -232,7 +258,7 @@ class Experiments:
         return params
 
 
-    def exp_BODYTEST(self, run=True):
+    def exp_BODYTEST(self, run=False):
         robot = robots.StickAnt()
         agent = gaAgents.TFSAgent(robot, [False, False, (1,2), False], gaAgents.EvoType.CONTROL_BODY_SERIAL)
         note = "serial_body_test"
@@ -253,7 +279,7 @@ class Experiments:
 
         return params
 
-    def exp10_TFS_spotlike(self, run=True):
+    def exp10_TFS_spotlike(self, run=False):
         robot = robots.SpotLike()
         agent = gaAgents.TFSAgent(robot, [False]*len(robot.body_parts), gaAgents.EvoType.CONTROL)
         note = "exp1.0"
@@ -274,7 +300,7 @@ class Experiments:
 
         return params
 
-    def exp11_TFS_spotlike(self, run=True):
+    def exp11_TFS_spotlike(self, run=False):
         robot = robots.SpotLike()
         agent = gaAgents.TFSAgent(robot, [False]*len(robot.body_parts), gaAgents.EvoType.CONTROL)
         note = "Exp1.1"
@@ -295,7 +321,7 @@ class Experiments:
 
         return params
 
-    def exp12_TFS_ant(self, run=True):
+    def exp12_TFS_ant(self, run=False):
         robot = robots.AntV3()
         agent = gaAgents.TFSAgent(robot, [False]*len(robot.body_parts), gaAgents.EvoType.CONTROL)
         note = "Exp1.2"
@@ -316,7 +342,7 @@ class Experiments:
 
         return params
 
-    def exp11_SineFull_spotlike(self, run=True):
+    def exp11_SineFull_spotlike(self, run=False):
         robot = robots.SpotLike()
         agent = gaAgents.SineFuncFullAgent(robot, [False]*len(robot.body_parts), gaAgents.EvoType.CONTROL)
         note = "Exp1.1"
@@ -337,7 +363,7 @@ class Experiments:
 
         return params
 
-    def exp12_SineFull_ant(self, run=True):
+    def exp12_SineFull_ant(self, run=False):
         robot = robots.AntV3()
         agent = gaAgents.SineFuncFullAgent(robot, [False]*len(robot.body_parts), gaAgents.EvoType.CONTROL)
         note = "Exp1.2"

@@ -5,6 +5,9 @@ no_fitness_termination= True
 pop_size              = $POP_SIZE(200)$
 reset_on_extinction   = False
 
+# custom
+gen_count = $GEN_COUNT(150)$
+
 [DefaultGenome]
 # node activation options
 activation_default      = clamped

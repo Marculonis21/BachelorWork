@@ -1,7 +1,59 @@
 \chapter*{Úvod}
 \addcontentsline{toc}{chapter}{Úvod}
 
-Následuje několik ukázkových kapitol, které doporučují, jak by se
-měla bakalářská práce sázet. Primárně popisují použití \TeX{}ové
-šablony, ale obecné rady poslouží dobře i~uživatelům jiných
-systémů.
+V dnešní době stále přibývá možností, kde se snažíme aplikovat metody umělé
+inteligence pro řešení různorodých problémů. Na řadu z těchto problémů se nám
+může nabízet hned několik možných řešení. Problém ale může nastat, pokud si
+nejsme jistí, nebo třeba vůbec není možné přesně definovat, co vlastně by mělo
+být správným řešením.
+
+\paragraph{}
+Pro tyto problémy se nám často hodí využívat metod evolučních algoritmů. Jedná
+se o optimalizační algoritmy inspirovaných v přírodě -- specificky Darwinovou
+evoluční teorií, které napodobováním přírodních procesů hledají dle našich
+požadavků ta nejlepší řešení.
+
+Zacházení s těmito algoritmy ale nemusí být vůbec jednoduché a podobně jako u
+dalších optimalizačních metod a metod strojového učení je jejich běh ukryt pod
+množstvím parametrů, které spolu souvisí často špatně předvídatelným způsobem.
+
+\paragraph{}
+Z tohoto důvodu je cílem této práce vytvořit platformu, která bude přístupná
+uživatelům různých úrovní specializace, umožňující tvořit a provádět
+experimenty s evolučními algoritmy. 
+
+S tímto cílem volíme tvořit experimenty s roboty ve virtuálním prostředí, což
+se na tento problém velmi dobře hodí. Uživatel díky robotům intuitivně chápe
+složitost problému a každý posun v řešeném problému je interaktivně
+pozorovatelný v daném prostředí ještě za doby řešení.
+
+Cílem pro projekt je, aby uživatel dostal kontrolu nad experimenty a mohl tak
+získat lepší přehled o práci s evolučními algoritmy a pochopil tak množství
+parametrů a jejich vzájemných souvislostí, se kterými se můžeme při tvorbě
+experimentů setkat. Projekt bude obsahovat různorodou řadu problémů, na které
+bude potřeba využít vícero různých přístupů, což umožní dále rozšířit pochopení
+problémů evolučních algoritmů. Nejtěžšími pak mohou být problémy, vyžadující
+využití neuronových sítí, což může být pro uživatele díky tomuto projektu
+jednoduchým, prvním využitím pokročilého algoritmu pro neuroevoluci (evoluční
+vývoj neuronových sítí) -- NEAT.
+
+Pro lehce pokročilého uživatele bude projekt dále nabízet možnosti nahlédnutí
+do útrob projektu, prezentující jak se s evolučními algoritmy zachází v
+samotném zdrojovém kódu, což mu zároveň umožní tvořit vlastní pokročilé
+experimenty a upravovat a rozšiřovat připravenou databázi částí evolučních
+algoritmů o vlastní.
+
+\paragraph{}
+Práce je rozdělena do čtyř hlavních kapitol. V kapitole
+\ref{chapter-zakladní pojmy} si představíme a vysvětlíme základní pojmy
+využívané v této práci jako jsou evoluční algoritmy, neuronové sítě a další.
+Dále v kapitole \ref{chapter-specifikace} blíže popíšeme specifikaci projektu a
+přesně jakých cílů tímto projektem chceme dosáhnout. V kapitole
+\ref{chapter-implementace} již rámcově představíme jak je celý projekt interně
+poskládaný a poskytneme tak základní náhled na to, jak knihovna pracuje uvnitř.
+V poslední kapitole \ref{chapter-experimenty} na příkladech předvedeme
+typy experimentů, které si uživatel bude moci sám ve výchozí verzi vyzkoušet, a
+které bude mít možnost hned upravovat a testovat. Zároveň v této kapitole
+ukážeme způsob, jakým tyto experimenty jdou statisticky vyhodnocovat a
+rozebereme výsledky ukázkových experimentů. V závěru pak bude následovat
+shrnutí výsledků práce a budou navržena možná rozšíření projektu.

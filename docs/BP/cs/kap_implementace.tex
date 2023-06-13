@@ -1,6 +1,6 @@
 %%% Fiktivní kapitola s ukázkami tabulek, obrázků a kódu
 
-\chapter{Implementace projektu}
+\chapter{Implementace projektu} \label{chapter-implementace}
 V předchozí kapitole jsme prošli funkční požadavky, očekávané od vyvíjeného
 souboru programů. Následuje rozbor jednotlivých modulů, které vznikly při
 vlastní implementaci. 
@@ -57,14 +57,14 @@ pomocí grafického prostředí (v sekci \ref{imp:GUI}), nebo pomocí příkazov
 
 \section{RoboEvo a pomocné moduly}
 V této sekci popíšeme hlavní modul \emph{RoboEvo} a jeho pomocné moduly
-\linebreak \emph{gaAgents}, \emph{gaOperators} a \emph{robots}. Soubor těchto
-modulů tvoří hlavní část celého projektu, obsahující celý proces umožňující
-provádění evolučních experimentů s roboty. Vybrané rozdělení modulů bylo
-vytvořeno pro zlepšení čitelnosti a zjednodušení rozšiřování kódu, kde nyní
-každý modul zprostředkovává velmi specifickou roli v procesu evolučního vývoje,
-a tudíž je pro uživatele jednoduché tyto části upravovat. Tato část projektu je
-zároveň zcela oddělena od zpracování uživatelského vstupu, který do hlavního
-modulu vstupuje z vnějších modulů až ve chvíli zahájení experimentu. 
+\emph{gaAgents}, \emph{gaOperators} a \emph{robots}. Soubor těchto modulů tvoří
+hlavní část celého projektu, obsahující celý proces umožňující provádění
+evolučních experimentů s roboty. Vybrané rozdělení modulů bylo vytvořeno pro
+zlepšení čitelnosti a zjednodušení rozšiřování kódu, kde nyní každý modul
+zprostředkovává velmi specifickou roli v procesu evolučního vývoje, a tudíž je
+pro uživatele jednoduché tyto části upravovat. Tato část projektu je zároveň
+zcela oddělena od zpracování uživatelského vstupu, který do hlavního modulu
+vstupuje z vnějších modulů až ve chvíli zahájení experimentu. 
 
 \subsection{Modul RoboEvo} \label{imp:roboevo}
 Modul \emph{RoboEvo} je centrální modul tohoto projektu, sloužící pro spouštění
@@ -86,12 +86,10 @@ jedinců.
 
 Hlavní funkcí, která z vnějšího vstupního prostředí (např. \emph{GUI},
 \emph{TUI}, vlastní modul uživatele) přijímá parametry pro spuštění
-experimentů, je funkce \linebreak\texttt{run\_experiment}. Povinným parametrem
-této funkce jsou parametry \linebreak experimentu, které jsou pro zapouzdření
-vloženy do jednoduché třídy \linebreak\texttt{ExperimentParams} (modul
+experimentů, je funkce pojmenovaná \texttt{run\_experiment}. Povinným
+parametrem této funkce jsou parametry experimentu, které jsou
+vloženy do jednoduché třídy \texttt{ExperimentParams} (z modulu
 \emph{experiment\_params}) obsahující následující hodnoty:
-
-%TODO: LOOK AT BLACK BARS FOR LINEBREAKS \linebreak
 
 %TODO: care for params changes
 \begin{itemize}
@@ -174,7 +172,7 @@ implementovat, aby byla použitelná). Výčet abstraktních metod agenta:
                 vytvářející populaci jedinců požadované velikosti,
             \item \texttt{get\_action(individual, step)} -- metoda
                 zprostředkovávající transformaci části genotypu jedince
-                (kterou funkce získá z parametru \texttt{individual}) na
+                (kterou funkce získá ze vstupního parametru \texttt{individual}) na
                 nastavení pro aktuátory daného robota na základě vstupu z
                 testovacího prostředí (simulační krok v testovacím prostředí --
                 z parametru \texttt{step}),
@@ -191,12 +189,13 @@ implementovat, aby byla použitelná). Výčet abstraktních metod agenta:
                 do které jako parametr vstoupí skupina jedinců (potomků
                 křížení), na kterých provede mutaci genotypu a vrátí
                 zmutované potomky,
+            \item \texttt{switch\_evo\_phase()} -- metoda využívána z hlavního
+                modulu, který řídí evoluční algoritmus, sloužící pro zahlášení
+                změny typu evolučního vývoje (přechod mezi vývojem řízení a
+                morfologie),
         \end{itemize}
     \item metody využívané pro vstupní rozhraní:
         \begin{itemize}
-            \item \texttt{for\_GUI(...)} -- metoda, která vytváří agenta s
-                výchozím nastavením(využíván při prezentaci agenta v
-                \emph{GUI}),
             \item \texttt{description()} -- metoda, do které můžeme vložit
                 text, sloužící jako rozsáhlejší popisek agenta v \emph{GUI}.
         \end{itemize}
@@ -233,7 +232,7 @@ pro experimenty:
         druhou polovinu jsou symetricky přenesena a nastavena na opačné
         hodnoty.
     \item \textbf{\emph{SineFuncFullAgent}} -- agent, jehož genotyp popisuje
-        parametry sinus \linebreak funkce pro každý aktuátor robota (amplituda,
+        parametry sinus funkce pro každý aktuátor robota (amplituda,
         frekvence, posun v ose $x$ a posun v ose $y$). Nastavení aktuátorů je
         pak vygenerované výpočtem sinus funkce pro každý aktuátor v daném
         simulačním kroku (z parametru \texttt{step} funkce
@@ -242,7 +241,6 @@ pro experimenty:
             \text{nastavení aktuátoru} = f(step) = A\cdot\sin(\frac{2\pi\cdot step}{T} + \delta_x) + \delta_y
             \label{sinefunc}
         \end{equation}
-
         kde $T$ je perioda sinus funkce, $A$ je amplituda sinus funkce a
         $\delta_x$ a $\delta_y$ jsou její posuny.
 
@@ -250,7 +248,7 @@ pro experimenty:
         \emph{SineFuncFullAgent}, který má parametry sinus funkcí pouze pro
         polovinu aktuátorů. Druhou polovinu generuje přenesením opačných hodnot
         z první poloviny. Pro výpočet hodnoty nastavení aktuátorů využívá
-        stejné funkce, jako \emph{SineFuncFullAgent} (funkce \ref{sinefunc}).
+        stejné funkce, jako \emph{SineFuncFullAgent} (funkce (\ref{sinefunc})).
     \item \textbf{\emph{FullRandomAgent}} -- agent, podobný agentovi
         \emph{StepCycleHalfAgent}, generující do svého genotypu nastavení pro všechny
         aktuátory robota. Tato nastavení se opět periodicky opakují se zvolenou
@@ -260,13 +258,13 @@ pro experimenty:
         každý aktuátor na generování požadovaného nastavení. Genotyp obsahuje
         parametry pro amplitudy a posuny pro vybraný počet sinus funkcí.
         Výpočet nastavení jednoho aktuátoru potom vypadá dle následující
-        rovnice:
+        funkce (\ref{TFS_func}):
 
         \begin{equation}
             \text{nastavení aktuátoru} = f(step) = \sum_{i=1}^{N}A_i\cdot\sin\frac{i\cdot
             step\cdot2\pi}{T} + \delta_i
+            \label{TFS_func}
         \end{equation}
-
         kde $N$ je pevný počet sinus funkcí, na které součet omezíme, $T$ je
         pevně zvolená perioda, $A_1,...,A_N$ jsou amplitudy sčítaných
         sinusoid a $\delta_i,...,\delta_N$ jsou jejich posuny,
@@ -291,10 +289,10 @@ Seznam implementovaných operátorů (podrobný popis operátorů v sekci
 \ref{Evoluční algoritmy - operátory}):
 \begin{itemize}
     \item \texttt{roulette\_selection(pop, fitness\_values)} -- implementace
-        základní \linebreak \emph{ruletové selekce}, s argumenty populace
-        jedinců a jejich fitness hodnot,
+        \emph{ruletové selekce}, s argumenty populace jedinců a jejich fitness
+        hodnot,
     \item \texttt{tournament\_selection(pop, fitness\_values, k)} --
-        implementace \linebreak \emph{turnajové selekce}, s argumenty populace
+        implementace \emph{turnajové selekce}, s argumenty populace
         jedinců a jejich fitness hodnot a hodnotu $k$ určující velikost turnaje,
     \item \texttt{tournament\_prob\_selection(pop, fitness\_values, prob, k)}
         -- implementace pokročilé \emph{turnajové selekce}, kde umístění
@@ -310,17 +308,18 @@ Seznam implementovaných operátorů (podrobný popis operátorů v sekci
     \item \texttt{crossover\_single\_point(pop, agent)} -- implementace
         operátoru jednobodového křížení, popsaného v sekci \ref{Evoluční
         algoritmy - operátory},
-    \item \texttt{uniform\_mutation(pop, agent)} -- implementace základního
+    \item \texttt{uniform\_mutation(pop, agent)} -- implementace jednoduchého
         operátoru uniformní mutace (popsané v sekci \ref{Evoluční algoritmy -
-        operátory}), využívající parametry agenta, které určují pravděpodobnost
-        mutace samotného jedince, pravděpodobnost mutace akcí a pravděpodobnost
-        mutace částí těla (\emph{individual mutation probability}, \emph{action
-        mutation probability} \emph{body mutation probability}),
+        operátory}), využívající parametry agenta, který specifikuje
+        pravděpodobnost mutace samotného jedince, pravděpodobnost mutace akcí a
+        pravděpodobnost mutace částí těla (\emph{individual mutation
+        probability}, \emph{action mutation probability} \emph{body mutation
+        probability}),
     \item \texttt{uniform\_shift\_mutation(pop, agent)} -- implementace
-        operátoru mutace, využívajících stejných parametrů pravděpodobností
-        jako předchozí operátor \texttt{uniform\_mutation}, který mutaci dané
-        hodnoty provede vygenerováním hodnoty malé změny z povoleného rozsahu,
-        kterou přičte k původní mutované hodnotě.
+        upraveného operátoru uniformní mutace, využívajících stejných parametrů
+        pravděpodobností jako předchozí operátor \texttt{uniform\_mutation}.
+        Tento operátor provede mutaci dané hodnoty vygenerováním hodnoty malé
+        změny z povoleného rozsahu, kterou přičte k původní mutované hodnotě.
 \end{itemize}
 
 \subsection{Modul robots} \label{imp:robots}
@@ -352,8 +351,8 @@ Následuje seznam veřejných metod základní třídy
 \texttt{BaseRobot}:
 
 \begin{itemize}
-    \item \texttt{create(body\_part\_mask, individual, tmp\_file=None)}
-        -- metoda, která na vstupu dostane argument masky částí těla, která
+    \item \texttt{create(body\_part\_mask, individual, tmp\_file = None)}
+        -- metoda,\\která na vstupu dostane argument masky částí těla, která
         popisuje, které části budou moci být měněni evolučním algoritmem a
         argument jedince, ze kterého získává délky části těla daného jedince
         (používané při vývoji morfologie robota). Tyto hodnoty metoda použije
@@ -378,7 +377,6 @@ knihovně umožní konfigurační soubor upravovat za běhu algoritmu. Toto nám
 umožní vytvářet experimenty, které vedle pohybu mohou zároveň vyvíjet i
 morfologii robotů (např. velikost specifikovaných končetin). 
 
-%TODO: specifikuj povolený rozsah pro končetiny.
 Speciální značky mohou být ve tvaru např \texttt{\$L\_FRONT(0.75)\$} nebo
 \texttt{@...@}. 
 
@@ -395,8 +393,8 @@ jednoduché výpočty v konfiguračních souborech.
 Značky jsou při vytváření robota vyhledávány pomocí regulárních výrazů
 očekávajících značky předvedeného formátu.
 
-Pokud máme vytvořenou konfiguraci robota v souboru (např
-\emph{custom\_stick\_ant.xml}), můžeme ho jednoduše přidat mezi
+Pokud máme vytvořenou konfiguraci robota s korektním XML formátem v souboru 
+(např. soubor \emph{custom\_stick\_ant.xml}), můžeme ho jednoduše přidat mezi
 použitelné roboty, vytvořením odpovídající třídy v modulu \emph{robots} (podle
 následující ukázky -- tvorba robota \emph{StickAnt}). Tato třída dále potřebuje
 určit cestu k náhledovému obrázku (v tomto případě \emph{Basic-Ant.jpg}) a
@@ -430,7 +428,7 @@ class StickAnt(BaseRobot): # tvorba robota StickAnt
     # implementace vlastní abstraktní metody pro popis robota pro GUI
     @property
     def description(self):
-        return """ POPIS ROBOTA """
+        return """ Libovolně rozsáhlý popis robota """
 \end{code}
 
 \subsubsection{Implementovaní roboti}
@@ -482,33 +480,15 @@ to těžší vyvinout stabilní pohyb, který ho udrží nepadat.
 \end{figure}
 
 \paragraph{}
-(Příklady robotů přímo z Gymnasium určených pro neuroevoluci)
-\paragraph{Robot \emph{Walker2D}} \label{imp:robots.Walker}
 
-% \begin{figure}[!htb]
-%     \centering
-%     \includegraphics[width=0.4\textwidth]{../img/crop_SpotLike.jpg}
-%     \caption{Robot \emph{Walker2D}}
-%     \label{imp:fig:robots.Walker2D}
-% \end{figure}
-
-\paragraph{Robot \emph{InvertedPendulum}} \label{imp:robots.InvertedPendulum}
-
-% \begin{figure}[!htb]
-%     \centering
-%     \includegraphics[width=0.4\textwidth]{../img/crop_SpotLike.jpg}
-%     \caption{Robot \emph{InvertedPendulum}}
-%     \label{imp:fig:robots.InvertedPendulum}
-% \end{figure}
-
-\paragraph{Robot \emph{InvertedDoublePendulum}} \label{imp:robots.InvertedDoublePendulum}
-
-% \begin{figure}[!htb]
-%     \centering
-%     \includegraphics[width=0.4\textwidth]{../img/crop_SpotLike.jpg}
-%     \caption{Robot \emph{InvertedDoublePendulum}}
-%     \label{imp:fig:robots.InvertedDoublePendulum}
-% \end{figure}
+\paragraph{Roboti knihovny Gymnasium}
+Naše knihovna umožňuje jednoduché přidání robotů, kteří jsou volně dostupní z
+knihovny Gymnasium. Většina těchto robotů má ve svém prostředí definované
+složitější cíle, kterých mají dosáhnout (např. balancování kyvadla ve
+vertikální poloze). Tato prostředí jsou často smysluplně využitelná pouze pro
+experimenty s vývoj pomocí algoritmů neuroevoluce. Několik vybraných robotů
+jsou jako ukázky již implementováni v naší knihovně -- \emph{Walker2D},
+\emph{InvertedPendulum}, \emph{InvertedDoublePendulum}.
 
 \section{Třída experimentů} \label{imp:experimentsetter}
 Pro usnadnění vytváření, ukládání a výběru experimentů jsme v modulu
@@ -542,8 +522,8 @@ def exp10_TFS_spotlike(self, run=True):
     # tvorba parametrů experimentu
     params = ExperimentParams(robot, 
                               agent,
-                              ga_population_size=100,
-                              ga_generation_count=500,
+                              population_size=100,
+                              generation_count=500,
                               show_best=False,
                               save_best=True,
                               save_dir=batch_dir,
@@ -570,9 +550,6 @@ grafického rozhraní nemusí být vhodné v případech, že uživatel bude cht
 provádět větší množství předem připravených experimentů, při kterých běh
 grafického rozhraní není potřeba.
 
-% TODO: GUI TUI ukázky
-TODO: GUI TUI ukázka
-
 \paragraph{Implementace GUI}
 Implementace používá modul \emph{PySimpleGUI} \citep{pysimplegui}, umožňující
 jednoduchý a rychlý vývoj grafických aplikací pomocí Pythonu. 
@@ -589,12 +566,40 @@ Naše grafická aplikace je rozdělená do několika sekcí:
 
 \begin{itemize}
     \item \emph{Main} -- přehled informací o nastavovaném experimentu a
-        spouštění experimentu,
-    \item \emph{Robot select} -- sekce pro výběr robota,
-    \item \emph{Agent config} -- sekce pro výběr a nastavení parametrů agenta,
+        spouštění experimentu (ukázka na obrázku \ref{imp:fig:GUI_main}),
+    \item \emph{Robot select} -- sekce pro výběr robota (ukázka na obrázku
+        \ref{imp:fig:GUI_robot}),
+    \item \emph{Agent config} -- sekce pro výběr a nastavení parametrů agenta
+        (ukázka na obrázku \ref{imp:fig:GUI_agent}),
     \item \emph{Evolution config} -- podrobnější úprava genetických operátorů a
-        parametrů evolučního algoritmu.
+        parametrů evolučního algoritmu (ukázka na obrázku \ref{imp:fig:GUI_evo}).
 \end{itemize}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.6\textwidth]{../img/GUI_main_tab.jpg}
+    \caption{Úvodní okno aplikace}
+    \label{imp:fig:GUI_main}
+\end{figure}
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.6\textwidth]{../img/GUI_robot_tab.jpg}
+    \caption{Okno pro volbu robota pro experiment}
+    \label{imp:fig:GUI_robot}
+\end{figure}
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.6\textwidth]{../img/GUI_agent_tab.jpg}
+    \caption{Okno pro volbu agenta pro experiment}
+    \label{imp:fig:GUI_agent}
+\end{figure}
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.6\textwidth]{../img/GUI_evo_tab.jpg}
+    \caption{Okno pro úpravu specifických nastavení agenta}
+    \label{imp:fig:GUI_evo}
+\end{figure}
+
 
 Vytváření jednotlivých sekcí je oddělené do vlastních funkcí, které jsou pak
 při inicializaci aplikace volány z rozložení hlavního okna.

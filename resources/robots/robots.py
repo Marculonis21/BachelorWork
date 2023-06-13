@@ -8,6 +8,10 @@ import tempfile
 import numpy as np
 
 class BaseRobot(ABC):
+    """Base robot class.
+
+    """
+
     def __init__(self, source_file, picture_path, env_id):
         self.environment_id = env_id # defined in custom evn script
         self.picture_path = picture_path

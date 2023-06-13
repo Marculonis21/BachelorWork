@@ -1,4 +1,19 @@
 #!/usr/bin/env python
+"""Experiment setter module
+
+Module used for setting up, saving and loading experiments. Experiments are
+stored in dictionary as ``(name, ExperimentParams)`` pairs.
+
+See also:
+    :mod:`experiment_params` : Module defining class of experiment parameters.
+
+Usage example::
+
+    from experiment_setter import Experiments
+    experiments = Experiments()
+    ...
+    params = experiments.get_experiment("...")
+"""
 
 import typing
 import time
@@ -15,15 +30,19 @@ from resources.experiment_params import ExperimentParams
 class Experiments:
     """
     Class of user defined experiments. Experiment parameters for main
-    `RunEvolution` method are accessed as via class methods or via
-    `get_experiment` method which takes an experiment name as an argument. 
+    :func:`roboEvo.run_experiment` method are accessed via class methods or via
+    :func:`get_experiment` method which takes an experiment name as an argument. 
 
     When defining new experiments users need to create their own method for
-    parameter creation and then add the experiment to `__experiments`
+    parameter creation and then add the experiment to ``__experiments``
     dictionary with selected custom name.
+
+    :cvar __experiment: Dictionary of experiments initialised in :func:`__init__`
+    :vartype __experiment: dict[str, ExperimentParams]
     """
 
     __batch_dir = "./saves/batch_runs/@1_run_@2_@3_@4/"
+
     __experiments : typing.Dict[str, ExperimentParams]
 
     def __init__(self):
@@ -50,7 +69,18 @@ class Experiments:
 
         self.load_saved_experiments()
 
-    def __create_batch_dir(self, robot, agent, note):
+    def __create_batch_dir(self, robot, agent, note) -> str:
+        """Method for automating save directory creation.
+
+        Args:
+            robot (BaseRobot) : Selected robot type.
+            agent (BaseAgent) : Selected agent type.
+            note (str) : Optional custom note.
+
+        Returns:
+            str : Save path.
+        """
+
         batch_dir = self.__batch_dir.replace("@1", note).replace(
                                              "@2", type(robot).__name__).replace(
                                              "@3", type(agent).__name__).replace(
@@ -61,6 +91,12 @@ class Experiments:
         print(f"Starting experiment - {sys._getframe(1).f_code.co_name}")
 
     def save_experiment(self, name, params):
+        """Method for saving experiments.
+
+        Method used while experiments need to be saved from :mod:`GUI` .
+        Saving to preset folder.
+        """
+
         path = "experiment_params"
         if not os.path.exists(path):
             os.makedirs(path)
@@ -69,11 +105,16 @@ class Experiments:
             pickle.dump(params, save_file)
 
     def load_saved_experiments(self):
+        """Method for loading saved experiments.
+
+        Method used for loading previously saved experiments from :mod:`GUI` .
+        """
+
         path = "experiment_params"
         if not os.path.exists(path): return 
 
         saved_experiments = [x[:-5] for x in os.listdir(path) if x.endswith(".expp")]
-        print(saved_experiments)
+        # print(saved_experiments)
 
         for name in saved_experiments:
             with lzma.open(f"{path}/{name}.expp", "rb") as save_file:
@@ -84,7 +125,15 @@ class Experiments:
     def get_experiment_names(self):
         return list(self.__experiments.keys());
 
-    def get_experiment(self, name):
+    def get_experiment(self, name) -> ExperimentParams:
+        """Method for accessing stored experiments by their selected name.
+
+        Method for accessing stored experiments in dictionary. Assert tests
+        name validity.
+
+        Args:
+            name (str) : Selected experiment name.
+        """
         assert name in self.get_experiment_names(), f"Unknown experiment name `{name}` - list of created experiments {self.get_experiment_names()}"
         return copy.copy(self.__experiments[name])
 
@@ -97,8 +146,8 @@ class Experiments:
 
         params = ExperimentParams(robot, 
                                   agent,
-                                  ga_population_size=150,
-                                  ga_generation_count=100,
+                                  population_size=150,
+                                  generation_count=100,
                                   show_best=False,
                                   save_best=True,
                                   save_dir=batch_dir,
@@ -118,8 +167,8 @@ class Experiments:
 
         params = ExperimentParams(robot, 
                                   agent,
-                                  ga_population_size=150,
-                                  ga_generation_count=200,
+                                  population_size=150,
+                                  generation_count=200,
                                   show_best=False,
                                   save_best=True,
                                   save_dir=batch_dir,
@@ -139,8 +188,8 @@ class Experiments:
 
         params = ExperimentParams(robot, 
                                   agent,
-                                  ga_population_size=150,
-                                  ga_generation_count=100,
+                                  population_size=150,
+                                  generation_count=100,
                                   show_best=False,
                                   save_best=True,
                                   save_dir=batch_dir,
@@ -160,8 +209,8 @@ class Experiments:
 
         params = ExperimentParams(robot, 
                                   agent,
-                                  ga_population_size=10,
-                                  ga_generation_count=10,
+                                  population_size=10,
+                                  generation_count=10,
                                   show_best=False,
                                   save_best=True,
                                   save_dir=batch_dir,
@@ -181,8 +230,8 @@ class Experiments:
 
         params = ExperimentParams(robot, 
                                   agent,
-                                  ga_population_size=10,
-                                  ga_generation_count=10,
+                                  population_size=10,
+                                  generation_count=10,
                                   show_best=False,
                                   save_best=True,
                                   save_dir=batch_dir,
@@ -202,8 +251,8 @@ class Experiments:
 
         params = ExperimentParams(robot, 
                                   agent,
-                                  ga_population_size=10,
-                                  ga_generation_count=10,
+                                  population_size=10,
+                                  generation_count=10,
                                   show_best=False,
                                   save_best=True,
                                   save_dir=batch_dir,
@@ -223,8 +272,8 @@ class Experiments:
 
         params = ExperimentParams(robot, 
                                   agent,
-                                  ga_population_size=10,
-                                  ga_generation_count=10,
+                                  population_size=10,
+                                  generation_count=10,
                                   show_best=False,
                                   save_best=True,
                                   save_dir=batch_dir,
@@ -245,8 +294,8 @@ class Experiments:
 
         params = ExperimentParams(robot, 
                                   agent,
-                                  ga_population_size=100,
-                                  ga_generation_count=100,
+                                  population_size=100,
+                                  generation_count=100,
                                   show_best=True,
                                   save_best=True,
                                   save_dir=batch_dir,
@@ -267,8 +316,8 @@ class Experiments:
 
         params = ExperimentParams(robot, 
                                   agent,
-                                  ga_population_size=8,
-                                  ga_generation_count=50,
+                                  population_size=8,
+                                  generation_count=50,
                                   show_best=True,
                                   save_best=True,
                                   save_dir=batch_dir,
@@ -280,6 +329,19 @@ class Experiments:
         return params
 
     def exp10_TFS_spotlike(self, run=False):
+        """Example of experiment.
+
+        This method is an example of how and experiment can be created through
+        this class.
+
+        Args: 
+            run (bool) : Flag argument stating if function returns ExperimentParams that should be run immediately.
+
+        Returns:
+            ExperimentParams : Created experiment parameters.
+
+        """
+
         robot = robots.SpotLike()
         agent = gaAgents.TFSAgent(robot, [False]*len(robot.body_parts), gaAgents.EvoType.CONTROL)
         note = "exp1.0"
@@ -288,8 +350,8 @@ class Experiments:
 
         params = ExperimentParams(robot, 
                                   agent,
-                                  ga_population_size=100,
-                                  ga_generation_count=500,
+                                  population_size=100,
+                                  generation_count=500,
                                   show_best=False,
                                   save_best=True,
                                   save_dir=batch_dir,
@@ -309,8 +371,8 @@ class Experiments:
 
         params = ExperimentParams(robot, 
                                   agent,
-                                  ga_population_size=100,
-                                  ga_generation_count=200,
+                                  population_size=100,
+                                  generation_count=200,
                                   show_best=False,
                                   save_best=True,
                                   save_dir=batch_dir,
@@ -330,8 +392,8 @@ class Experiments:
 
         params = ExperimentParams(robot, 
                                   agent,
-                                  ga_population_size=100,
-                                  ga_generation_count=100,
+                                  population_size=100,
+                                  generation_count=100,
                                   show_best=False,
                                   save_best=True,
                                   save_dir=batch_dir,
@@ -351,8 +413,8 @@ class Experiments:
 
         params = ExperimentParams(robot, 
                                   agent,
-                                  ga_population_size=100,
-                                  ga_generation_count=200,
+                                  population_size=100,
+                                  generation_count=200,
                                   show_best=False,
                                   save_best=True,
                                   save_dir=batch_dir,
@@ -372,8 +434,8 @@ class Experiments:
 
         params = ExperimentParams(robot, 
                                   agent,
-                                  ga_population_size=100,
-                                  ga_generation_count=100,
+                                  population_size=100,
+                                  generation_count=100,
                                   show_best=False,
                                   save_best=True,
                                   save_dir=batch_dir,

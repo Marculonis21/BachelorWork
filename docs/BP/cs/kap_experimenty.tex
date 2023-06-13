@@ -1,4 +1,4 @@
-\chapter{Experimenty a výsledky}
+\chapter{Experimenty a výsledky} \label{chapter-experimenty}
 
 V této kapitole se podíváme na tři typy experimentů, které s naším systémem
 můžeme provádět. Knihovna implementuje několik různých přístupů jak roboty
@@ -43,7 +43,6 @@ Podrobnější popis agentů se nachází v sekci \ref{imp:gaAgents}.
     \label{fig:robot:spotlike}
 \end{figure}
 
-%TODO: imp ref robots SPOT
 První pokus se bude snažit vyvinout řízení pro pokročilého robota v projektu
 označovaném jako \emph{SpotLike} (na obrázku \ref{fig:robot:spotlike}, blíže
 popsaný v implementaci v sekci \ref{imp:robots.Spot}). Jedná se o robota
@@ -133,9 +132,9 @@ kombinací záznamů o fitness hodnotách v dané generaci ze všech pěti nezá
 běhů.
 
 Z grafu se ukazuje, že tento přístup vývoje řízení dosáhl maximální hodnotu
-fitness okolo 15 (TODO popsat rozměry) a populace na této hodnotě stagnuje a
-není schopna většího posunu.
-%TODO: popsate units
+fitness okolo 15 a populace na této hodnotě stagnuje a není schopna většího
+posunu.
+%TODO: popsat units
 
 \paragraph{Pokročilý agent}
 Pro porovnání zvolíme pokročilého agenta, generující signály do motorů pomocí
@@ -337,7 +336,7 @@ specifický pohyb. Tímto přístupem by teoreticky jedinci měli být schopni
 dosáhnout lepších výsledků, než při vývoji samotného řízení.
 
 Pro tento experiment volíme stejného robota (s totožnými rozsahy velikostí
-končetin) a stejného agenta jako v předchozím experimentu. Konfigurace tohoto
+končetin) a stejného agenta jako v předchozím experimentu. Konfigurace
 experimentu se nachází v modulu \emph{experiment\_setter} pod názvem
 \texttt{exp2\_body\_serial}. Evoluční algoritmus poběží nejprve 100 generací,
 při kterých bude vyvíjet řízení robotů a následně 100 generací pro vývoj
@@ -372,4 +371,4 @@ robotům hodilo mít mnohem delší části končetin vedoucí přímo od těla
 (\emph{stehno}), které tedy svém pohybu jsou schopny posunout robota o to
 dál a tak optimalizovat uraženou vzdálenost.
 
-\section{Diskuze výsledků}
+% \section{Diskuze výsledků}

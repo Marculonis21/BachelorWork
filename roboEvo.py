@@ -1,4 +1,28 @@
 #!/usr/bin/env python
+"""Central module of the library used for running evolutionary algorithm.
+
+This module is the central part of the library with which all the user interfaces 
+communicate and it is then used for starting and running experiments with 
+evolutionary algorithms.
+
+Usage example::
+
+    import roboEvo
+    ...
+    params = # GET EXPERIMENT PARAMETERS
+    roboEvo.run_experiment(params)
+
+Special global variables:
+    This module works with a few global variables used for communication 
+    between GUI and running experiments to enable drawing progress graphs.
+
+    Variables:
+        :GUI_GEN_NUMBER: (*int*) : Number of generations that EA has finished.
+        :GUI_PREVIEW: (*bool*) : Flag raised when GUI wants to run a preview of best individual so far.
+        :GUI_ABORT: (*bool*) : Flag raised when GUI wants to abort EA.
+        :EPISODE_HISTORY: (*list[list[float]]*) : List of fitness values of all generations through the EA runtime. Saved at the end of the experiment and used for GUI graph drawing.
+        :LAST_POP: (*list*) : Copy of all individuals from the last generation. Saved at the end of the experiment.
+"""
 
 # creating and registering custom environment
 import resources.agents.gymnasiumCustomEnv as _
@@ -12,8 +36,6 @@ from resources.experiment_params import ExperimentParams
 import gymnasium as gym
 from gymnasium.wrappers.time_limit import TimeLimit
 
-import neat
-
 import matplotlib.pyplot as plt
 import numpy as np
 import copy
@@ -21,26 +43,32 @@ from dask.distributed import Client
 import time
 import os
 
-GUI_FLAG = False
-GUI_FITNESS = []
 GUI_GEN_NUMBER = 0
 
 GUI_PREVIEW = False
 GUI_ABORT = False 
 
-GRAPH_VALUES = [[],[],[]]
 EPISODE_HISTORY = []
 LAST_POP = None
 
-def raise_preview():
-    global GUI_PREVIEW
-    GUI_PREVIEW = True
+def _simulation_run(env : gym.Env, agent : gaAgents.BaseAgent, individual, render=False) -> float:
+    """Performs run in simulated environment.
 
-def raise_abort():
-    global GUI_ABORT
-    GUI_ABORT = True
+    This function performs a single run in the simulated environment of a
+    selected individual in specifie environment - used for evaluating and
+    rendering individuals.
 
-def __simulation_run(env, agent, individual, render=False):
+    Args:
+
+        env (Env) : Selected Farama Gymnasium environment.
+        agent (BaseAgent) : Selected agent type.
+        individual : Genotype of an individual from EA.
+        render (bool) : Optional flag, set to True if rendering of the run is desired.
+
+    Returns:
+        float : Reward of the individual from the environment.
+    """
+
     steps = -1
     individual_reward = 0
     terminated = False
@@ -69,7 +97,23 @@ def __simulation_run(env, agent, individual, render=False):
     # Optionally for future - return REWARD + some colected information ??? 
     return individual_reward
 
-def render_run(agent, robot, individual):
+def render_run(agent : gaAgents.BaseAgent, robot : robots.BaseRobot, individual):
+    """Function for rendering the simulation run.
+
+    Specialized function used when rendering of the simulation run is desired.
+
+    Args:
+        agent (BaseAgent) : Selected agent type.
+        robot (BaseRobot) : Selected robot type.
+        individual : Genotype of an individual from EA.
+
+    Returns:
+        float : Reward of the individual from the simulation.
+
+    See also:
+        :func:`_simulation_run` : Function used for running the simulation.
+    """
+
     print(individual)
 
     run_reward = -1 
@@ -84,18 +128,33 @@ def render_run(agent, robot, individual):
 
         print("PREPARED FOR RENDERING... Press ENTER to start")
         input()
-        run_reward = __simulation_run(env, agent, individual, render=True)
+        run_reward = _simulation_run(env, agent, individual, render=True)
 
     finally:
         file.close()
 
     return run_reward
 
-def __run_evolution(robot, agent, client, generation_count, population_size, show_graph, load_population=[], debug=False):
-    global GRAPH_VALUES, EPISODE_HISTORY, LAST_POP
-    global GUI_GEN_NUMBER, GUI_FITNESS, GUI_PREVIEW
+def _run_evolution(params : ExperimentParams, client : Client, load_population=[], gui=False, debug=False):
+    """Function for setting up and running evolutionary algorithm.
 
-    population = agent.generate_population(population_size)
+    This function takes parameters from selected experiment and runs the
+    evolution with parameters described by the experiment parameters.
+
+    Args:
+        params (ExperimentParams) : Class of multiple experiment parameters used in experiments.
+        client (Client) : Client from Dask library, used for running evaluations in paralel. 
+        load_population (list) : Optional population parameter to be loaded in instead of creating entirely new population. Used with morphology evolution.
+        gui (bool) : Flag showing that module was started through GUI.
+        debug (bool) : Debug flag. Used for testing features.
+
+    Returns:
+        Tuple[`best_individual`, Env] : A tuple of `best_individual` genome and environment used to run evaluation of the best individual.
+    """
+
+    global EPISODE_HISTORY, LAST_POP, GUI_GEN_NUMBER, GUI_PREVIEW
+
+    population = params.agent.generate_population(params.population_size)
 
     # for serial conrol + body evolution
     if load_population != []:
@@ -108,10 +167,10 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
 
     # create individual source files for different bodies (if needed - body parts evolutions)
     for i in range(len(population)):
-        file = robot.create(agent.body_part_mask, population[i])
+        file = params.robot.create(params.agent.body_part_mask, population[i])
         robot_source_files.append(file)
 
-        env = gym.make(id=robot.environment_id,
+        env = gym.make(id=params.robot.environment_id,
                        xml_file=file.name,
                        reset_noise_scale=0.0,
                        disable_env_checker=True,
@@ -120,20 +179,20 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
 
         environments.append(env)
 
-        if not agent.evolve_body: # there exists only 1 environment if we don't need more!
+        if not params.agent.evolve_body: # there exists only 1 environment if we don't need more!
             break
 
     best_individual = None 
     best_individual_env = None 
 
-    for generations in range(generation_count+1):
+    for generations in range(params.generation_count+1):
         if GUI_ABORT:
             break
 
         GUI_GEN_NUMBER = generations
 
         if GUI_PREVIEW: # GUI FORCED PREVIEW
-            render_run(agent, robot, best_individual)
+            render_run(params.agent, params.robot, best_individual)
             GUI_PREVIEW = False
 
         # Get fitness values
@@ -141,41 +200,33 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
         futures = []
         if debug:
             for index, individual in enumerate(population):
-                fitness_values.append(__simulation_run(environments[index if agent.evolve_body else 0], agent, individual))
+                fitness_values.append(_simulation_run(environments[index if params.agent.evolve_body else 0], params.agent, individual))
         else:
             for index, individual in enumerate(population):
-                futures.append(client.submit(__simulation_run, environments[index if agent.evolve_body else 0], agent, individual))
+                futures.append(client.submit(_simulation_run, environments[index if params.agent.evolve_body else 0], params.agent, individual))
 
             fitness_values = client.gather(futures)
-
-        if GUI_FLAG:
-            GUI_FITNESS = [np.mean(fitness_values), 
-                           min(fitness_values),
-                           max(fitness_values)]
 
         # for statistical reconstruction later
         EPISODE_HISTORY.append(fitness_values)
         if generations % 5 == 0: # frequency of info update
-            GRAPH_VALUES[0].append(np.mean(fitness_values))
-            GRAPH_VALUES[1].append(min(fitness_values))
-            GRAPH_VALUES[2].append(max(fitness_values))
 
-            if not GUI_FLAG:
+            if not gui:
                 print("Best fitness: ", max(fitness_values))
-                if show_graph:
+                if params.show_graph:
                     plt.cla()
                     plt.title('Training')
                     plt.xlabel('5 Generations')
                     plt.ylabel('Fitness')
-                    plt.plot(GRAPH_VALUES[0], label='Mean')
-                    plt.plot(GRAPH_VALUES[1], label='Min')
-                    plt.plot(GRAPH_VALUES[2], label='Max')
+                    plt.plot(np.mean(EPISODE_HISTORY,axis=1), label='Mean')
+                    plt.plot(np.min(EPISODE_HISTORY, axis=1), label='Min')
+                    plt.plot(np.max(EPISODE_HISTORY, axis=1), label='Max')
                     plt.legend(loc='upper left', fontsize=9)
                     plt.tight_layout()
                     plt.pause(0.1)
 
         # get index of the best individuals for elitism
-        elitism_count = int(population_size*0.10) # 10% of pop size
+        elitism_count = int(params.population_size*0.10) # 10% of pop size
 
         fitness_values = np.array(fitness_values)
         top_indices = np.argpartition(fitness_values, -elitism_count)[-elitism_count:]
@@ -185,15 +236,15 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
         elite_individuals_envs = []
         for top_i in sorted_top_indices:
             elite_individuals.append(copy.deepcopy(population[top_i]))
-            elite_individuals_envs.append(copy.deepcopy(environments[top_i if agent.evolve_body else 0]))
+            elite_individuals_envs.append(copy.deepcopy(environments[top_i if params.agent.evolve_body else 0]))
 
         best_individual = copy.deepcopy(elite_individuals[0])
         best_individual_env = copy.deepcopy(elite_individuals_envs[0])
 
         # Genetic operators - selection, crossover, mutation
-        parents          = agent.selection(population,fitness_values)
-        children         = agent.crossover(parents)
-        mutated_children = agent.mutation(children)
+        parents          = params.agent.selection(population,fitness_values)
+        children         = params.agent.crossover(parents)
+        mutated_children = params.agent.mutation(children)
         population = mutated_children
 
         # apply elitism - transfer top individuals
@@ -203,10 +254,10 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
         # change environments based on possible robot morphology changes
         for i in range(len(population)):
             environments[i].close()
-            robot.create(agent.body_part_mask, population[i], tmp_file=robot_source_files[i])
+            params.robot.create(params.agent.body_part_mask, population[i], tmp_file=robot_source_files[i])
 
-            if generations != generation_count:
-                env = gym.make(id=robot.environment_id,
+            if generations != params.generation_count:
+                env = gym.make(id=params.robot.environment_id,
                                xml_file=robot_source_files[i].name,
                                reset_noise_scale=0.0,
                                disable_env_checker=True,
@@ -214,7 +265,7 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
                 env = TimeLimit(env, max_episode_steps=500)
                 environments[i] = env
 
-            if not agent.evolve_body:
+            if not params.agent.evolve_body:
                 break
 
     # after evo close tmp files
@@ -222,13 +273,13 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
         file.close()
 
     # CONTINUE EVO = serial control + body evolution - switching vars to body evo
-    if agent.continue_evo: 
+    if params.agent.continue_evo: 
         print("switching evo")
-        agent.switch_evo_phase()
-        best_individual, best_individual_env = __run_evolution(robot, agent, client, generation_count, population_size, show_graph, load_population=population, debug=debug)
+        params.agent.switch_evo_phase()
+        best_individual, best_individual_env = _run_evolution(params, client, population, gui, debug)
         print("switch evo done")
 
-    if not GUI_FLAG:
+    if not gui:
         plt.close()
 
     LAST_POP = copy.deepcopy(population)
@@ -238,17 +289,29 @@ def __run_evolution(robot, agent, client, generation_count, population_size, sho
 ################################################################################
 ################################################################################
 
-def run_experiment(params:ExperimentParams, gui=False, debug=False):
-    global GUI_FITNESS, GRAPH_VALUES, EPISODE_HISTORY
-    global GUI_FLAG
-    GUI_FLAG = gui
+def run_experiment(params : ExperimentParams, gui=False, debug=False):
+    """Main input function of the module.
 
-    GUI_FITNESS = []
-    GRAPH_VALUES = [[],[],[]]
+    This function acts as a main input function from which both of the input
+    interfaces start their experiments. It can also be used by the user who
+    would possibly like to use this module connected to his own library. 
+
+    This function takes experiment parameters and then takes care of starting
+    the correct evolutionary algorithm and saving all of the data from the
+    algorithm progress.
+
+    Args:
+        params (ExperimentParams) : Parameters of the selected experiment.
+        gui (bool) : Flag showing if the method was called from the GUI.
+        debug (bool) : Optional debug flag, used for debugging and testing.
+    """
+
+    global EPISODE_HISTORY
     EPISODE_HISTORY = []
 
     _params = copy.deepcopy(params)
-    if isinstance(_params.agent,gaAgents.NEATAgent):
+    
+    if isinstance(_params.agent,gaAgents.NEATAgent): # override EA with NEAT
         _params.agent.evo_override(_params)
         return
 
@@ -258,13 +321,10 @@ def run_experiment(params:ExperimentParams, gui=False, debug=False):
     # Run evolution
     try:
         print("RUNNING EVOLUTION")
-        best_individual, best_individual_env = __run_evolution(_params.robot, 
-                                                               _params.agent,
-                                                               client,
-                                                               generation_count=_params.ga_generation_count, 
-                                                               population_size=_params.ga_population_size, 
-                                                               show_graph=_params.show_graph,
-                                                               debug=debug)
+        best_individual, best_individual_env = _run_evolution(_params,
+                                                              client,
+                                                              gui=gui,
+                                                              debug=debug)
         print("EVOLUTION DONE")
     finally:
         client.close()
@@ -272,7 +332,7 @@ def run_experiment(params:ExperimentParams, gui=False, debug=False):
     # Set final reward (render best if set)
     best_reward = 0
     if _params.show_best: best_reward = render_run(_params.agent, _params.robot, best_individual)
-    else:                 best_reward = __simulation_run(best_individual_env, _params.agent, best_individual, render=False)
+    else:                 best_reward = _simulation_run(best_individual_env, _params.agent, best_individual, render=False)
 
     # File saving
     if not os.path.exists(_params.save_dir):

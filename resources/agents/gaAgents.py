@@ -1,4 +1,32 @@
 #!/usr/bin/env python
+"""Module for genetic agents.
+
+Module that stores base agent abstract class :class:`BaseAgent` from which all
+the other agent classes have to inherit.
+
+Agent class is heavily used as an information source for GUI.
+
+Usage example::
+
+    import gaAgents
+
+    robot = ... # Get some robot (type BaseRobot) 
+
+    # regular TFSAgent instance 
+    agent1 = gaAgents.TFSAgent(robot)
+
+    # TFSAgent with unlocked robot body parts (first with range 1 to 5, last with range 2 to 3)
+    agent2 = gaAgents.TFSAgent(robot, [(1,5), False, False, (2,3)])
+
+Default implemented agents:
+    * :class:`FullRandomAgent`
+    * :class:`StepCycleHalfAgent`
+    * :class:`SineFuncFullAgent`
+    * :class:`SineFuncHalfAgent`
+    * :class:`TFSAgent`
+    * :class:`NEATAgent`
+"""
+
 from abc import ABC, abstractmethod, abstractclassmethod, abstractproperty
 import numpy as np
 import math
@@ -45,15 +73,84 @@ def mutation_deco( func ):
             return func( self, population)
     return wrapper
 
-
-
 class EvoType(Enum):
-    CONTROL = 0
-    BODY = 1
-    CONTROL_BODY_PARALEL = 2
-    CONTROL_BODY_SERIAL = 3
+    """EvoType enum
+    Enum used for naming different types of evolution that agent can perform.
+    """
+
+    CONTROL = 0 
+    BODY = 1   
+    CONTROL_BODY_PARALEL = 2 
+    CONTROL_BODY_SERIAL = 3 
 
 class BaseAgent(ABC):
+    """Base agent class
+
+    This is the base abstract class from which every agent is inheriting and
+    also calling in their init function. 
+
+    In :func:`__init__` we get to initialise all default class fields which
+    might be later used by the evolutionary algorithm, by the UI or by the
+    agent itself.
+
+    :ivar evo_type: Value of selected evolution type.
+    :ivar continue_evo: Flag showing if the evolution of agent will continue
+        after generations are finished (used for serial control-body evolution
+        ``EvoType.CONTROL_BODY_SERIAL``).
+
+    :ivar evolve_control: Flag showing if robot controls (`actions`) should be
+        evolved.
+    :ivar evolve_body: Flag showing if robot body should be evolved.
+
+    :ivar body_part_mask: List of bools and tuples, showing which body parts
+        should be unlocked for evolution and what ranges are allowed for them.
+    :ivar orig_body_part_mask: Copy original :attr:`body_part_mask` parameter. 
+        Used for evolution type switching.
+    :ivar action_range: List of tuples (`ranges` of values) specifying allowed
+        range of values for each action - creator of new agent class is
+        ***obligated*** to specify this range, used in genetic operators. For
+        examples look into implemented classes.
+    :ivar body_range: Same as :attr:`action_range`, but for body parts. 
+
+    :ivar action_size: Size of the action space that agents environment
+        supports.
+    :ivar observation_size: Size of the observation space that agents
+        environment returns (`we often don't care about this one`).
+
+    :ivar gui: Flag showing if this agent was created through GUI (possibly
+        changing which genetic operators are used).
+
+    :ivar arguments: Dictionary of agent specific arguments. Every agent
+        populates this dictionary by itself depending on its needs. 
+    :ivar arguments_tooltips: Dictionary of optional tooltips (hints) for
+        :attr:`arguments` values. Used from GUI when describing agent options.
+    :ivar genetic_operators: Dictionary of selected genetic operations for
+        selection, crossover and mutation, which overrides default operators
+        when the agent is created via GUI (:attr:`gui`).
+
+    :ivar individual_mutation_prob: Mutation probability - allow mutation of
+        selected individual.
+    :ivar action_mutation_prob: Mutation probability - allow mutation of
+        selected action.
+    :ivar body_mutation_prob: Mutation probability - allow mutation of selected
+        body part.
+
+    :vartype evo_type: EvoType
+    :vartype continue_evo: bool
+    :vartype evolve_control: bool
+    :vartype evolve_body: bool
+    :vartype body_part_mask: List[False|Tuple[float, float]]
+    :vartype action_range: List[Tuple[float, float]]
+    :vartype body_range: List[Tuple[float]]
+    :vartype gui: bool 
+    :vartype arguments: Dict[str, float|{"MIN":float, "MAX":float}]
+    :vartype arguments_tooltips: Dict[str, str]
+    :vartype genetic_operators: Dict[str, List[Callable, List[Callable parameters ...]]]
+    :vartype individual_mutation_prob: float
+    :vartype action_mutation_prob: float
+    :vartype body_mutation_prob: float
+    """
+
     def  __init__(self, robot, body_part_mask, evo_type=EvoType.CONTROL, gui=False):
 
         # find out if evolution should continue after first evolution ended - (control evolution
@@ -682,8 +779,8 @@ class NEATAgent(BaseAgent):
 
             client.close()
 
-        population = self.generate_population(experiment_params.ga_population_size)
-        winner = population.run(eval_genomes, experiment_params.ga_generation_count)
+        population = self.generate_population(experiment_params.population_size)
+        winner = population.run(eval_genomes, experiment_params.generation_count)
 
         file = experiment_params.robot.create(experiment_params.agent.body_part_mask)
         env = None

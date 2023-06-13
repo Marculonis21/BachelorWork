@@ -9,6 +9,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 import PySimpleGUI as sg
 
+import numpy as np
+
 font = ("Helvetica", 15)
 
 figure = None
@@ -37,9 +39,9 @@ def draw_chart(window):
     plt.title('Training')
     plt.xlabel('Episode')
     plt.ylabel('Fitness')
-    plt.plot(roboEvo.GRAPH_VALUES[0], label='Mean')
-    plt.plot(roboEvo.GRAPH_VALUES[1], label='Min')
-    plt.plot(roboEvo.GRAPH_VALUES[2], label='Max')
+    plt.plot(np.mean(roboEvo.EPISODE_HISTORY, axis=1), label='Mean')
+    plt.plot(np.min( roboEvo.EPISODE_HISTORY, axis=1), label='Min')
+    plt.plot(np.max( roboEvo.EPISODE_HISTORY, axis=1), label='Max')
     plt.legend(loc='upper left', fontsize=9)
     plt.tight_layout()
     figure_aggregate = draw_figure(window['-FIG-'].TKCanvas, figure)
@@ -53,9 +55,9 @@ def update_chart(window):
     plt.title('Training')
     plt.xlabel('Episode')
     plt.ylabel('Fitness')
-    plt.plot(roboEvo.GRAPH_VALUES[0], label='Mean')
-    plt.plot(roboEvo.GRAPH_VALUES[1], label='Min')
-    plt.plot(roboEvo.GRAPH_VALUES[2], label='Max')
+    plt.plot(np.mean(roboEvo.EPISODE_HISTORY, axis=1), label='Mean')
+    plt.plot(np.min( roboEvo.EPISODE_HISTORY, axis=1), label='Min')
+    plt.plot(np.max( roboEvo.EPISODE_HISTORY, axis=1), label='Max')
     plt.legend(loc='upper left', fontsize=9)
     plt.tight_layout()
 
@@ -102,6 +104,10 @@ def get_params(values, robot_tab, agent_tab):
 
     population_size = int(values["-POP_SIZE-"])
     generation_count = int(values["-GEN_COUNT-"])
+
+    if isinstance(agent, roboEvo.gaAgents.NEATAgent):
+        population_size = int(agent.arguments["POP_SIZE"])
+        generation_count = int(agent.arguments["GEN_COUNT"])
 
     show_best = values["-SHOW_BEST-"]
     save_best = values["-SAVE_BEST-"]

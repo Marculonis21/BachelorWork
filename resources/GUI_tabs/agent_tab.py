@@ -24,14 +24,9 @@ agents = {agent.__class__.__name__ : agent for agent in [
 
 agent_names = list(agents.keys())
 
-# agents_argument_defaults = {}
-
 def single_value_option(key, text, tooltip, default, disabled=False):
     text = [sg.Text(text, tooltip=tooltip)]
     input = [sg.Input(default, size=(8,None), enable_events=True, key=key, disabled=disabled)]
-
-    # global agents_argument_defaults
-    # agents_argument_defaults[key] = default
 
     return text, input
 
@@ -40,10 +35,6 @@ def range_value_option(key, text, tooltip, default_min, default_max):
     FONT = ("Helvetica", 12)
     input = [sg.Text("MIN", font=FONT), sg.Input(default_min, size=(8,None), enable_events=True, key=key+"_min"),
              sg.Text("MAX", font=FONT), sg.Input(default_max, size=(8,None), enable_events=True, key=key+"_max")]
-
-    # global agents_argument_defaults
-    # agents_argument_defaults[key+"_min"] = default_min
-    # agents_argument_defaults[key+"_max"] = default_max
 
     return text, input
 
@@ -64,7 +55,7 @@ def get_agent_arguments(agent_name):
         # SINGLE VALUE argument
         else: 
             tooltip = agent.arguments_tooltips[arg] if arg in agent.arguments_tooltips.keys() else None
-            _name, _input = single_value_option(f"{agent_name}|{arg}", str(arg).capitalize(), tooltip, agent.arguments[arg], "NET_NUM" in arg or "POP_SIZE" in arg)
+            _name, _input = single_value_option(f"{agent_name}|{arg}", str(arg).capitalize(), tooltip, agent.arguments[arg], "NET_NUM" in arg)
             names.append(_name)
             inputs.append(_input)
 
@@ -76,9 +67,6 @@ def reset_agent_arguments(agent_name, window, values):
         if isinstance(agent.arguments[arg], dict):
             window[f"{agent_name}|{arg}_min"].update(agent.arguments[arg]["MIN"])
             window[f"{agent_name}|{arg}_max"].update(agent.arguments[arg]["MAX"])
-        else:
-            if "POP_SIZE" in arg:
-                agent.arguments[arg] = values["-POP_SIZE-"]
 
             window[f"{agent_name}|{arg}"].update(agent.arguments[arg])
 
@@ -134,11 +122,13 @@ def tab():
     for name in agent_names:
         agent_options.append(agents_argument_options[name])
 
-    tab = sg.Tab("Agent config", [options_menu, 
-                                  frame,
-                                  [sg.VPush()],
-                                  agent_options,
-                                  [sg.VPush()]])
+    layout = [options_menu, 
+              frame,
+              [sg.VPush()],
+              agent_options,
+              [sg.VPush()]]
+
+    tab = sg.Tab("Agent config", layout, key="-AGENT_TAB-")
     return tab
 
 def set_agent(agent_selected, window):
@@ -161,6 +151,9 @@ def set_agent(agent_selected, window):
 
     if not isinstance(agent, roboEvo.gaAgents.NEATAgent):
         evo_tab.set_evo_ops(agent_selected, window)
+        window["-EVO_TAB-"].update(visible=True)
+    else:
+        window["-EVO_TAB-"].update(visible=False)
 
 
 def expand_description(text):

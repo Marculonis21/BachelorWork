@@ -84,7 +84,7 @@ def main(args):
                                               agent=agent,
                                               note="")
 
-            # params = experiments.exp12_SineFull_spotlike()
+            # params = experiments.exp12_SineFull_spotlike(True)
             # params.note = "motors_test_" + params.note
             params.show_graph = not args.no_graph
             roboEvo.run_experiment(params, args.debug)

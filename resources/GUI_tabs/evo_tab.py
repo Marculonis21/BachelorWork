@@ -14,7 +14,7 @@ ga_operators = roboEvo.gaOperators.Operators.__ops_dir__()
 
 FONT = ("Helvetica", 14)
 def single_value_option(key, text, tooltip, default):
-    text = [sg.Text(text, font=FONT, tooltip=tooltip, key=key+"_text")]
+    text = [sg.Text(text, font=FONT, tooltip=tooltip)]
     input = [sg.Input(default, font=FONT, size=(8,None), enable_events=True, key=key)]
 
     return text, input
@@ -67,7 +67,7 @@ def tab():
               crossover,
               mutation]
 
-    tab = sg.Tab("Evolution config", layout)
+    tab = sg.Tab("Evolution config", layout, key="-EVO_TAB-")
     return tab;
 
 def set_evo_ops(agent_selected, window):
@@ -87,10 +87,7 @@ def handle_argument_inputs(window, values, key):
             out += s
     window[key].update(out)
 
-    if "-POP_SIZE-" == key:
-        window[f"NEATAgent|POP_SIZE"].update(values["-POP_SIZE-"])
-
-def set_operator(operator_selected, window):
+def set_operator(operator_selected, window, operator_params=[]):
     op_type = ""
     if "selection" in operator_selected.lower():
         op_type = "selection"
@@ -107,6 +104,14 @@ def set_operator(operator_selected, window):
     wanted_key = f"options_{op_type}|{operator_selected}"
     if wanted_key in window.AllKeysDict.keys():
         window[wanted_key].update(visible=True)
+
+    if operator_params != []:
+        # zipping together operator parameter names from list of all operators
+        # and actuall parameter values that we get from outside
+        for name, value in zip(ga_operators[op_type][operator_selected][1], operator_params):
+            key = f"{op_type}|{operator_selected}|{name}"
+            window[key].update(value)
+
 
 def events(window, event, values):
     if event == "-EVO_TYPE_SELECT-":

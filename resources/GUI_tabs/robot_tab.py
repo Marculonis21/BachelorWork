@@ -43,7 +43,7 @@ def tab():
             img_overview,
             [sg.VPush()]]
 
-    tab = sg.Tab("Robot select", main)
+    tab = sg.Tab("Robot select", main, key="-ROBOT_TAB-")
     return tab
 
 def set_robot(robot_selected, window, values, agent=None):

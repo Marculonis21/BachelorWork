@@ -10,6 +10,7 @@ import resources.GUI_tabs.evo_tab as evo_tab
 
 import PySimpleGUI as sg
 import threading
+import numpy as np
 
 font = ("Helvetica", 15)
 
@@ -46,7 +47,7 @@ if __name__ == "__main__":
         robot_tab.events(window, event, values, agents=agent_tab.agents)
         agent_tab.events(window, event, values)
         evo_tab.events(window, event, values)
-        main_tab.events(window, event, values, robot_tab=robot_tab, agent_tab=agent_tab)
+        main_tab.events(window, event, values, robot_tab, agent_tab, evo_tab)
 
         main_tab.set_overview_text(window, values, robot_tab, agent_tab)
 
@@ -75,19 +76,22 @@ if __name__ == "__main__":
             break
 
         if event == "-RUN_PREVIEW-":
-            roboEvo.raise_preview()
+            roboEvo.GUI_PREVIEW = True
 
         if (event == sg.WIN_CLOSED or event == 'Exit') or event == "-EXIT-":
-            roboEvo.raise_abort()
+            roboEvo.GUI_ABORT = True
             working_thread.join()
             break
 
         run_window.update_chart(window)
 
         window["-GENNUM-"].update(str(roboEvo.GUI_GEN_NUMBER))
-        if len(roboEvo.GUI_FITNESS) > 0:
-            window["-MEANFIT-"].update(str(roboEvo.GUI_FITNESS[0]))
-            window["-MINFIT-"].update(str(roboEvo.GUI_FITNESS[1]))
-            window["-MAXFIT-"].update(str(roboEvo.GUI_FITNESS[2]))
+        if len(roboEvo.EPISODE_HISTORY) > 0:
+            mean = np.mean(roboEvo.EPISODE_HISTORY[-1])
+            min  = np.min(roboEvo.EPISODE_HISTORY[-1])
+            max  = np.max(roboEvo.EPISODE_HISTORY[-1])
+            window["-MEANFIT-"].update(mean)
+            window["-MINFIT-"].update(min)
+            window["-MAXFIT-"].update(max)
 
     window.close()

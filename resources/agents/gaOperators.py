@@ -1,4 +1,36 @@
 #!/usr/bin/env python
+"""Implemented genetic operators
+
+This module contains a single class :class:`Operators` in which there are many
+already fully implemented genetic operators ready to be used in evolutionary 
+algorithms.
+
+Those operators are implemented as **static methods** so user has to create
+only an instance of this class to be able to use operators.
+
+Default implemented operators:
+    **Selection:**
+        * :func:`roulette_selection`
+        * :func:`tournament_selection`
+        * :func:`tournament_prob_selection`
+    **Crossover:**
+        * :func:`crossover_single_point`
+        * :func:`crossover_uniform`
+    **Mutation:**
+        * :func:`uniform_mutation`
+        * :func:`uniform_shift_mutation`
+
+.. note::
+    If one wants to implement custom operators, it is adviced to do so inside 
+    this :class:`Operators` class and name the function in a way that the name
+    includes one of the types of operators (i.e. 'selection', 'crossover' or 
+    'mutation').
+
+    There are "hidden" methods like :func:`__ops_dir__` which are used to 
+    automatically detect all operator methods and sort them by type to be later
+    used inside GUI without any additional work necessary.
+"""
+
 import copy
 import numpy as np
 import random
@@ -70,7 +102,7 @@ class Operators:
         """
         Runs tournamnets between randomly chosen individuals and selects one acording to probability based on their results
 
-        p-selection = p*((1-p)^indiv_tournament_result)
+        p-selection = p*(1-p)^(indiv_tournament_result-1)
         """
         population = np.array(population, dtype=object)
         fitness_values = np.array(fitness_values)

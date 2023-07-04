@@ -156,17 +156,17 @@ class BaseAgent(ABC):
         # find out if evolution should continue after first evolution ended - (control evolution
         # changes to body evolution)
         self.evo_type = evo_type
-        self.continue_evo = False
-        if evo_type == EvoType.CONTROL_BODY_SERIAL:
-            self.continue_evo = True
-            evo_type = EvoType.CONTROL
+
+        self.continue_evo   = True if evo_type == EvoType.CONTROL_BODY_SERIAL \
+                              else False
 
         self.evolve_control = True if evo_type == EvoType.CONTROL or \
                                       evo_type == EvoType.CONTROL_BODY_PARALEL \
                               else False
-        self.evolve_body = True if evo_type == EvoType.BODY or \
-                                   evo_type == EvoType.CONTROL_BODY_PARALEL \
-                           else False
+
+        self.evolve_body    = True if evo_type == EvoType.BODY or \
+                                      evo_type == EvoType.CONTROL_BODY_PARALEL \
+                              else False
 
         # apply body_mask only if we actually want to evolve body
         # when not evolving body - robot stays with its default body values
@@ -326,6 +326,15 @@ class SineFuncFullAgent(BaseAgent):
         self.action_mutation_prob     = 0.1
         self.body_mutation_prob       = 0.1
 
+        _amp   = self.arguments["amplitude_range"]["MAX"]
+        _period = self.arguments["period_range"]["MAX"]
+        _shiftX = 0
+        _shiftY = self.arguments["shift_y_range"]["MAX"]
+        _step = np.linspace(0, _period, 100000).reshape(-1,1)
+        _min_max_search = _amp*np.sin((2*np.pi*_step)/_period + _shiftX) + _shiftY
+        self.max = np.array([np.max(_min_max_search)])
+        self.min = -self.max
+
     @property
     def description(self):
         return "Sine Function Full agent\n    Each motor of the robot is controlled by sine wave. Values of these agents are made of only 4 parameters (amplitude, frequency, shiftX, shiftY) for each motor."
@@ -357,11 +366,8 @@ class SineFuncFullAgent(BaseAgent):
         _period = self.arguments["period_range"]["MAX"]
         _shiftX = 0
         _shiftY = self.arguments["shift_y_range"]["MAX"]
-
         _step = np.linspace(0, _period, 100000).reshape(-1,1)
-
         _min_max_search = _amp*np.sin((2*np.pi*_step)/_period + _shiftX) + _shiftY
-
         self.max = np.array([np.max(_min_max_search)])
         self.min = -self.max
 
@@ -432,6 +438,15 @@ class SineFuncHalfAgent(BaseAgent):
         self.action_mutation_prob     = 0.1
         self.body_mutation_prob       = 0.1
 
+        _amp   = self.arguments["amplitude_range"]["MAX"]
+        _period = self.arguments["period_range"]["MAX"]
+        _shiftX = 0
+        _shiftY = self.arguments["shift_y_range"]["MAX"]
+        _step = np.linspace(0, _period, 100000).reshape(-1,1)
+        _min_max_search = _amp*np.sin((2*np.pi*_step)/_period + _shiftX) + _shiftY
+        self.max = np.array([np.max(_min_max_search)])
+        self.min = -self.max
+
     @property
     def description(self):
         return "Sine Function Half agent\n    Similar to Sine Function Full agent, however only half of robot's motors are controlled by sine waves. The other half is symmetrical (point symmetry through center of the body)."
@@ -465,11 +480,8 @@ class SineFuncHalfAgent(BaseAgent):
         _period = self.arguments["period_range"]["MAX"]
         _shiftX = 0
         _shiftY = self.arguments["shift_y_range"]["MAX"]
-
         _step = np.linspace(0, _period, 100000).reshape(-1,1)
-
         _min_max_search = _amp*np.sin((2*np.pi*_step)/_period + _shiftX) + _shiftY
-
         self.max = np.array([np.max(_min_max_search)])
         self.min = -self.max
 
@@ -607,6 +619,15 @@ class TFSAgent(BaseAgent):
         self.action_mutation_prob     = 0.1
         self.body_mutation_prob       = 0.1
 
+        # Get min and max of actions for remapping
+        _N = np.arange(self.arguments["series_length"]) + 1
+        _amps   = np.ones([self.arguments["series_length"]]) * self.arguments["coeficient_range"]
+        _shifts = np.zeros([self.arguments["series_length"]])
+        _step = np.linspace(0, 2*self.arguments["period"], 100000).reshape(-1,1)
+        _min_max_search = np.sum(_amps*np.sin((_N*2*np.pi*_step)/self.arguments["period"] + _shifts), axis=1)
+        self.max = np.array([np.max(_min_max_search)])
+        self.min = -self.max
+
     @property
     def description(self):
         return "TFSAgent\n    TFSAgent uses Truncated Fourier Series for each motor with potential of developing more complex periodical sequences with comparison to simpler sine wave agents."
@@ -635,15 +656,12 @@ class TFSAgent(BaseAgent):
     def generate_population(self, population_size):
         population = []
 
-        N = np.arange(self.arguments["series_length"]) + 1
-
+        # Get min and max of actions for remapping
+        _N = np.arange(self.arguments["series_length"]) + 1
         _amps   = np.ones([self.arguments["series_length"]]) * self.arguments["coeficient_range"]
         _shifts = np.zeros([self.arguments["series_length"]])
-
         _step = np.linspace(0, 2*self.arguments["period"], 100000).reshape(-1,1)
-
-        _min_max_search = np.sum(_amps*np.sin((N*2*np.pi*_step)/self.arguments["period"] + _shifts), axis=1)
-
+        _min_max_search = np.sum(_amps*np.sin((_N*2*np.pi*_step)/self.arguments["period"] + _shifts), axis=1)
         self.max = np.array([np.max(_min_max_search)])
         self.min = -self.max
 
@@ -721,8 +739,13 @@ class NEATAgent(BaseAgent):
     def evo_override(self, experiment_params):
         from dask.distributed import Client
         from gymnasium.wrappers.time_limit import TimeLimit
+        TIME_LIMIT = 10000
 
-        def custom_eval(env, agent, net, render=False):
+        def custom_eval(env, net, render=False):
+            """ Method for custom evaluation of neat-created nets in selected 
+            environments.
+            """
+
             steps = -1
             individual_reward = 0
             terminated = False
@@ -732,9 +755,10 @@ class NEATAgent(BaseAgent):
             obs = obs[0]
             while True:
                 steps += 1
+
                 action = net.activate(obs)
-                
-                obs, reward, terminated, truncated, info = env.step(action)
+
+                obs, reward, terminated, truncated, _ = env.step(action)
 
                 individual_reward += reward
 
@@ -746,7 +770,13 @@ class NEATAgent(BaseAgent):
 
             return individual_reward
 
-        def eval_genomes(genomes, config):
+        def eval_genomes(genomes, config): 
+            """ Method for neat lib evaluator 
+
+            Creating eval method for neat lib - running selected custom eval 
+            envs.
+            """
+
             client = Client(n_workers=1,threads_per_worker=1,scheduler_port=0)
 
             robot = experiment_params.robot
@@ -756,25 +786,26 @@ class NEATAgent(BaseAgent):
             env = None
             if file == None:
                 env = gym.make(id=robot.environment_id,
+                               max_episode_steps=TIME_LIMIT,
                                render_mode=None)
             else:
                 env = gym.make(id=robot.environment_id,
                                xml_file=file.name,
                                reset_noise_scale=0.0,
                                disable_env_checker=True,
+                               max_episode_steps=TIME_LIMIT,
                                render_mode=None)
-                env = TimeLimit(env, max_episode_steps=1000)
+                    
                 file.close()
 
             futures = []
-            for genome_id, genome in genomes:
+            for _, genome in genomes:
                 net = neat.nn.FeedForwardNetwork.create(genome, config) 
-                futures.append(client.submit(custom_eval, env, None, net))
+                futures.append(client.submit(custom_eval, env, net))
 
             fitness_values = client.gather(futures)
 
-            for i in range(len(genomes)):
-                genome_id, genome = genomes[i]
+            for i, (_, genome) in enumerate(genomes):
                 genome.fitness = fitness_values[i]
 
             client.close()
@@ -789,17 +820,17 @@ class NEATAgent(BaseAgent):
                            render_mode="human")
         else:
             env = gym.make(id=experiment_params.robot.environment_id,
-                            xml_file=file.name,
-                            reset_noise_scale=0.0,
-                            disable_env_checker=True,
-                            render_mode="human")
-            env = TimeLimit(env, max_episode_steps=1000)
+                           xml_file=file.name,
+                           reset_noise_scale=0.0,
+                           disable_env_checker=True,
+                           max_episode_steps=TIME_LIMIT,
+                           render_mode="human")
             file.close()
 
         net = neat.nn.FeedForwardNetwork.create(winner, self.config) 
-        print("READY FOR RENDER ... ")
+        print("READY FOR RENDER ...")
         input()
-        print(custom_eval(env, experiment_params.agent, net, True))
+        print(custom_eval(env, net, True))
 
     def get_action(self, net, obs):
         return net.activate(obs)
@@ -814,7 +845,9 @@ class NEATAgent(BaseAgent):
             return regex
 
         tmp_file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
-        text = copy.deepcopy(self.config_source_file)
+        raw_text = copy.deepcopy(self.config_source_file)
+        first_free_line_idx = raw_text.split("\n").index('')
+        text = "".join([x+"\n" for x in raw_text.split("\n")[first_free_line_idx+1:]])
 
         raw_arguments = re.findall(r'\$[A-Za-z0-9_]+\([+-]?[0-9]*[.]?[0-9]+\)\$', self.config_source_file)
         argument_values = list(self.arguments.values())
@@ -833,9 +866,6 @@ class NEATAgent(BaseAgent):
         tmp_file.write(text)
         tmp_file.flush()
 
-        print(text)
-        quit()
-
         self.config = neat.Config(neat.DefaultGenome, 
                                   neat.DefaultReproduction,
                                   neat.DefaultSpeciesSet,
@@ -843,24 +873,19 @@ class NEATAgent(BaseAgent):
                                   tmp_file.name)
         tmp_file.close()
 
-        pop = neat.Population(config)
+        pop = neat.Population(self.config)
         pop.add_reporter(neat.StdOutReporter(show_species_detail=True))
-        stats = neat.StatisticsReporter()
-        pop.add_reporter(stats)
 
         return pop
 
     @selection_deco
     def selection(self, population, fitness_values):
         pass
-        # return Operators.roulette_selection(population, fitness_values)
 
     @crossover_deco
     def crossover(self, population):
         pass
-        # return Operators.crossover_uniform(population, self)
 
     @mutation_deco
     def mutation(self, population):
         pass
-        # return Operators.uniform_shift_mutation(population, self)

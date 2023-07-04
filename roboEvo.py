@@ -29,7 +29,6 @@ import resources.agents.gymnasiumCustomEnv as _
 
 # import all modules to be reachable from central roboEvo
 import resources.agents.gaAgents as gaAgents
-import resources.agents.gaOperators as gaOperators
 import resources.robots.robots as robots
 from resources.experiment_params import ExperimentParams
 
@@ -113,8 +112,6 @@ def render_run(agent : gaAgents.BaseAgent, robot : robots.BaseRobot, individual)
     See also:
         :func:`_simulation_run` : Function used for running the simulation.
     """
-
-    print(individual)
 
     run_reward = -1 
     file = robot.create(agent.body_part_mask, individual)
@@ -311,7 +308,7 @@ def run_experiment(params : ExperimentParams, gui=False, debug=False):
 
     _params = copy.deepcopy(params)
     
-    if isinstance(_params.agent,gaAgents.NEATAgent): # override EA with NEAT
+    if isinstance(_params.agent, gaAgents.NEATAgent): # override EA with NEAT
         _params.agent.evo_override(_params)
         return
 

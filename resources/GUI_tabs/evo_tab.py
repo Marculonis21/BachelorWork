@@ -10,7 +10,7 @@ import resources.GUI_tabs.robot_tab as robot_tab
 evo_types = {e_type.name : e_type for e_type in roboEvo.gaAgents.EvoType if e_type.name != "BODY"}
 evo_type_names = list(evo_types.keys())
 
-ga_operators = roboEvo.gaOperators.Operators.__ops_dir__()
+ga_operators = roboEvo.gaAgents.Operators.__ops_dir__()
 
 FONT = ("Helvetica", 14)
 def single_value_option(key, text, tooltip, default):

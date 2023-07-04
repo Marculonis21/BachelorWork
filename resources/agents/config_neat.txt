@@ -1,12 +1,13 @@
+gen_count = $GEN_COUNT(150)$
+# custom (not part of orig neat config) 
+# -> first n lines from start till first free line deleted
+
 [NEAT]
 fitness_criterion     = max
 fitness_threshold     = 0
 no_fitness_termination= True
 pop_size              = $POP_SIZE(200)$
 reset_on_extinction   = False
-
-# custom
-gen_count = $GEN_COUNT(150)$
 
 [DefaultGenome]
 # node activation options

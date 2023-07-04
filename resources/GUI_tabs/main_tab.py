@@ -2,6 +2,7 @@
 
 import PySimpleGUI as sg
 
+import roboEvo
 from experiment_setter import Experiments
 import resources.GUI_tabs.run_window as run_window 
 
@@ -14,13 +15,14 @@ def tab():
 
     frame = [sg.Frame("Experiment overview", frame_text, size=(800, 350), pad=(10,10))]
     options = [sg.Checkbox("Save best", visible=False, default=True, key="-SAVE_BEST-"), sg.Checkbox("Show final run", visible=False, key="-SHOW_BEST-"), 
+               sg.Button("View individual", pad=((10,0),None), key="-VIEW_INDIVIDUAL-"),
                sg.Push(), 
                sg.Button("Save experiment", pad=((5,0),None), key="-SAVE_EXPERIMENT-"), 
                sg.Button("Load experiment", pad=((2,10),None), key="-LOAD_EXPERIMENT-")]
 
     save_dir = [sg.Text("Save directory:", pad=((10,0),30)), sg.Text("./saves/individuals/", size=(40,None), font=("Helvetica", 10), key="-SAVE_DIR_TEXT-"), 
                 sg.Push(), 
-                sg.FolderBrowse("Browse", size=(5,None), initial_folder="./saves/individuals", pad=((0,10),None), target="-SAVE_DIR_TEXT-")]
+                sg.FolderBrowse("Browse", size=(6,None), initial_folder="./saves/individuals", pad=((0,10),None), target="-SAVE_DIR_TEXT-")]
 
     start = [sg.Push(), sg.Button("Start", size=(5,1), pad=(10,5), key="-START-")]
 
@@ -32,6 +34,41 @@ def tab():
 
     tab = sg.Tab("Main", main, key="-MAIN_TAB-")
     return tab
+
+def popup_view_individual():
+    title = [sg.Text("Select individual for run view", size=(None,1), pad=(10,10))]
+
+    save_dir = [sg.Text("Selected directory: ", pad=((10,0),30)), sg.Text("", size=(40,None), font=("Helvetica", 10), key="DIR"), 
+                sg.Push(), 
+                # sg.FileBrowse("Browse", size=(6,None), initial_folder="./saves/", pad=((0,10),None), file_types=(("Best individual save files","*.save"), ("Population save files" ,"*last_population*")), target="DIR")]
+                sg.FileBrowse("Browse", size=(6,None), initial_folder="./saves/", pad=((0,10),None), file_types=(("Best individual save files","*.save")), target="DIR")]
+
+    show = [sg.Button("Show", pad=(10,10), key="SHOW")]
+    main = [save_dir,
+            show]
+
+    layout = [title,
+              main]
+
+    name = None
+    popup = sg.Window("Experiment name", layout, font=font, keep_on_top=True, modal=True)
+    while True:
+        event, values = popup.read(1)
+
+        if event == sg.WIN_CLOSED or event == 'Exit':
+            break
+
+        if event == "SHOW" and values["Browse"] != "": # if indiv selected -> play
+            agent, robot, individual = roboEvo.gaAgents.BaseAgent.load(values["Browse"])
+            run_reward = roboEvo.render_run(agent, robot, individual)
+            print("Run reward:", run_reward)
+
+        if popup["DIR"].get() != "":
+            popup["DIR"].update(".../"+popup["DIR"].get().split("/").pop()) # makes nicer text
+
+        popup.refresh()
+    popup.close()
+    return name
 
 def popup_save_experiments():
     title = [sg.Text("Set experiment name for saving:", size=(None,1), pad=(10,10))]
@@ -118,6 +155,10 @@ def events(window, event, values, robot_tab, agent_tab, evo_tab):
         correct_int_inputs(window, values, '-MAIN_POP_SIZE_IN-')
 
     window["-SAVE_EXPERIMENT-"].update("Save experiment")
+
+    if event == "-VIEW_INDIVIDUAL-":
+        popup_view_individual()
+
     if event == "-SAVE_EXPERIMENT-":
         experiment_name = popup_save_experiments()
         if experiment_name != None:

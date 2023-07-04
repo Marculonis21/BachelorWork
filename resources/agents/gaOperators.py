@@ -119,6 +119,9 @@ class Operators:
 
             selection_probability = probability*((1-probability)**np.arange(k))
 
+            # probability normalisation -> sums always to 1
+            selection_probability = selection_probability/np.sum(selection_probability)
+
             selected = np.random.choice(len(sorted_indivs), p=selection_probability)
             new_population.append(sorted_indivs[selected])
 

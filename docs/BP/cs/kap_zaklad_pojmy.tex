@@ -581,29 +581,47 @@ jejichž hodnoty označíme $x_1,...,x_n$ a váhy korespondujících hran označ
 $w_1,...,w_n$, potom výstupní hodnotu tohoto neuronu, označenou $O$,
 můžeme spočítat jako,
 \begin{equation}
-    O = f(\sum_{i=1}^{n} x_iw_i + b)
+    O = f(\xi)
+    % O = f(\sum_{i=1}^{n} x_iw_i + b)
 \end{equation}
-kde $f$ je nelineární aktivační funkce na neuronu a $b$ je práh (\emph{bias})
-daného neuronu, což je hodnota, která se přičítá k váženému součtu, sloužící
-jako posun výsledku.
+kde  $\xi = \sum_{i=1}^{n} x_iw_i + b$ je potenciál neuronu, $f$ je aktivační
+funkce na neuronu a $b$ je práh (\emph{bias}) daného neuronu, což je hodnota,
+která se přičítá k váženému součtu, sloužící jako posun výsledku.
 
 \paragraph{Aktivační funkce}
 Aktivační funkce slouží k transformaci potenciálu neuronu na výstupní hodnotu.
 Nejčastěji se jedná o nelineární transformaci pomocí nelineární funkce. Dnes
-nejpoužívanějšími aktivačními funkcemi jsou \emph{logistická sigmoida} (vzorec
-(\ref{eq:sigmoid}), obrázek \ref{fig:graph_sigmoid}), \emph{hyperbolický tangens}
-(vzorec (\ref{eg:tanh}), obrázek \ref{fig:graph_tanh}) nebo \emph{ReLU} (vzorec
-(\ref{eg:relu}), obrázek \ref{fig:graph_relu}). Pokud potenciál neuronu před
-použitím aktivační funkce $f$ označíme $\xi$,
-\begin{equation} \label{eq:sigmoid}
-    f(\xi) = \frac{1}{1+e^{-\xi}}
-\end{equation}
-\begin{equation} \label{eg:tanh}
-    f(\xi) = tanh(\xi) = \frac{2}{1+e^{-2\xi}} - 1
-\end{equation}
-\begin{equation} \label{eg:relu}
-    f(\xi) = \max(0, \xi)
-\end{equation}
+nejpoužívanějšími aktivačními funkcemi jsou:
+% \emph{logistická sigmoida} (vzorec
+% (\ref{eq:sigmoid}), obrázek \ref{fig:graph_sigmoid}), \emph{hyperbolický tangens}
+% (vzorec (\ref{eg:tanh}), obrázek \ref{fig:graph_tanh}) nebo \emph{ReLU} (vzorec
+% (\ref{eg:relu}), obrázek \ref{fig:graph_relu}). Pokud potenciál neuronu před
+% použitím aktivační funkce $f$ označíme $\xi$,
+
+\begin{itemize}
+    \item \emph{logistická sigmoida} (obrázek \ref{fig:graph_sigmoid}),
+        \begin{equation}
+            f(\xi) = \frac{1}{1+e^{-\xi}}
+        \end{equation}
+    \item \emph{hyperbolický tangens} (obrázek \ref{fig:graph_tanh}),
+        \begin{equation}
+            f(\xi) = tanh(\xi) = \frac{2}{1+e^{-2\xi}} - 1
+        \end{equation}
+    \item \emph{ReLu (Rectified Linear Unit)} (obrázek \ref{fig:graph_relu}).
+        \begin{equation}
+            f(\xi) = \max(0, \xi)
+        \end{equation}
+\end{itemize}
+% \begin{equation} \label{eq:sigmoid}
+
+%     f(\xi) = \frac{1}{1+e^{-\xi}}
+% \end{equation}
+% \begin{equation} \label{eg:tanh}
+%     f(\xi) = tanh(\xi) = \frac{2}{1+e^{-2\xi}} - 1
+% \end{equation}
+% \begin{equation} \label{eg:relu}
+%     f(\xi) = \max(0, \xi)
+% \end{equation}
 \begin{figure}[!htb]
     \centering
     \begin{minipage}{0.5\textwidth}
@@ -626,45 +644,48 @@ použitím aktivační funkce $f$ označíme $\xi$,
 \paragraph{Neuronová síť}
 Architektura neuronové sítě je tvořena ze třech základních typů neuronů --
 vstupní (ze kterých pouze vycházejí spojení), výstupní (do kterých pouze
-přicházení spojení) a skryté (spojení přicházejí a jsou předávány dál).
-Neuronová síť pak jde popsat jako orientovaný graf. Pokud se jedná o graf bez
-orientovaných cyklů můžeme síť označit za \emph{dopřednou neuronovou síť}.
-Pokud obsahuje nějaké orientované cykly, označujeme ji jako \emph{rekurentní
-neuronovou síť}. Dále se budeme zaměřovat na \emph{dopředné vrstevnaté
-neuronové sítě}.
+přicházení spojení) a skryté (mají vstupní i výstupní spoje). Neuronová síť pak jde
+popsat jako orientovaný graf. Pokud se jedná o graf bez orientovaných cyklů
+můžeme síť označit za \emph{dopřednou neuronovou síť}. Pokud obsahuje nějaké
+orientované cykly, označujeme ji jako \emph{rekurentní neuronovou síť}. Dále se
+budeme zaměřovat na \emph{dopředné vrstevnaté neuronové sítě}.
 
-V těchto sítích vstup přechází po orientovaných hranách vrstvami neuronů, kde
-každý neuron z předchozí vrstvy je spojen hranou s každým vrcholem následující
-vrstvě. První vrstva se nazývá \emph{vstupní vrstva}, tvořena ze
-\emph{vstupních neuronů}, a slouží pro vstup parametrů (vstupů) do sítě.
-Vstupní neuron dostane hodnotu konkrétního vstupu a tuto hodnotu posílá beze
-změny dále (vstupní neurony nepoužívají aktivační funkci). Poslední vrstva se
-nazývá \emph{výstupní vrstva}. Je tvořena z \emph{výstupních neuronů} a její
-výstup je zároveň výstupem celé sítě. Každá neuronová síť musí nutně mít
-alespoň jeden vstupní a alespoň jeden výstupní neuron. Libovolná další vrstva
-mezi \emph{vstupní} a \emph{výstupní vrstvou} se nazývá \emph{skrytá vrstva}.
-Těchto vrstev může být v síti teoreticky libovolné množství.
+Dopředné neuronové sítě jsou často rozdělené do vrstev a nazývají se vrstevnaté
+neuronové sítě. V těchto sítích vstup přechází po orientovaných hranách
+vrstvami neuronů, kde každý neuron z předchozí vrstvy je spojen hranou s každým
+vrcholem následující vrstvě. První vrstva se nazývá \emph{vstupní vrstva}. Je
+tvořena ze \emph{vstupních neuronů} a slouží pro vstup parametrů (vstupů) do
+sítě. Vstupní neuron dostane hodnotu konkrétního vstupu a tuto hodnotu posílá
+beze změny dále (vstupní neurony nepoužívají aktivační funkci). Poslední vrstva
+se nazývá \emph{výstupní vrstva}. Je tvořena z \emph{výstupních neuronů} a
+výstup těchto neuronů je zároveň výstupem celé sítě. Každá neuronová síť musí
+nutně mít alespoň jeden vstupní a alespoň jeden výstupní neuron. Libovolná
+další vrstva mezi \emph{vstupní} a \emph{výstupní vrstvou} se nazývá
+\emph{skrytá vrstva}. Těchto vrstev může být v síti teoreticky libovolné
+množství.
 
 Následující rovnice předvedou jeden dopředný průchod neuronovou sítí
 transformující vstupní vektor hodnot na výstupní vektor. V tomto příkladu si
 představíme průchod dat jednoduchou sítí, skládající se ze vstupní vrstvy
-(potenciál vstupních neuronů značíme $x_1,...,x_n$), jedné skryté vrstvy
-neuronů (potenciály neuronů v této vrstvě označíme $h_1,...,h_k$, s
-odpovídajícím vektorem prahů $b_1,...,b_k$) a výstupní vrstvy
-(potenciál neuronů výstupní vrstvy označíme jako $y_1,...,y_m$ a vektor prahů
-$b_1,...,b_m$).
+(výstupy $n$ vstupních neuronů značíme $x_1,...,x_n$), jedné skryté vrstvy
+neuronů (výstupy $k$ neuronů v této vrstvě označíme $h_1,...,h_k$, s
+odpovídajícím vektorem prahů $b_1,...,b_k$ a váhami $w_{j,i}$ pro $i=1,...,k$ a
+$j=1,...,n$) a výstupní vrstvy (výstupy $m$ neuronů výstupní vrstvy označíme
+jako $y_1,...,y_m$, matici vah $w'_{j,i}$ pro $j=1,...,k$ a $i=1,...,m$ a
+vektor prahů $b'_1,...,b'_m$).
 
+Výstup skrytých neuronů se spočítá jako,
 \begin{equation} \label{eq:hidden}
-    h_i = f(\sum_{j}^{n} x_j w_{j,i} + b_i), \quad i = 1,...,k
+    h_i = f(\sum_{j=1}^{n} x_j w_{j,i} + b_i), \quad i = 1,...,k
 \end{equation}
-
+kde $w_{j,i}$ je váha hrany ze vstupního neuronu $j$ do skrytého neuronu $i$ a
+$f$ je aktivační funkce neuronů skryté vrstvy.
+Výstupy výstupních neuronů se spočítají jako,
 \begin{equation} \label{eq:output}
-    y_i = a(\sum_{j}^{k} h_j w_{j,i} + b_i), \quad i = 1,...,m
+    y_i = a(\sum_{j=1}^{k} h_j w'_{j,i} + b'_i), \quad i = 1,...,m
 \end{equation}
-kde $f$ je aktivační funkce neuronů skryté vrstvy a $a$ je aktivační funkce
-neuronů výstupní vrstvy. Rovnice (\ref{eq:hidden}) představuje výpočet potenciálu
-neuronů ve skryté vrstvě naší neuronové sítě z příkladu a rovnice
-(\ref{eq:output}) představuje výpočet potenciálů výstupních neuronů této sítě.
+kde $w'_{j,i}$ je váha hrany z $j$-tého skrytého neuronu do $i$-tého výstupního
+neuronu a $a$ je aktivační funkce neuronů výstupní vrstvy.
 
 \paragraph{Trénování neuronových sítí}
 Trénování (neboli učení) neuronových sítí je často velmi složitý proces, při
@@ -703,8 +724,8 @@ proměnlivé architektury a nepotřebuje znát korektní výstupy pro daný vstu
 sítě. Pro trénovaní stačí, když jsme schopni nějakým způsobem ohodnotit kvalitu
 řešení, k jakému se s využitím dané konfigurace (architektura a váhy spojení)
 sítě dostaneme. Díky tomuto se neuroevoluce hodí pro vývoj neuronových sítí v
-případech, kdy nejsme schopni přesně určit správné výstupy sítě a pouze můžeme
-pozorovat kvalitu chování daného vyvíjeného systému.
+případech, kdy nejsme schopni přesně určit správné výstupy sítě pro dané vstupy
+a pouze můžeme pozorovat kvalitu chování daného vyvíjeného systému.
 
 \paragraph{Vývoj neuronových sítí}
 Vývoj pomocí neuroevoluce probíhá stejně jako u jiných evolučních algoritmů.
@@ -722,9 +743,9 @@ být ale výpočetně velmi náročný, kvůli rychle narůstající délce geno
 velikostí architektury (počet vrstev a počet neuronů v síti) neuronové sítě.
 
 \paragraph{Pokročilé metody}
-S těmito problémy se můžeme potýkat hned několika způsoby. Různé styly
+Výše uvedené problémy můžeme řešit hned několika způsoby. Různé styly
 zakódování neuronových sítí do genotypu umožňují vývoj mnohem
-rozsáhlejších sítí, zachovávající udržitelně malou velikost genetické
+rozsáhlejších sítí, a přitom zachovávají udržitelně malou velikost genetické
 informace jedinců. 
 
 Některé metody \citet{gomez2008accelerated} navrhovaly postup, jakým můžeme
@@ -789,37 +810,36 @@ nespojené neurony. Druhý typ mutace přidává nový neuron. Tato mutace prob�
 tak, že na místo existující synapse se přidá nový neuron. Původní synapse se
 označí jako nepoužívaná a namísto toho se vytvoří dvě nové rozdělující tu
 původní. Váha spojení je v tomto procesu zachována. Při těchto operacích je
-vždy novým genům synapsí navýšena jejich \emph{historická značka} (používán
-globální čítač změn, jehož číslo je s každým novým genem navýšeno). Růst
+vždy novým genům synapsí navýšena jejich \emph{historická značka} (používá se
+globální čítač, jehož číslo je s každým novým genem navýšeno). Růst
 sítí probíhá právě díky mutaci.
 
 \paragraph{Křížení}
-Křížení probíhá za pomoci \emph{historických značek}. Dva jedinci se nejdříve
-hranami zarovnají pomocí jejich \emph{historických značek}. Stejná čísla totiž v
-síti značí stejnou strukturu. Synapse, která se v obou jedincích schoduje se
-dědí náhodně z jednoho rodiče. Synapse, kterou má jen jeden z rodičů se dědí z
-toho lepšího z dvojce rodičů a pokud je v nějakém jedinci hrana neaktivní a v
-druhém aktivní, s určitou pravděpodobností se tento stav v novém jedinci změní.
-Algoritmus je tímto stylem schopný vytvářet velké množství různých topologií.
-Tyto nové topologie, přestože často důležité pro řešení zadaného problému, ale
-mají jen velmi malou šanci se v populaci menších topologií udržet, protože
-původní menší topologie jsou na začátku často optimalizovanější než nové větší
-topologie. Proto NEAT využívá systém, kterým chrání tyto nové topologie před
-vyhynutím z populace.
+Křížení využívá \emph{historické značky}. Dva jedinci se nejdříve hranami
+zarovnají pomocí jejich \emph{historických značek}. Stejná čísla historických
+značek totiž v síti značí stejnou strukturu. Synapse, která se v obou jedincích
+schoduje se dědí náhodně z jednoho rodiče. Synapse, kterou má jen jeden z
+rodičů se dědí pouze když je v lepším z rodičů a pokud je v nějakém jedinci
+hrana neaktivní a v druhém aktivní, s danou pravděpodobností se tento stav v
+novém jedinci změní. Algoritmus je tímto stylem schopný vytvářet velké množství
+různých topologií. Tyto nové topologie, přestože jsou často důležité pro řešení
+zadaného problému, mají jen velmi malou šanci se v populaci menších topologií
+udržet, protože původní menší topologie jsou v době vzniku větší topologie
+často optimalizovanější než tyto nové topologie. Proto NEAT využívá systém, kterým
+chrání tyto nové topologie před vyhynutím z populace.
 
 \paragraph{Ochrana nových druhů}
 Nové topologie jsou chráněny rozřazením genotypů do odlišných druhů. Jednotlivé
 genotypy poté primárně soutěží s jedinci stejného druhu a nové druhy tak mají
 šanci se vyvinout a optimalizovat na jejich úroveň. NEAT pro výpočet odlišností
 jedinců opět využívá \emph{historické značky}, pomocí kterých hledá společné
-hrany a vypočítá vzdálenost dvou genomů. Geny můžeme dělit do několika
-kategorií. Buď se shodují (mají stejnou \emph{historickou značku}), a pak jsou
-označené jako shodné (\emph{matching genes}), nebo se neshodují. Poté v
-závislosti na tom, jestli se neshodné geny objevují v rozmezí hodnot
-\emph{historických značek} druhého z jedinců nebo mimo toto rozmezí, nazývají se
-tyto geny buď disjunktní (\emph{disjoint}), nebo přesahující (\emph{excess}).
-Hodnota vzdálenosti dvou jedinců se poté počítá jednoduchou lineární kombinací
-genů různých typů mezi jedinci pomocí \emph{historických značek} jako:
+hrany a vypočítá vzdálenost dvou genomů. Geny rozdělíme do několika kategorií.
+Buď se shodují (mají stejnou \emph{historickou značku}), a pak jsou označené
+jako shodné (\emph{matching genes}), nebo se neshodují. Neshodné geny, které
+mají historické značky v rozmezí hodnot \emph{historických značek} druhého z
+jedinců, se nazývají disjunktní (\emph{disjoint}) a zbylé geny se nazývají
+přesahující (\emph{excess}). Hodnota vzdálenosti dvou jedinců se poté počítá
+jednoduchou lineární kombinací počtu genů jako:
 
 \begin{equation}
     \delta = \frac{c_1E}{N} + \frac{c_2D}{N} + c_3\cdot\overline{W}
@@ -829,14 +849,20 @@ genů, $D$ je počet disjunktních genů, $\overline{W}$ je průměrný rozdíl 
 shodujících se genů a koeficienty $c_1$, $c_2$ a $c_3$ umožňují nastavovat
 důležitost těchto tří faktorů \citep{stanley2002evolving}.
 
-V každé generaci se pak vytváří seznam
-různých druhů a pokud se objeví genom, který nezapadá do žádného z druhů, je
-pro něj vytvořen jeho vlastní nový druh.
+Na začátku generace se pak vytváří seznam druhů. Pokud se objeví genom, který
+nezapadá do žádného z druhů, je pro něj vytvořen jeho vlastní nový druh.
 
 \paragraph{Fitness}
 Rozdělení do druhů má vliv i na fitness jedinců. Kvalita každého jedince se při
-výpočtu fitness dělí počtem jedinců stejného druhu. To zároveň omezuje druhy v
-ovládnutí celé generace a dál ochraňuje nové topologie.
+výpočtu fitness dělí počtem jedinců stejného druhu (vzorec
+(\ref{eq:neatfitness})). To zároveň omezuje druhy v ovládnutí celé generace a
+dál ochraňuje nové topologie.
+\begin{equation} \label{eq:neatfitness}
+    f'_i = \frac{f_i}{\sum_{j=1}^n sh(\delta(i,j))}
+\end{equation}
+kde $sh$ je binární indikátor s hodnotou 1, pokud je vzdálenost $\delta(i,j)$
+menší než daný práh $\delta_t$, jinak má hodnotu 0. $f_i$ je fitness hodnota
+jedince a $f'_i$ jeho upravená hodnota.
 
 \paragraph{Minimalizace dimenzionality jedinců}
 Jak již bylo zmíněno, NEAT inicializuje celou populaci jedinců s minimální
@@ -846,13 +872,14 @@ topologie vznikají díky genetickým operátorům a všechna zvětšení genoty
 tedy v evoluci opodstatněná. Díky tomuto NEAT samovolně vede k vývoji
 minimálních topologií. To umožňuje, že tento algoritmus je často výkonnější než
 ostatní, protože prohledává minimální potřebný prostor pro nalezení řešení,
-oproti neuroevolučním algoritmům používající fixní topologie neuronových sítí.
+oproti neuroevolučním algoritmům, které používají fixní topologie neuronových
+sítí.
 
 \subsection{HyperNEAT} \label{NN - HyperNEAT}
 Pro porovnání algoritmus HyperNEAT (\emph{Hypercube-based NEAT})
 \citep{stanley2009hypercube} \citep{eplex} je neuroevoluční algoritmus
 rozšiřující algoritmus NEAT. HyperNEAT slouží pro vývoj umělých neuronových
-sítí fixní topologie (typicky omezené tvarem hyperkrychle). 
+sítí fixní topologie. 
 
 Na rozdíl od algoritmu NEAT, používá HyperNEAT nepřímou
 reprezentaci vah sítě. Tyto váhy jsou reprezentovány pomocí jiné neuronové
@@ -868,7 +895,7 @@ velmi rozsáhlé neuronové sítě s předem určenou strukturou (takto dokáže
 napodobit regularitu velkého množství spojů v lidském mozku).
 
 \paragraph{}
-Následuje naznačení průběhu HyperNEAT algoritmu:
+Naznačení průběhu HyperNEAT algoritmu:
 \begin{enumerate}
     \item Zvolit konfiguraci vyvíjené sítě (vstupní a výstupní neurony a
         rozložení skrytých neuronů),
@@ -883,6 +910,8 @@ Následuje naznačení průběhu HyperNEAT algoritmu:
                 \emph{CPPN} sítě.
         \end{enumerate}
 \end{enumerate}
+
+Protože v práci nebudeme HyperNEAT používat, detailnější popis vynecháme.
 
 \section{Simulované prostředí} \label{Simulované prostředí}
 
@@ -920,10 +949,10 @@ prezentovat.
 Evoluční algoritmy jsou velmi lehce paralelizovatelné a tedy pro
 urychlení procesu vývoje a experimentů bude pro nás výhodné, pokud by simulace
 zvládala paralelní běh na více vláknech (více simulací, každá na vlastním
-vlákně). V poslední řadě pro lehčí integraci do vlastního modulu bude užitečné,
-aby modul spravující zvolený simulátor byl open-source, což nám dá volnost v
-případě, že si budeme chtít chování systémů v prostředí nějak vlastnoručně
-upravit.
+vlákně). V neposlední řadě pro lehčí integraci do vlastního modulu bude
+užitečné, aby modul spravující zvolený simulátor byl open-source, což nám dá
+volnost v případě, že si budeme chtít chování systémů v prostředí nějak
+vlastnoručně upravit.
 
 V oddíle \ref{Simulátory prostředí} popíšeme několik simulátorů prostředí,
 které využívají fyzikální simulátory. Samotné fyzikální simulátory představíme
@@ -959,14 +988,14 @@ Webots \citep{Webots} je open-source víceplatformní, robustní a deterministic
 robotický simulátor vyvíjený od roku 1998. Umožňuje programování a testování
 virtuálních robotů mnoha různých typů a jednoduchou následnou aplikaci softwaru
 v reálných robotech. Simulátor je možné použít pro simulaci prostředí s vícero
-agenty najednou s možnostmi lokální i globální komunikace mezi agenty. Výpočty
-fyzikálních interakcí zajišťuje fyzikální simulátor ODE. Pro vývoj robotů a
-prostředí je možné využít řady programovacích jazyků a to C, C++, Python, Java,
-MATLAB nebo ROS (\emph{Robot Operating System}). Prostředí umožňuje práci v
-grafickém rozhraní a vizualizaci simulací pomocí OpenGL. Knihovna dále nabízí
-využití připravených modelů robotů, vlastní editor robotů a map a možnosti
-vložení vlastních robotů z 3D modelovacích softwarů v CAD formátu
-\citep{michel2004cyberbotics}.
+agenty najednou. Agenti spolu mohou komunikovat a to jak lokálně tak i
+globálně. Výpočty fyzikálních interakcí zajišťuje fyzikální simulátor ODE. Pro
+vývoj robotů a prostředí je možné využít řady programovacích jazyků a to C,
+C++, Python, Java, MATLAB nebo ROS (\emph{Robot Operating System}). Prostředí
+umožňuje práci v grafickém rozhraní a vizualizaci simulací pomocí OpenGL.
+Knihovna dále nabízí využití připravených modelů robotů, vlastní editor robotů
+a map a možnosti vložení vlastních robotů z 3D modelovacích softwarů v CAD
+formátu \citep{michel2004cyberbotics}.
 
 \subsubsection{CoppeliaSim} \label{CoppeliaSim}
 CoppeliaSim \citep{coppeliaSim} \citep{coppeliarobotics} (původně známý pod
@@ -1061,10 +1090,10 @@ algoritmů. Chceme tedy nějaký jednoduchý přístup k simulaci a ovládání 
 rychlost a přesnost simulace. 
 
 Opět většina ze simulátorů prostředí toto nabízí. Osobně se nám ale nejvíce
-zalíbilo MuJoCo. Díky nedávnému otevření fyzikálního simulátoru MuJoCo a změně
-prostředí (nejprve do \textbf{OpenAI Gym} a nyní do \textbf{Farama Foundation
-Gymnasium}) jsme dostali možnost využít jednoduché Python API pro ovládání
-robotů a zároveň konfiguraci celé simulace. 
+zalíbilo MuJoCo. Díky nedávnému převedení fyzikálního simulátoru MuJoCo do
+open-source a změně prostředí (nejprve do \textbf{OpenAI Gym} a nyní do
+\textbf{Farama Foundation Gymnasium}) jsme dostali možnost využít jednoduché
+Python API pro ovládání robotů a zároveň konfiguraci celé simulace. 
 
 Tato abstrakce od vlastní simulace je pro tuto práci velmi přínosná, protože se
 především chceme zajímat o vývoj řízení robotů pomocí evolučních algoritmů.

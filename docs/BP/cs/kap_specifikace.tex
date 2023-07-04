@@ -20,8 +20,8 @@ daného problému. Tímto zároveň experimenty s různými roboty vynucují vyu
 různých pokročilejších metod pro dosažení požadovaných cílů daného experimentu.
 
 V následující sekci \ref{Specifikace-funkčnípožadavky} zabývající se funkčními
-požadavky si představíme jednotlivé části, které od takového systému budeme
-požadovat.
+požadavky si představíme jednotlivé vlastnosti, které od takového systému
+budeme požadovat.
 
 \section{Funkční požadavky} \label{Specifikace-funkčnípožadavky}
 
@@ -32,15 +32,17 @@ upravit co nejvíce částí evolučního vývoje, který bude v době experimen
 probíhat. Uživatel musí být v době běhu experimentu schopný sledovat průběžné
 výsledky z jednotlivých generací a vizualizovat dosavadní výsledky v
 simulovaném prostředí. Po dokončení experimentu musí být možné uložit
-výsledky ve formě dále zpracovatelné např. pro statistický rozbor většího
+výsledky ve formě dále zpracovatelné, např. pro statistický rozbor většího
 množství experimentů s možností vizualizace dat nejlepších jedinců finálních
-generací.
+generací a podobně.
 
 Systém bude z hlavní části vytvořený v programovacím jazyce Python, vytvářející
 uživateli přístupnější kód a umožňující rychlejší experimentování a
 prototypování nápadů. Python je vhodný, jelikož se pro tento systém nesnažíme o
 maximální efektivitu nebo rychlost experimentů, ale o čitelnost celého systému
-a schopnost vytvářet s naší knihovnou vlastní experimenty.
+a schopnost vytvářet s naší knihovnou vlastní experimenty. Zároveň nám to
+umožní zpřístupnit otestovaný program uživatelům na operačních systémech
+Windows i Linux.
 
 Univerzálnost navrženého řešení umožní uživateli přistupovat k našemu systému
 třemi způsoby popsanými níže. Každý způsob přístupu k systému má své vlastní
@@ -61,11 +63,10 @@ otevřenou Python knihovnu, kterou uživatel může připojit ke svému
 projektu a pomocí naší knihovny jednoduše vytvářet experimenty s požadovanou
 volností konfigurace jednotlivých parametrů evolučního vývoje.
 
-V případě, že uživatel nebude knihovnu připojovat ke svému vlastnímu projektu,
-bude systém schopen fungovat samostatně. Zároveň bude mít knihovna dostatečnou
-dokumentaci na to, aby takový uživatel byl schopen provádět pokročilou
-konfiguraci experimentů přímo v kódu knihovny, a aby tyto experimenty bylo
-možné provádět z kódu, bez omezení výstupů systému nebo vizualizace řešení.
+Knihovna bude mít dostatečnou dokumentaci na to, aby takový uživatel byl
+schopen provádět pokročilou konfiguraci experimentů přímo v kódu knihovny, a
+aby tyto experimenty bylo možné provádět z kódu, bez omezení výstupů systému
+nebo vizualizace řešení.
 
 \paragraph{Rozšiřování knihovny}
 Pro pokročilé uživatele bude navržený systém rozšiřitelnou platformou. Dokumentace

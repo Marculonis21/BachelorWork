@@ -14,12 +14,12 @@ font = ("Helvetica", 15)
 agents : Dict[str, roboEvo.gaAgents.BaseAgent]
 # default for gui init
 agents = {agent.__class__.__name__ : agent for agent in [
-    roboEvo.gaAgents.FullRandomAgent(roboEvo.robots.AntV3(),    [], roboEvo.gaAgents.EvoType.CONTROL, gui=True),
-    roboEvo.gaAgents.SineFuncFullAgent(roboEvo.robots.AntV3(),  [], roboEvo.gaAgents.EvoType.CONTROL, gui=True),
-    roboEvo.gaAgents.SineFuncHalfAgent(roboEvo.robots.AntV3(),  [], roboEvo.gaAgents.EvoType.CONTROL, gui=True),
-    roboEvo.gaAgents.StepCycleHalfAgent(roboEvo.robots.AntV3(), [], roboEvo.gaAgents.EvoType.CONTROL, gui=True),
-    roboEvo.gaAgents.TFSAgent(roboEvo.robots.AntV3(),           [], roboEvo.gaAgents.EvoType.CONTROL, gui=True),
-    roboEvo.gaAgents.NEATAgent(roboEvo.robots.AntV3(),          [], roboEvo.gaAgents.EvoType.CONTROL, gui=True)
+    roboEvo.gaAgents.StepCycleFullAgent(roboEvo.robots.AntV3(),    [], roboEvo.gaAgents.EvoType.CONTROL, gui=True),
+    roboEvo.gaAgents.StepCycleHalfAgent(roboEvo.robots.AntV3(),    [], roboEvo.gaAgents.EvoType.CONTROL, gui=True),
+    roboEvo.gaAgents.SineFuncFullAgent(roboEvo.robots.AntV3(),     [], roboEvo.gaAgents.EvoType.CONTROL, gui=True),
+    roboEvo.gaAgents.SineFuncHalfAgent(roboEvo.robots.AntV3(),     [], roboEvo.gaAgents.EvoType.CONTROL, gui=True),
+    roboEvo.gaAgents.TFSAgent(roboEvo.robots.AntV3(),              [], roboEvo.gaAgents.EvoType.CONTROL, gui=True),
+    roboEvo.gaAgents.NEATAgent(roboEvo.robots.AntV3(),             [], roboEvo.gaAgents.EvoType.CONTROL, gui=True)
 ]}
 
 agent_names = list(agents.keys())

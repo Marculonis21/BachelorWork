@@ -19,7 +19,7 @@ Usage example::
     agent2 = gaAgents.TFSAgent(robot, [(1,5), False, False, (2,3)])
 
 Default implemented agents:
-    * :class:`FullRandomAgent`
+    * :class:`StepCycleFullAgent`
     * :class:`StepCycleHalfAgent`
     * :class:`SineFuncFullAgent`
     * :class:`SineFuncHalfAgent`
@@ -241,6 +241,74 @@ class BaseAgent(ABC):
             agent, robot, individual = pickle.load(save_file)
 
         return agent, robot, individual
+
+class StepCycleFullAgent(BaseAgent):
+    def __init__(self, robot, body_parts, evo_type=EvoType.CONTROL, gui=False):
+        super(StepCycleFullAgent, self).__init__(robot, body_parts, evo_type, gui)
+
+        self.arguments = {"cycle_repeat": 25}
+        self.arguments_tooltips = {"cycle_repeat":"Length of the step sequence"}
+
+        self.individual_mutation_prob = 0.75
+        self.action_mutation_prob     = 0.1
+        self.body_mutation_prob       = 0.1
+
+    @property
+    def description(self):
+        return "Full Random agent\n    Starts off as a sequence of random actions for each motor for chosen amount of steps. Behavior of the agent is then made by repeating this sequence till end state is reached periodically."
+
+    def get_action(self, individual, step):
+        actions = []
+        actions, _ = individual
+
+        action = np.array(actions[step % self.arguments["cycle_repeat"]])
+
+        return action
+
+    def generate_population(self, population_size):
+        population = []
+
+        for _ in range(population_size):
+            # gen actions
+            actions = []
+            body_parts = []
+
+            actions = 2*np.random.random(size=(self.arguments["cycle_repeat"], self.action_size,)) - 1
+
+            if self.evolve_body:
+                body_parts = np.array([])
+                for value in self.body_part_mask:
+                    if value:
+                        assert isinstance(value, tuple) or isinstance(value, list)
+                        _part = np.random.uniform(value[0], value[1],size=1)
+                        body_parts = np.concatenate([body_parts,_part])
+            body_parts = np.array([body_parts])
+
+            individual = [actions, body_parts]
+            population.append(individual)
+
+        # set ranges for actions and body parts
+        self.action_range = [(-1.0,1.0,self.action_size)] 
+        self.body_range    = [] 
+
+        for value in self.body_part_mask:
+            if value:
+                assert isinstance(value, tuple)
+                self.body_range.append((value[0], value[1]))
+
+        return np.array(population, dtype=object)
+
+    @selection_deco
+    def selection(self, population, fitness_values):
+        return Operators.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
+
+    @crossover_deco
+    def crossover(self, population):
+        return Operators.crossover_uniform(population, self)
+
+    @mutation_deco
+    def mutation(self, population):
+        return Operators.uniform_mutation(population, self)
 
 class StepCycleHalfAgent(BaseAgent):
     def __init__(self, robot, body_parts, evo_type=EvoType.CONTROL, gui=False):
@@ -527,75 +595,6 @@ class SineFuncHalfAgent(BaseAgent):
     def selection(self, population, fitness_values):
         # return Operators.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
         return Operators.roulette_selection(population, fitness_values)
-
-    @crossover_deco
-    def crossover(self, population):
-        return Operators.crossover_uniform(population, self)
-
-    @mutation_deco
-    def mutation(self, population):
-        return Operators.uniform_mutation(population, self)
-
-class FullRandomAgent(BaseAgent):
-    def __init__(self, robot, body_parts, evo_type=EvoType.CONTROL, gui=False):
-        super(FullRandomAgent, self).__init__(robot, body_parts, evo_type, gui)
-
-        self.arguments = {"cycle_repeat": 25}
-        self.arguments_tooltips = {"cycle_repeat":"Length of the step sequence"}
-
-        self.individual_mutation_prob = 0.75
-        self.action_mutation_prob     = 0.1
-        self.body_mutation_prob       = 0.1
-
-    @property
-    def description(self):
-        return "Full Random agent\n    Starts off as a sequence of random actions for each motor for chosen amount of steps. Behavior of the agent is then made by repeating this sequence till end state is reached periodically."
-
-    def get_action(self, individual, step):
-        actions = []
-        actions, _ = individual
-
-        action = np.array(actions[step % self.arguments["cycle_repeat"]])
-
-        return action
-
-    def generate_population(self, population_size):
-        population = []
-
-        for _ in range(population_size):
-            # gen actions
-            actions = []
-            body_parts = []
-
-            actions = 2*np.random.random(size=(self.arguments["cycle_repeat"], self.action_size,)) - 1
-
-            if self.evolve_body:
-                body_parts = np.array([])
-                for value in self.body_part_mask:
-                    if value:
-                        assert isinstance(value, tuple) or isinstance(value, list)
-                        _part = np.random.uniform(value[0], value[1],size=1)
-                        body_parts = np.concatenate([body_parts,_part])
-            body_parts = np.array([body_parts])
-
-            individual = [actions, body_parts]
-            population.append(individual)
-
-        # set ranges for actions and body parts
-        self.action_range = [(-1.0,1.0,self.action_size)] 
-        self.body_range    = [] 
-
-        for value in self.body_part_mask:
-            if value:
-                assert isinstance(value, tuple)
-                self.body_range.append((value[0], value[1]))
-
-        return np.array(population, dtype=object)
-
-    @selection_deco
-    def selection(self, population, fitness_values):
-        # FUCK YOU
-        return Operators.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
 
     @crossover_deco
     def crossover(self, population):

@@ -1,5 +1,4 @@
-%%% Fiktivní kapitola s ukázkami tabulek, obrázků a kódu
-
+% TODO: oddělit předložky na konci řádků 
 \chapter{Implementace projektu} \label{chapter-implementace}
 V předchozí kapitole jsme prošli funkční požadavky, očekávané od vyvíjeného
 souboru programů. Následuje rozbor jednotlivých modulů, které vznikly při
@@ -9,7 +8,7 @@ vlastní implementaci.
 Celý projekt je napsána v programovacím jazyce \textbf{Python}. Cílem projektu
 je vytvořit čitelnou rozšířitelnou platformu, která bude uživateli jednoduše
 dostupná. Pokud uživatel bude mít potřebu vytvořené moduly jakkoli měnit nebo
-rozšiřovat, Python toto bez problémů umožní. Jednoduchá čitelnost Pythonu
+rozšiřovat, implementace v Pythonu toto bez problémů umožní. Jednoduchá čitelnost Pythonu
 spojená s rychlostí, jakou mohou být prováděny iterace změn, bez potřeby
 zdlouhavého překladu celé knihovny, se nám zdají býti dostatečně užitečné
 vlastnosti volbu Pythonu jako jazyka pro tento projekt.
@@ -46,9 +45,9 @@ Dále v této kapitole v sekci \ref{imp:roboevo} popíšeme centrální modul
 implementace popíšeme v dalších oddílech. Popíšeme třídu agentů v oddílu
 \ref{imp:gaAgents}. Implementace vlastních genetických operátorů se nachází v
 oddílu \ref{imp:gaOperators}. Vlastní modul \emph{robots} propojující roboty ze
-simulátoru \emph{MuJoCo} (MuJoCo popsáno v základních pojmech v oddílu
-\ref{MuJoCo}) s ostatními třídami je vysvětlena (v oddílu \ref{imp:robots}). V
-sekci \ref{imp:experimentsetter} předvedeme třídu \texttt{Experiment} modulu
+simulátoru \emph{MuJoCo} (MuJoCo bylo popsáno v základních pojmech v oddílu
+\ref{MuJoCo}) s ostatními třídami je vysvětlena v oddílu \ref{imp:robots}. V
+sekci \ref{imp:experimentsetter} představíme třídu \texttt{Experiment} modulu
 \emph{experiment\_setter}, sloužící k uchování a předvolbě parametrů pro
 experimenty, usnadňující tak provádění většího množství experimentů. Jako
 poslední si představíme moduly umožňující uživateli práci s knihovnou buď
@@ -58,9 +57,9 @@ pomocí grafického prostředí (v sekci \ref{imp:GUI}), nebo pomocí příkazov
 \section{RoboEvo a pomocné moduly}
 V této sekci popíšeme hlavní modul \emph{RoboEvo} a jeho pomocné moduly
 \emph{gaAgents}, \emph{gaOperators} a \emph{robots}. Soubor těchto modulů tvoří
-hlavní část celého projektu, obsahující celý proces umožňující provádění
-evolučních experimentů s roboty. Vybrané rozdělení modulů bylo vytvořeno pro
-zlepšení čitelnosti a zjednodušení rozšiřování kódu, kde nyní každý modul
+hlavní část celého projektu, podporující celý proces provádění evolučních
+experimentů s roboty. Vytvořené rozdělení modulů bylo zvoleno pro zlepšení
+čitelnosti a zjednodušení rozšiřování kódu, kde nyní každý modul
 zprostředkovává velmi specifickou roli v procesu evolučního vývoje, a tudíž je
 pro uživatele jednoduché tyto části upravovat. Tato část projektu je zároveň
 zcela oddělena od zpracování uživatelského vstupu, který do hlavního modulu
@@ -74,8 +73,9 @@ Každý experiment se skládá z několika nezávislých částí. Experiment m�
 využívat různé typy evolučních agentů s různými genetickými operátory a může se
 snažit vyvíjet různé typy robotů. Jak bylo zmíněno výše, tyto částí jsou pro
 přehlednost, čitelnost a rozšířitelnost kódu oddělené do vlastních menších
-implementací, rozšiřující hlavní modul (jednotlivé implementace budou popsány v
-dalších oddílech). 
+implementací, rozšiřujících hlavní modul (jednotlivé implementace budou popsány
+v dalších oddílech). Oddělené moduly umožňují jednoduše kombinovat různé agenty
+s různými roboty.
 
 \paragraph{Implementace modulu \emph{RoboEvo}}
 Tento modul obsahuje funkce sloužící jak k inicializaci evolučních experimentů,
@@ -95,9 +95,9 @@ vloženy do jednoduché třídy \texttt{ExperimentParams} (z modulu
 \begin{itemize}
     \item \texttt{robot} -- zvolený robot z modulu \texttt{robots},
     \item \texttt{agent} -- zvolený agent z modulu \texttt{gaAgents},
-    \item \texttt{ga\_population\_size} -- velikost populace jedinců v
+    \item \texttt{population\_size} -- velikost populace jedinců v
         evolučním algoritmu,
-    \item \texttt{ga\_generation\_count} -- počet generací, po které bude
+    \item \texttt{generation\_count} -- počet generací, po které bude
         evoluční algoritmus běžet,
     \item \texttt{show\_best} -- příznak určující, zda po doběhnutí evolučního
         algoritmu \\chceme v simulovaném prostředí zobrazit řešení nejlepšího
@@ -108,8 +108,8 @@ vloženy do jednoduché třídy \texttt{ExperimentParams} (z modulu
         evolučního algoritmu (pokud neexistuje, je složka automaticky vytvořena
         po doběhnutí algoritmu),
     \item \texttt{show\_graph} -- příznak určující, zda je při běhu algoritmu
-        vykreslován graf zobrazující fitness hodnoty (min, mean a max) v
-        jednotlivých generacích,
+        vykreslován graf zobrazující fitness hodnoty (minimální, průměrnou a
+        maximální) v jednotlivých generacích,
     \item \texttt{note} -- případná poznámka, kterou může uživatel speciálně
         odlišit název dat, ukládaných po doběhnutí algoritmu.
 \end{itemize}
@@ -119,8 +119,8 @@ potřebné pro běh experimentu. V přípravě probíhá spouštění výpočetn
 jednotek pro paralelizaci testovacího prostředí (umožňující ohodnocení
 populace jedinců paralelně). Následně proběhne spuštění evolučního algoritmu se
 zvolenými parametry, po kterém funkce uloží data vygenerovaná evolučním
-algoritmem -- fitness hodnoty jedinců v každé generaci, celá
-populace jedinců z poslední generace a (volitelné) nejlepší řešení na konci
+algoritmem -- fitness hodnoty jedinců v každé generaci, celou
+populaci jedinců z poslední generace a (volitelné) nejlepší řešení na konci
 experimentu. Tato data jsou uložená do složky, dostupné na cestě popsané v
 parametru \texttt{save\_dir}.
 
@@ -182,7 +182,7 @@ implementovat, aby byla použitelná). Výčet abstraktních metod agenta:
                 genetických operátorů selekce) vybere jedince a vrátí jejich
                 seznam,
             \item \texttt{crossover(population)} -- genetický operátor --
-                metoda s parametrem populaci jedinců (označující skupinu
+                metoda s parametrem populace jedinců (označující skupinu
                 rodičů), na které provede křížení genotypů a vrátí vytvořenou
                 skupinu potomků,
             \item \texttt{mutation(population)} -- genetický operátor -- metoda
@@ -190,9 +190,9 @@ implementovat, aby byla použitelná). Výčet abstraktních metod agenta:
                 křížení), na kterých provede mutaci genotypu a vrátí
                 zmutované potomky,
             \item \texttt{switch\_evo\_phase()} -- metoda využívána z hlavního
-                modulu, který řídí evoluční algoritmus, sloužící pro zahlášení
+                modulu, který řídí evoluční algoritmus, sloužící pro vyhlášení
                 změny typu evolučního vývoje (přechod mezi vývojem řízení a
-                morfologie),
+                morfologie při sériovém vývoji řízení a morfologie),
         \end{itemize}
     \item metody využívané pro vstupní rozhraní:
         \begin{itemize}
@@ -206,7 +206,7 @@ způsobem můžeme v experimentech jednoduše zaměňovat typy využívaných
 agentů a měnit tak průběh evolučního vývoje. 
 
 \paragraph{Vlastní agent}
-Uživatel pak může jednoduše přidávat vlastní agenty, vytvořením třídy odvozené
+Uživatel může jednoduše přidávat vlastní agenty, vytvořením třídy odvozené
 od třídy \texttt{BaseAgent} a implementováním potřebných metod. Pro
 zjednodušení tohoto procesu, uživatel nemusí vlastnoručně programovat všechny
 tyto metody, ale může využít připravené genetické operátory, implementované v
@@ -222,7 +222,7 @@ pro experimenty:
 \label{imp:gaAgents.stepcyclehalfagent}
 \label{imp:gaAgents.sinefuncfullagent}
 \label{imp:gaAgents.sinefunchalfagent}
-\label{imp:gaAgents.fullrandom}
+\label{imp:gaAgents.stepcyclehalfagent}
 \label{imp:gaAgents.TFSagent}
 \begin{itemize}
     \item \textbf{\emph{StepCycleHalfAgent}} -- agent, jehož genotyp je vektor předem
@@ -230,29 +230,36 @@ pro experimenty:
         popisují hodnoty nastavení aktuátorů. Tato nastavení jsou periodicky
         opakována v periodě zvolené délky vždy pro polovinu aktuátorů a pro
         druhou polovinu jsou symetricky přenesena a nastavena na opačné
-        hodnoty.
+        hodnoty (vynásobením hodnoty minus jedničkou -- všechny aktuátory mají
+        povolený rozsah hodnot od $-1$ do $1$).
+
+    \item \textbf{\emph{StepCycleFullAgent}} -- agent, podobný agentovi
+        \emph{StepCycleHalfAgent}, generující do svého genotypu nastavení pro
+        všechny aktuátory robota pro určitý počet kroků. Tato nastavení se opět
+        periodicky opakují.
+
     \item \textbf{\emph{SineFuncFullAgent}} -- agent, jehož genotyp popisuje
-        parametry sinus funkce pro každý aktuátor robota (amplituda,
+        parametry sinusové funkce pro každý aktuátor robota (amplituda,
         frekvence, posun v ose $x$ a posun v ose $y$). Nastavení aktuátorů je
         pak vygenerované výpočtem sinus funkce pro každý aktuátor v daném
-        simulačním kroku (z parametru \texttt{step} funkce
+        simulačním kroku (z celočíselného parametru\texttt{step} funkce
         \texttt{get\_action}), podle následující rovnice:
         \begin{equation}
             \text{nastavení aktuátoru} = f(step) = A\cdot\sin(\frac{2\pi\cdot step}{T} + \delta_x) + \delta_y
             \label{sinefunc}
         \end{equation}
-        kde $T$ je perioda sinus funkce, $A$ je amplituda sinus funkce a
-        $\delta_x$ a $\delta_y$ jsou její posuny.
+        kde $T$ je perioda sinus funkce, $A$ je amplituda funkce a $\delta_x$ a
+        $\delta_y$ jsou její posuny. Hodnota parametru \texttt{step} může být
+        pro plynulejší přechody mezi nastaveními aktuátorů dělena na menší
+        hodnoty.
 
     \item \textbf{\emph{SineFuncHalfAgent}} -- agent, podobný jako
-        \emph{SineFuncFullAgent}, který má parametry sinus funkcí pouze pro
-        polovinu aktuátorů. Druhou polovinu generuje přenesením opačných hodnot
-        z první poloviny. Pro výpočet hodnoty nastavení aktuátorů využívá
-        stejné funkce, jako \emph{SineFuncFullAgent} (funkce (\ref{sinefunc})).
-    \item \textbf{\emph{FullRandomAgent}} -- agent, podobný agentovi
-        \emph{StepCycleHalfAgent}, generující do svého genotypu nastavení pro všechny
-        aktuátory robota. Tato nastavení se opět periodicky opakují se zvolenou
-        velikostí periody.
+        \emph{SineFuncFullAgent}, který má parametry sinusových funkcí pouze pro
+        polovinu aktuátorů. Druhou polovinu generuje opět přenesením opačných
+        hodnot z první poloviny. Pro výpočet hodnoty nastavení aktuátorů
+        využívá stejné funkce, jako \emph{SineFuncFullAgent} (funkce
+        (\ref{sinefunc})).
+
     \item \textbf{\emph{TFSAgent}} -- složitější agent než \emph{SineFuncFullAgent},
         využívající genotyp popisující zkrácenou Fourierovu transformaci pro
         každý aktuátor na generování požadovaného nastavení. Genotyp obsahuje
@@ -272,7 +279,7 @@ pro experimenty:
         neuroevoluce -- NEAT (\emph{NeuroEvolution of Augmenting Topologies}),
         popsaný v základních pojmech v sekci \ref{NN - NEAT}. Naše implementace
         využívá python knihovnu pro NEAT -- \emph{neat-python}
-        \citet{McIntyre_neat-python}.
+        \citep{McIntyre_neat-python}.
 \end{itemize}
 
 Kromě zcela náhodného agenta a agenta využívajícího NEAT, se agenti snaží pro
@@ -282,7 +289,7 @@ podle nějakých periodických funkcí.
 
 \subsection{Modul gaOperators} \label{imp:gaOperators}
 Modul \emph{gaOperators} slouží pro usnadnění tvorby evolučních algoritmů
-implementací řady nejpoužívanějších genetických operátorů, použitelných v
+implementací řady nejpoužívanějších genetických operátorů použitelných v
 metodách agentů (popsaných v předešlé sekci \ref{imp:gaAgents}). 
 
 Seznam implementovaných operátorů (podrobný popis operátorů v sekci
@@ -290,21 +297,30 @@ Seznam implementovaných operátorů (podrobný popis operátorů v sekci
 \begin{itemize}
     \item \texttt{roulette\_selection(pop, fitness\_values)} -- implementace
         \emph{ruletové selekce}, s argumenty populace jedinců a jejich fitness
-        hodnot,
+        hodnoty. Vyžaduje, aby všechny hodnoty \texttt{fitness\_values} byly
+        nezáporné,
     \item \texttt{tournament\_selection(pop, fitness\_values, k)} --
         implementace \emph{turnajové selekce}, s argumenty populace
-        jedinců a jejich fitness hodnot a hodnotu $k$ určující velikost turnaje,
+        jedinců, jejich fitness hodnoty a hodnotu $k$ určující velikost turnaje,
     \item \texttt{tournament\_prob\_selection(pop, fitness\_values, prob, k)}
         -- implementace pokročilé \emph{turnajové selekce}, kde umístění
-        jedince v turnaji určuje jeho pravděpodobnost na zvolení podle vzorce:
+        jedince v turnaji mezi $k$ náhodně vybranými jedinci určuje jeho
+        pravděpodobnost na zvolení podle vzorce: 
         \begin{equation}
             p(X) = prob\cdot(1-prob)^{(X-1)}
         \end{equation}
-        kde $X$ je pozice, na které se daný jedince umístil v turnaji a $prob$
-        je vstupní parametr funkce, určující pravděpodobnost na zvolení prvního,
+        kde $X=1,...,k$ je pozice, na které se daný jedince umístil v turnaji a $prob$
+        je vstupní parametr funkce, určující pravděpodobnost na zvolení
+        prvního. Toto rozdělení pravděpodobností je normalizováno tak, aby pro
+        každou volbu $k$ se sečetlo na jedničku. Následně je vektor
+        pravděpodobností využit při náhodném výběru jednoho z jedinců v
+        turnaji, 
     \item \texttt{crossover\_uniform(pop, agent)} -- implementace základního
         operátoru uniformního křížení, popsaného v sekci \ref{Evoluční
-        algoritmy - operátory},
+        algoritmy - operátory}, s argumenty populace jedinců a odkazem na
+        zvoleného agenta, který pro metody udržuje další potřebné informace
+        (např. sílu mutace jedinců, příznak označující povolení vývoje
+        morfologie),
     \item \texttt{crossover\_single\_point(pop, agent)} -- implementace
         operátoru jednobodového křížení, popsaného v sekci \ref{Evoluční
         algoritmy - operátory},
@@ -313,13 +329,17 @@ Seznam implementovaných operátorů (podrobný popis operátorů v sekci
         operátory}), využívající parametry agenta, který specifikuje
         pravděpodobnost mutace samotného jedince, pravděpodobnost mutace akcí a
         pravděpodobnost mutace částí těla (\emph{individual mutation
-        probability}, \emph{action mutation probability} \emph{body mutation
+        probability}, \emph{action mutation probability}, \emph{body mutation
         probability}),
     \item \texttt{uniform\_shift\_mutation(pop, agent)} -- implementace
         upraveného operátoru uniformní mutace, využívajících stejných parametrů
         pravděpodobností jako předchozí operátor \texttt{uniform\_mutation}.
         Tento operátor provede mutaci dané hodnoty vygenerováním hodnoty malé
-        změny z povoleného rozsahu, kterou přičte k původní mutované hodnotě.
+        změny z povoleného rozsahu (příklad -- náhodně zvolená
+        $\delta\in[\frac{min}{0.05}, \frac{max}{0.05}]$), kterou přičte k
+        původní mutované hodnotě ($a = a' + \delta$, kde $a'$ je mutovaná
+        hodnota před mutací a $a$ hodnota po aplikování mutace). Výsledná
+        hodnota je poté omezena do povoleného rozsahu.
 \end{itemize}
 
 \subsection{Modul robots} \label{imp:robots}
@@ -331,35 +351,37 @@ experimentů můžeme měnit za běhu algoritmu, což nám umožňuje vyvíjet v
 pohybu i morfologii robotů. 
 
 \paragraph{Třída \texttt{BaseRobot}}
-Modul je vytvořen podobným stylem jako modul \emph{gaAgents} (v sekci
+Modul \emph{robots} je vytvořen podobným stylem jako modul \emph{gaAgents} (v sekci
 \ref{imp:gaAgents}), tedy obsahuje jednu hlavní třídu \texttt{BaseRobot},
 tvořící šablonu pro odvozené třídy jednotlivých robotů. Tato implementace
 zásadně zjednodušuje možné připojení vlastního robota do naší knihovny což
-umožní využívat vlastního robot v experimentech s evolučním vývojem. 
+umožní využívat vlastní roboty v experimentech s evolučním vývojem. 
 
 Třída \texttt{BaseRobot} obsahuje několik metod využívaných všemi odvozenými
-třídami a jednu abstraktní metodu, kterou každá ze tříd musí implementovat sama
-(informace o robotovi, sloužící k jeho prezentaci v grafické aplikaci --
-popsané v sekci \ref{imp:GUI}). Zároveň definuje všechna pole, nesoucí
-informace o daném robotovi (identifikační hodnota \emph{MuJoCo} prostředí,
-slovník jmen částí těla robota, které mohou být použité při evolučním vývoji a
-odkaz na náhledový obrázek, zobrazující robota, pro \emph{GUI}). Tyto informace
-jsou uložené o každém robotovi voláním inicializační funkce rodičovské třídy s
-potřebnými parametry.
+třídami a jednu abstraktní metodu, kterou každá z odvozených tříd musí
+implementovat sama (informace o robotovi, sloužící k jeho prezentaci v grafické
+aplikaci -- popsané v sekci \ref{imp:GUI}). Zároveň definuje všechna pole
+nesoucí informace o daném robotovi (identifikační hodnota \emph{MuJoCo}
+prostředí, slovník jmen částí těla robota, které mohou být použité při
+evolučním vývoji a odkaz na náhledový obrázek, zobrazující robota, pro
+\emph{GUI}). Tyto informace jsou uložené o každém robotovi voláním
+konstruktor rodičovské třídy s potřebnými parametry.
 
 Následuje seznam veřejných metod základní třídy
 \texttt{BaseRobot}:
 
 \begin{itemize}
     \item \texttt{create(body\_part\_mask, individual, tmp\_file = None)}
-        -- metoda,\\která na vstupu dostane argument masky částí těla, která
-        popisuje, které části budou moci být měněni evolučním algoritmem a
-        argument jedince, ze kterého získává délky části těla daného jedince
-        (používané při vývoji morfologie robota). Tyto hodnoty metoda použije
-        při úpravě konfiguračního XML souboru, který popisuje robota v
-        simulačním prostředí, a vrací nově vytvořený soubor s konfigurací
-        (pokud metoda dostane argument \texttt{tmp\_file}, tak konfiguraci
-        vygeneruje do tohoto souboru),
+        -- metoda,\\která na vstupu dostane argument masky částí těla
+        popisující, které části budou moci být měněny evolučním algoritmem
+        (seznam hodnot -- buď hodnoty \texttt{False}/0 pro části těla, které se
+        nemají měnit, nebo specifikování rozsahu ve formátu \texttt{tupple} --
+        \texttt{(min, max)}) a argument jedince, ze kterého získává délky části
+        těla daného jedince (používané při vývoji morfologie robota). Tyto
+        hodnoty metoda použije při úpravě konfiguračního XML souboru, který
+        popisuje robota v simulačním prostředí, a vrací nově vytvořený soubor s
+        konfigurací (pokud metoda dostane argument \texttt{tmp\_file}, tak
+        konfiguraci vygeneruje do tohoto souboru),
     \item \texttt{create\_default()} -- stejná funkcionalita jako předchozí
         metoda, ale pro zjednodušení zápisu vytvoří konfiguraci robota s
         výchozím nastavením,
@@ -414,10 +436,13 @@ class StickAnt(BaseRobot): # tvorba robota StickAnt
         # cesta k náhledovému obrázku robota
         picture_path = DIR+"/Basic-Ant.jpg"
 
+
         # MuJoCo prostředí, ve kterém robot bude spuštěn
-        # v této implementaci se jedná o vlastní prostředí,
-        # uzpůsobené pro všechny roboty najednou
         environment_id = "custom/CustomEnv-v0"
+
+        # 'custom/CustomEnv-v0' označuje naše prostředí 
+        # vytvořené tak, aby jednoduše podporovalo všechny základní 
+        # druhy robotů (bez robotů využívající NEAT)
 
         # volání inicializační funkce třídy BaseRobot,
         # která drží všechny informace v jednotném formátu
@@ -433,7 +458,7 @@ class StickAnt(BaseRobot): # tvorba robota StickAnt
 
 \subsubsection{Implementovaní roboti}
 Knihovna obsahuje tři implementované roboty. Roboti by měli být dostatečně
-rozdílní v obtížnosti ovládání, aby se na nich mohl pozorovat rozdíl v
+rozdílní v obtížnosti ovládání, aby se na nich mohl demonstrovat rozdíl v
 efektivitě pokročilých evolučních algoritmů.
 
 \paragraph{Robot \emph{StickAnt}} \label{imp:robots.StickAnt}
@@ -452,10 +477,10 @@ jednoduchých končetin, kde každá je jedním pantovým kloubem připojena na 
 
 \paragraph{Robot \emph{AntV3}} \label{imp:robots.Ant}
 Jedná se o výchozího robota knihovny \emph{Gymnasium} (ukázka na obrázku
-\ref{imp:fig:robots.AntV3})). Morfologie tohoto robota je pokročilejší. Každá
-noha má navíc jeden pantový kloub, který můžeme brát jako koleno. Ovládání
-tohoto robota již začíná být složitější, kvůli možnosti převrátit se a
-spadnout.
+\ref{imp:fig:robots.AntV3})). Morfologie tohoto robota je pokročilejší než
+morfologie robota \emph{StickAnt}. Každá noha má navíc jeden pantový kloub,
+který můžeme brát jako koleno. Ovládání tohoto robota již začíná být
+složitější, kvůli tomu, že robot se může převrátit a spadnout.
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=0.4\textwidth]{../img/crop_Ant-v3.jpg}
@@ -482,13 +507,13 @@ to těžší vyvinout stabilní pohyb, který ho udrží nepadat.
 \paragraph{}
 
 \paragraph{Roboti knihovny Gymnasium}
-Naše knihovna umožňuje jednoduché přidání robotů, kteří jsou volně dostupní z
-knihovny Gymnasium. Většina těchto robotů má ve svém prostředí definované
-složitější cíle, kterých mají dosáhnout (např. balancování kyvadla ve
-vertikální poloze). Tato prostředí jsou často smysluplně využitelná pouze pro
-experimenty s vývoj pomocí algoritmů neuroevoluce. Několik vybraných robotů
-jsou jako ukázky již implementováni v naší knihovně -- \emph{Walker2D},
-\emph{InvertedPendulum}, \emph{InvertedDoublePendulum}.
+Naše knihovna umožňuje jednoduché přidání robotů, volně dostupných v knihovně
+Gymnasium. Většina těchto robotů má ve svém prostředí definované složitější
+cíle, kterých mají dosáhnout (např. balancování kyvadla ve vertikální poloze).
+Tato prostředí jsou často smysluplně využitelná pouze pro experimenty s vývoj
+pomocí algoritmů neuroevoluce. Několik vybraných robotů jsou jako ukázky již
+implementováni v naší knihovně -- \emph{Walker2D}, \emph{InvertedPendulum},
+\emph{InvertedDoublePendulum}.
 
 \section{Třída experimentů} \label{imp:experimentsetter}
 Pro usnadnění vytváření, ukládání a výběru experimentů jsme v modulu
@@ -515,7 +540,7 @@ def exp10_TFS_spotlike(self, run=True):
     note = "exp1.0"
 
     # __create_batch_dir - Funkce, která na základě zvoleného robota, 
-    # agenta a zvolené poznámky vytvoří # cestu, kam se uloží 
+    # agenta a zvolené poznámky vytvoří cestu, kam se uloží 
     # výsledky experimentu.
     batch_dir = self.__create_batch_dir(robot, agent, note) 
 
@@ -538,7 +563,7 @@ def exp10_TFS_spotlike(self, run=True):
 
 Tato třída výrazně usnadňuje spouštění experimentů pro vstupní prostředí. Navíc
 díky dalším metodám (pro kontrolu správného výběru experimentu a pro výpis
-všech vytvořených experimentů) má uživatel schopnost pracovat s experimenty,
+všech vytvořených experimentů) uživatel může pracovat s experimenty,
 aniž by měl potřebu znát obsah této třídy.
 
 \section{Grafické rozhraní} \label{imp:GUI}
@@ -552,18 +577,19 @@ grafického rozhraní není potřeba.
 
 \paragraph{Implementace GUI}
 Implementace používá modul \emph{PySimpleGUI} \citep{pysimplegui}, umožňující
-jednoduchý a rychlý vývoj grafických aplikací pomocí Pythonu. 
+jednoduchý a rychlý vývoj grafických aplikací v Pythonu. 
 
-\emph{PySimpleGUI} umožňuje vytvářet elementy rozhraní (např.
+\emph{PySimpleGUI} umožňuje vytvářet prvky rozhraní (např.
 tlačítka, vstupní textová pole, ale i celá okna) uvnitř vlastních funkcí a
-elementy pak vracet jako hodnotu funkce. To oproti jiným grafickým knihovnám
-zlepšuje celkovou čitelnost a přehlednost kódu. Elementy musejí být v okně
+prvky pak vracet jako hodnotu funkce. To oproti jiným grafickým knihovnám
+zlepšuje celkovou čitelnost a přehlednost kódu. Prvky rozhraní musí být v okně
 vložené do rozložení~(\emph{layout}). Tato rozložení ale mohou být jednoduše
-uložená v Python seznamech, díky schopnosti Pythonu pracovat se seznamy
+uložená v seznamech, díky schopnosti Pythonu pracovat se seznamy
 heterogenních dat.
 
 Naše grafická aplikace je rozdělená do několika sekcí:
 
+% TODO: Change pics
 \begin{itemize}
     \item \emph{Main} -- přehled informací o nastavovaném experimentu a
         spouštění experimentu (ukázka na obrázku \ref{imp:fig:GUI_main}),
@@ -607,7 +633,7 @@ při inicializaci aplikace volány z rozložení hlavního okna.
 Běh aplikace je tak, jak tomu u grafických aplikací bývá, zajištěn nekonečným
 cyklem, který se opakuje vždy při příchodu nějaké události do aplikace (např.
 kliknutí myší na tlačítko v okně). Modul \emph{PySimpleGUI} pracuje na základě
-posílá zpráv o událostech. Tyto zprávy jsou po obdržení zpracovávány uvnitř
+posílání zpráv o událostech. Tyto zprávy jsou po obdržení zpracovávány uvnitř
 nekonečného cyklu a dle potřeby vyřešeny.
 
 Určité sekce využívají napojení na pomocné moduly z centrálního modulu
@@ -619,24 +645,24 @@ Pokud uživatel spustí vybraný experiment, proběhne proces, ve kterém se z
 navolených hodnot v aplikaci vytvoří parametry pro spuštění experimentu (objekt
 třídy \texttt{ExperimentParams}), které následně předá modulu \emph{RoboEvo}.
 Zároveň se vytvoří nové okno, které vykresluje graf a vypisuje informace o
-právě běžícím experimentu. Z tohoto okna může uživatel v libovolný čas zažádat
-o prezentaci jedince s dosud nejlepším řešením.
+právě běžícím experimentu. Z tohoto okna může uživatel v libovolném okamžiku
+zažádat o prezentaci jedince s dosud nejlepším řešením.
 
 \section{Textové rozhraní} \label{imp:TUI}
-Vedle grafického rozhraní lze knihovna ovládat i pomocí zadávání příkazů do
+Vedle grafického rozhraní lze knihovnu ovládat i pomocí zadávání příkazů do
 příkazové řádky. Tento přístup ke knihovně se může hodit při vypracování
 větších nebo vícero experimentů, kdy očekáváme, že experimenty poběží delší
 dobu (několik hodin). Pro tento účel nepotřebujeme a ani by nebylo
 nejvýhodnější po celou dobu sledovat okno grafické aplikace.
 
-Textové rozhraní je tedy vytvořené hlavně pro účel spouštění experimentů. Proto
-toto rozhraní úzce spolupracuje se třídou experimentů (popsanou výše v sekci
-\ref{imp:experimentsetter}). Rozhraní vytváří jednoduchý způsob, jak vybírat a
-spouštět vyhodnocení dostupných experimentů.
+Textové rozhraní (TUI) je tedy vytvořené hlavně za účelem spouštění
+experimentů. Proto toto rozhraní úzce spolupracuje se třídou experimentů
+(popsanou výše v sekci \ref{imp:experimentsetter}). Rozhraní vytváří jednoduchý
+způsob, jak vybírat a spouštět vyhodnocení dostupných experimentů.
 
 \paragraph{Ovládání TUI}
-Textové rozhraní ovládá uživatel voláním textového rozhraní z příkazové řádky s
-různými vstupními argumenty. Těmito argumenty jsou následující:
+Textové rozhraní ovládá uživatel z příkazové řádky s různými vstupními
+argumenty. Těmito argumenty jsou následující:
 
 \begin{itemize}
     \item \texttt{-{}-experiment} -- argument, který obdrží textový vstup
@@ -644,9 +670,9 @@ různými vstupními argumenty. Těmito argumenty jsou následující:
         jehož parametry chceme načíst a spustit (pracující s modulem
         \emph{experiment\_setter} popsaného v oddíle
         \ref{imp:experimentsetter}),
-    \item \texttt{-{}-experiment\_names} -- při výběru tohoto argumentu při
-        spuštění programu program vypíše názvy všech dostupných vytvořených
-        experimentů z modulu \emph{experiment\_setter} a následně se ukončí,
+    \item \texttt{-{}-experiment\_names} -- při uvedení tohoto argumentu
+        program vypíše názvy všech dostupných vytvořených experimentů z modulu
+        \emph{experiment\_setter} a následně se ukončí,
     \item \texttt{-{}-batch} -- argument číselné hodnoty, specifikující
         kolikrát se má nakonfigurovaný experiment opakovaně spustit (používané
         pro statistické vyhodnocení výsledků experimentů),
@@ -658,7 +684,7 @@ různými vstupními argumenty. Těmito argumenty jsou následující:
         datům nejlepšího jedince z libovolného předchozího experimentu,
         umožňující vizualizaci řešení daného jedince,
     \item \texttt{-{}-no\_graph} -- argument, který značí, že za běhu algoritmu
-        nemá být vykreslován graf průběhu fitness hodnot v
+        nemá být vykreslován graf průběhu fitness hodnot v jednotlivých
         generacích.
 \end{itemize}
 
@@ -677,9 +703,9 @@ experimentů.
      ...
 \end{code}
 
-Pokud již máme vybraný jeden nebo více experimentů, které chceme spustit,
+Pokud již známe jeden nebo více experimentů, které chceme spustit,
 můžeme je spustit výběrem parametru \texttt{-{}-experiment} a vypsáním seznamu 
-zvolených experimentů odděleného mezerou.
+zvolených experimentů oddělených mezerou.
 
 \begin{code}
 >>> TUI.py --experiment exp11_TFS_spot exp_12_TFS_ant
@@ -687,10 +713,12 @@ zvolených experimentů odděleného mezerou.
     ...
 \end{code}
 
-Ve spojení s parametrem \texttt{-{}-experiment} můžeme vybrat další. Těmi mohou
-být například parametr \texttt{-{}-batch} (\texttt{-{}-batch 5} bude opakovat
-běh všech zvolených experimentů 5krát), nebo parametr \texttt{-{}-no\_graph},
-který zabrání průběžnému vykreslování grafů z běhu experimentu.
+Ve spojení s parametrem \texttt{-{}-experiment} můžeme vybrat další parametry.
+Těmi mohou být parametr \texttt{-{}-batch} (\texttt{-{}-batch 5} bude
+opakovat běh všech zvolených experimentů 5krát), nebo parametr
+\texttt{-{}-no\_graph}, který zabrání průběžnému vykreslování grafů z běhu
+experimentu nebo parametr \texttt{-{}-note}, umožňující upravit název složky,
+do které se budou data ukládat.
 
 \paragraph{}
 Posledním často používaným parametrem je \texttt{-{}-open}, pomocí kterého

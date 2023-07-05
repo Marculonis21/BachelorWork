@@ -27,7 +27,7 @@ Default implemented agents:
     * :class:`NEATAgent`
 """
 
-from abc import ABC, abstractmethod, abstractclassmethod, abstractproperty
+from abc import ABC, abstractmethod, abstractproperty
 import numpy as np
 import math
 # import gym
@@ -40,6 +40,7 @@ import neat
 import re
 import tempfile
 import copy
+import os
 
 import resources.agents.gaOperators as gaOperators
 Operators = gaOperators.Operators
@@ -181,11 +182,14 @@ class BaseAgent(ABC):
         self.body_range   = [] 
        
         file = robot.create_default()
+        file.close() # needs to be closed before gym opens it again (Windows)
         if file == None:
             default_env = gym.make(robot.environment_id)
         else:
             default_env = gym.make(robot.environment_id, xml_file=file.name)
-            file.close()
+            
+        file.close() # ANOTHER ONE?
+        os.unlink(file.name)
 
         self.action_size = default_env.action_space.shape[0]
         self.observation_size = default_env.observation_space.shape[0]

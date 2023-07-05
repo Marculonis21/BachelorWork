@@ -47,7 +47,9 @@ class BaseRobot(ABC):
             return None
 
         if tmp_file == None:
-            tmp_file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
+            # TMP files needs to stay existing after closing (windows does not
+            # allow to use already opened files)
+            tmp_file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_",delete=False)
 
         _, body_part_adjustments = individual
 

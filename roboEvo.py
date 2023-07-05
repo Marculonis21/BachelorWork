@@ -115,6 +115,7 @@ def render_run(agent : gaAgents.BaseAgent, robot : robots.BaseRobot, individual)
 
     run_reward = -1 
     file = robot.create(agent.body_part_mask, individual)
+    file.close()
     try:
         env = gym.make(id=robot.environment_id,
                        xml_file=file.name,
@@ -129,6 +130,7 @@ def render_run(agent : gaAgents.BaseAgent, robot : robots.BaseRobot, individual)
 
     finally:
         file.close()
+        os.unlink(file.name)
 
     return run_reward
 
@@ -165,6 +167,8 @@ def _run_evolution(params : ExperimentParams, client : Client, load_population=[
     # create individual source files for different bodies (if needed - body parts evolutions)
     for i in range(len(population)):
         file = params.robot.create(params.agent.body_part_mask, population[i])
+        file.close()
+
         robot_source_files.append(file)
 
         env = gym.make(id=params.robot.environment_id,
@@ -252,6 +256,7 @@ def _run_evolution(params : ExperimentParams, client : Client, load_population=[
         for i in range(len(population)):
             environments[i].close()
             params.robot.create(params.agent.body_part_mask, population[i], tmp_file=robot_source_files[i])
+            robot_source_files[i].close()
 
             if generations != params.generation_count:
                 env = gym.make(id=params.robot.environment_id,
@@ -265,9 +270,10 @@ def _run_evolution(params : ExperimentParams, client : Client, load_population=[
             if not params.agent.evolve_body:
                 break
 
-    # after evo close tmp files
+    # after evo tmp files cleanup
     for file in robot_source_files:
         file.close()
+        os.unlink(file.name)
 
     # CONTINUE EVO = serial control + body evolution - switching vars to body evo
     if params.agent.continue_evo: 

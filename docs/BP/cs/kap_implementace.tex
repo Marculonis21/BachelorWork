@@ -42,17 +42,17 @@ provádění experimentů s evolučním vývojem, se dále může zaměřit na h
 \paragraph{} 
 Dále v této kapitole v sekci \ref{imp:roboevo} popíšeme centrální modul
 \emph{RoboEvo} pracující s několika dalšími pomocnými moduly, jejichž
-implementace popíšeme v dalších oddílech. Popíšeme třídu agentů v oddílu
-\ref{imp:gaAgents}. Implementace vlastních genetických operátorů se nachází v
-oddílu \ref{imp:gaOperators}. Vlastní modul \emph{robots} propojující roboty ze
-simulátoru \emph{MuJoCo} (MuJoCo bylo popsáno v základních pojmech v oddílu
-\ref{MuJoCo}) s ostatními třídami je vysvětlena v oddílu \ref{imp:robots}. V
-sekci \ref{imp:experimentsetter} představíme třídu \texttt{Experiment} modulu
-\emph{experiment\_setter}, sloužící k uchování a předvolbě parametrů pro
-experimenty, usnadňující tak provádění většího množství experimentů. Jako
-poslední si představíme moduly umožňující uživateli práci s knihovnou buď
-pomocí grafického prostředí (v sekci \ref{imp:GUI}), nebo pomocí příkazové
-řádky (v sekci \ref{imp:TUI}). 
+implementace popíšeme v dalších oddílech. Představíme si modul \emph{robots}
+propojující roboty ze simulátoru \emph{MuJoCo} (\emph{MuJoCo} bylo popsáno v
+základních pojmech v oddílu \ref{MuJoCo}) s ostatními třídami v oddílu
+\ref{imp:robots}. Dále si v oddílu \ref{imp:gaAgents} představíme třídu agentů.
+Popis třídy implementující vlastní genetické operátorů se nachází v oddílu
+\ref{imp:gaOperators}. V sekci \ref{imp:experimentsetter} představíme třídu
+\texttt{Experiment} modulu \emph{experiment\_setter}, sloužící k uchování a
+předvolbě parametrů pro experimenty, usnadňující tak provádění většího množství
+experimentů. Jako poslední si představíme moduly umožňující uživateli práci s
+knihovnou buď pomocí grafického prostředí (v sekci \ref{imp:GUI}), nebo pomocí
+příkazové řádky (v sekci \ref{imp:TUI}). 
 
 \section{RoboEvo a pomocné moduly}
 V této sekci popíšeme hlavní modul \emph{RoboEvo} a jeho pomocné moduly
@@ -141,6 +141,240 @@ V rámci této funkce se zároveň sbírají důležitá data o vývoji fitness 
 napříč všemi generacemi a pokud to uživatel povolil, jsou aktuální data v
 průběhu algoritmu vykreslována do jednoduchého grafu.
 
+\subsection{Modul robots} \label{imp:robots}
+Pro přehledné rozdělení všech částí evolučního algoritmu, zlepšení čitelnosti a
+tvorby experimentů oddělujeme i třídu popisující roboty a práci s roboty do
+vlastního modulu \emph{robots}. 
+
+\paragraph{Roboti a řízení robotů}
+Roboti knihovny \emph{Gymnasium} jsou popisováni pomocí XML konfiguračních
+souborů, specifikující různé vlastnosti jak samotných robotů, tak prostředí, ve
+kterém se pohybují. 
+
+Robot vznikne spojováním jednoduchých tvarů pomocí kloubů. Tyto klouby mohou
+být různých typů (např. pantový, kulovitý), kde každý typ se liší počtem os, ve
+kterých spojeným částem těla povoluje pohyb (např. pantový v jedné ose).
+Kloubu dále můžeme nastavit povolený rozsah (úhel ve stupních), ve kterém se
+bude moci pohybovat. 
+
+Následuje ukázka konfigurace pantového kloubu (\texttt{type="hinge"}) v jednom
+z výchozích robotů. Tento kloub je pohyblivý kolem osy z (\texttt{axis="0 0
+1"}), interně pojmenován \texttt{hip\_1} s rozsahem od -30 do 30 stupňů.
+\begin{code}
+<joint axis="0 0 1" name="hip_1" pos="0.0 0.0 0.0" range="-30 30" 
+ type="hinge"/>
+\end{code}
+
+Do kloubů můžeme vložit různé aktuátory, pomocí kterého můžeme kloubem
+pohybovat (\emph{MuJoCo} nabízí velké množství různých aktuátorů, jejichž celý
+popis je nad rámec této práce -- více informací je možné najít v oficiální
+dokumentaci \emph{MuJoCo} \citep{modeling-mujocodocumentation}). 
+
+Většina z robotů ale využívá aktuátory jen dvou typů. Prvním je \texttt{motor}
+(umožňující vedle jiných specifikovat atribut převodu motoru (\emph{gear})) --
+aktuátor využitý výchozím robotem \emph{AntV3} popsán později v oddílu
+\ref{imp:robots.Ant}). Následuje ukázka z XML konfigurace tohoto robota
+popisující konfiguraci aktuátor motoru. Důležitým je argument
+\texttt{joint}, který přiřazuje daný aktuátor ke zvolenému kloubu a argument
+\texttt{ctrlrange}, který udává rozsah hodnot (nastavení aktuátoru), která jsou
+přímo mapována na povolený rozsah kloubu.
+\begin{code}
+<actuator>
+  <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="hip_1"   
+   gear="100"/>
+  ...
+</actuator>
+\end{code}
+Druhým typem je \texttt{position} (abstrakce servomotoru), umožňující nastavit
+reálný atribut \texttt{kp} (\emph{velocity feedback gain}), se kterým se můžeme
+potkat při nastavování PID ovladačů (\emph{proportional-integral-derivative}).
+Tento aktuátor je v práci využíván v konfiguraci vlastního robota
+\emph{SpotLike} (opět popsán později). Tento typ aktuátoru jsme využili,
+protože \emph{SpotLike} je již složitější robot s dvanácti stupni volnosti a
+možnost ručního naladění servomotorů byla nutná. To umožnilo robotovi stabilní
+postoj bez příliš velkých korekcí při změnách nastavení servomotorů (jinak
+vedoucích k oscilacím).
+
+Definovaný seznam aktuátorů (část v ukázce výše) poté v simulovaném prostředí
+vytváří způsob, jak robota ovládat. V pořadí, ve kterém jsme aktuátory
+definovali v XML souboru, můžeme robotovi v simulovaném prostředí posílat
+seznam hodnot odpovídající délky (počet aktuátorů). Aktuátory jsou následně
+nastavovány na specifikované hodnoty. Tedy například robot \emph{SpotLike} s
+dvanácti stupni volnosti očekává seznam dvanácti hodnot (pokud má aktuátor
+nastavenou hodnotu argumentu \texttt{ctrllimited}, tak je libovolná vstupní
+hodnota vždy za běhu omezena na povolený rozsah specifikovaný argumentem
+\texttt{ctrlrange}).
+
+Ovládání robota je poté sekvence n-tic reálných čísel (kde n je počet
+aktuátorů), které robotovi posíláme v každém kroku simulace. Je tedy možné si
+představit, jak složité je vytvořit i pro jednoduchého robota s minimálním
+počtem aktuátorů takové ovládání, které ho například rozpohybuje v určitém
+směru.
+
+\paragraph{Třída \texttt{BaseRobot}}
+Modul \emph{robots} je vytvořen podobným stylem jako modul \emph{gaAgents} (v sekci
+\ref{imp:gaAgents}), tedy obsahuje jednu hlavní třídu \texttt{BaseRobot},
+tvořící šablonu pro odvozené třídy jednotlivých robotů. Tato implementace
+zásadně zjednodušuje možné připojení vlastního robota do naší knihovny což
+umožní využívat vlastní roboty v experimentech s evolučním vývojem. 
+
+Třída \texttt{BaseRobot} obsahuje několik metod využívaných všemi odvozenými
+třídami a jednu abstraktní metodu, kterou každá z odvozených tříd musí
+implementovat sama (informace o robotovi, sloužící k jeho prezentaci v grafické
+aplikaci -- popsané v sekci \ref{imp:GUI}). Zároveň definuje všechna pole
+nesoucí informace o daném robotovi (identifikační hodnota \emph{MuJoCo}
+prostředí, slovník jmen částí těla robota, které mohou být použité při
+evolučním vývoji a odkaz na náhledový obrázek, zobrazující robota, pro
+\emph{GUI}). Tyto informace jsou uložené o každém robotovi voláním
+konstruktor rodičovské třídy s potřebnými parametry.
+
+Následuje seznam veřejných metod základní třídy
+\texttt{BaseRobot}:
+
+\begin{itemize}
+    \item \texttt{create(body\_part\_mask, individual, tmp\_file = None)}
+        -- metoda,\\která na vstupu dostane argument masky částí těla
+        popisující, které části budou moci být měněny evolučním algoritmem
+        (seznam hodnot -- buď hodnoty \texttt{False}/0 pro části těla, které se
+        nemají měnit, nebo specifikování rozsahu ve formátu \texttt{tupple} --
+        \texttt{(min, max)}) a argument jedince, ze kterého získává délky části
+        těla daného jedince (používané při vývoji morfologie robota). Tyto
+        hodnoty metoda použije při úpravě konfiguračního XML souboru, který
+        popisuje robota v simulačním prostředí, a vrací nově vytvořený soubor s
+        konfigurací (pokud metoda dostane argument \texttt{tmp\_file}, tak
+        konfiguraci vygeneruje do tohoto souboru),
+    \item \texttt{create\_default()} -- stejná funkcionalita jako předchozí
+        metoda, ale pro zjednodušení zápisu vytvoří konfiguraci robota s
+        výchozím nastavením,
+    \item \texttt{body\_part\_names()} -- metoda vracející jména všech
+        dostupných končetin robota.
+\end{itemize}
+
+\paragraph{Konfigurace vlastního robota}
+Roboti v simulátoru \emph{MuJoCo} jsou popisování konfiguračními soubory ve
+formátu XML (dokumentace k modelování v \emph{MuJoCo}
+\citep{modeling-mujocodocumentation}). Pro naši implementaci využíváme tento
+formát pro tvorbu šablony konfiguračních souborů, kde na místo některých
+číselných hodnot v konfiguraci můžeme dosadit speciální značky, které naší
+knihovně umožní konfigurační soubor upravovat za běhu algoritmu. Toto nám
+umožní vytvářet experimenty, které vedle pohybu mohou zároveň vyvíjet i
+morfologii robotů (např. velikost specifikovaných končetin). 
+
+Speciální značky mohou být ve tvaru např \texttt{\$L\_FRONT(0.75)\$} nebo
+\texttt{@...@}. 
+
+Značka ohraničená symbolem $\$$ se může nacházet na pozici teoreticky libovolné
+číselné hodnoty v konfiguračním souboru. Značka označuje a pojmenovává hodnotu
+(zde např. interně pojmenovaná jako \texttt{L\_FRONT} s výchozí hodnotou
+$0.75$), kterou bude možno zvolit pro vývoj pomocí evolučního algoritmu. 
+
+Značka ohraničená symbolem $@$ označuje část konfiguračního souboru, která může
+obsahovat základní aritmetické operace, které budou vyhodnoceny po dosazení
+hodnot za všechny značky ohraničené symbolem $\$$. Umožňuje tedy provádět
+jednoduché výpočty v konfiguračních souborech.
+
+Značky jsou při vytváření robota vyhledávány pomocí regulárních výrazů
+očekávajících značky předvedeného formátu.
+
+Pokud máme vytvořenou konfiguraci robota s korektním XML formátem v souboru 
+(např. soubor \emph{custom\_stick\_ant.xml}), můžeme ho jednoduše přidat mezi
+použitelné roboty, vytvořením odpovídající třídy v modulu \emph{robots} (podle
+následující ukázky -- tvorba robota \emph{StickAnt}). Tato třída dále potřebuje
+určit cestu k náhledovému obrázku (v tomto případě \emph{Basic-Ant.jpg}) a
+identifikační název \emph{MuJoCo} prostředí, ve kterém bude robot testován
+(nyní všichni roboti využívají stejné prostředí -- \emph{custom/CustomEnv-v0}).
+
+\begin{code}
+class StickAnt(BaseRobot): # tvorba robota StickAnt
+    def __init__(self):
+        # všechny soubory se nachází ve stejné složce jako 
+        # tento modul
+        DIR = os.path.dirname(__file__)
+
+        # cesta k šabloně konfiguračního souboru robota
+        source_file = DIR+"/custom_stick_ant.xml"
+
+        # cesta k náhledovému obrázku robota
+        picture_path = DIR+"/Basic-Ant.jpg"
+
+
+        # MuJoCo prostředí, ve kterém robot bude spuštěn
+        environment_id = "custom/CustomEnv-v0"
+
+        # 'custom/CustomEnv-v0' označuje naše prostředí 
+        # vytvořené tak, aby jednoduše podporovalo všechny základní 
+        # druhy robotů (bez robotů využívající NEAT)
+
+        # volání inicializační funkce třídy BaseRobot,
+        # která drží všechny informace v jednotném formátu
+        super(StickAnt, self).__init__(source_file, 
+                                       picture_path, 
+                                       environment_id)
+
+    # implementace vlastní abstraktní metody pro popis robota pro GUI
+    @property
+    def description(self):
+        return """ Libovolně rozsáhlý popis robota """
+\end{code}
+
+\subsubsection{Implementovaní roboti}
+Knihovna obsahuje tři implementované roboty. Roboti by měli být dostatečně
+rozdílní v obtížnosti ovládání, aby se na nich mohl demonstrovat rozdíl v
+efektivitě pokročilých evolučních algoritmů.
+
+\paragraph{Robot \emph{StickAnt}} \label{imp:robots.StickAnt}
+Základním robotem je robot pojmenovaný \emph{StickAnt} (ukázka na obrázku
+\ref{imp:fig:robots.StickAnt}). Výchozím robotem pro jeho tělo je výchozí
+\emph{AntV3} z knihovny \emph{Gymnasium}. Morfologie tohoto robota je velmi
+jednoduchá. Jeho tělo se skládá z koule fungující jako torso a čtyř
+jednoduchých končetin, kde každá je jedním pantovým kloubem připojena na torso.
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.4\textwidth]{../img/crop_Basic-Ant.jpg}
+    \caption{Robot \emph{StickAnt}}
+    \label{imp:fig:robots.StickAnt}
+\end{figure}
+
+\paragraph{Robot \emph{AntV3}} \label{imp:robots.Ant}
+Jedná se o výchozího robota knihovny \emph{Gymnasium} (ukázka na obrázku
+\ref{imp:fig:robots.AntV3})). Morfologie tohoto robota je pokročilejší než
+morfologie robota \emph{StickAnt}. Každá noha má navíc jeden pantový kloub,
+který můžeme brát jako koleno. Ovládání tohoto robota již začíná být
+složitější, kvůli tomu, že robot se může převrátit a spadnout.
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.4\textwidth]{../img/crop_Ant-v3.jpg}
+    \caption{Robot \emph{AntV3}}
+    \label{imp:fig:robots.AntV3}
+\end{figure}
+
+\paragraph{Robot \emph{SpotLike}} \label{imp:robots.Spot}
+Robot inspirovaný pokročilým robotem pojmenovaným \emph{Spot} od firmy
+\emph{Boston Dynamics} (popsaný v článku \citep{guizzo2019leaps}). Jedná se o
+čtyřnohého robota s morfologií těla, která připomíná psa (ukázka na obrázku
+\ref{imp:fig:robots.SpotLike}). Každou nohu ovládají tři klouby (dohromady tedy
+12 stupňů volnosti pro celého robota), což z tohoto robota dělá toho
+nejobtížnějšího na ovládání. Čtyři vysoké nohy jsou zároveň vratké a tudíž je o
+to těžší vyvinout stabilní pohyb, který ho udrží nepadat.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.4\textwidth]{../img/crop_SpotLike.jpg}
+    \caption{Robot \emph{SpotLike}}
+    \label{imp:fig:robots.SpotLike}
+\end{figure}
+
+\paragraph{}
+
+\paragraph{Roboti knihovny Gymnasium}
+Naše knihovna umožňuje jednoduché přidání robotů, volně dostupných v knihovně
+Gymnasium. Většina těchto robotů má ve svém prostředí definované složitější
+cíle, kterých mají dosáhnout (např. balancování kyvadla ve vertikální poloze).
+Tato prostředí jsou často smysluplně využitelná pouze pro experimenty s vývoj
+pomocí algoritmů neuroevoluce. Několik vybraných robotů jsou jako ukázky již
+implementováni v naší knihovně -- \emph{Walker2D}, \emph{InvertedPendulum},
+\emph{InvertedDoublePendulum}.
+
 \subsection{Modul \emph{gaAgents}} \label{imp:gaAgents}
 Modul \emph{gaAgents} je kolekcí několika tříd popisující agenty využívané
 evolučními algoritmy. Každá třída agenta povinně obsahuje několik funkcí, které
@@ -192,7 +426,7 @@ implementovat, aby byla použitelná). Výčet abstraktních metod agenta:
             \item \texttt{switch\_evo\_phase()} -- metoda využívána z hlavního
                 modulu, který řídí evoluční algoritmus, sloužící pro vyhlášení
                 změny typu evolučního vývoje (přechod mezi vývojem řízení a
-                morfologie při sériovém vývoji řízení a morfologie),
+                morfologie při odděleném vývoji řízení a morfologie),
         \end{itemize}
     \item metody využívané pro vstupní rozhraní:
         \begin{itemize}
@@ -341,179 +575,6 @@ Seznam implementovaných operátorů (podrobný popis operátorů v sekci
         hodnota před mutací a $a$ hodnota po aplikování mutace). Výsledná
         hodnota je poté omezena do povoleného rozsahu.
 \end{itemize}
-
-\subsection{Modul robots} \label{imp:robots}
-Pro přehledné rozdělení všech částí evolučního algoritmu, zlepšení čitelnosti a
-tvorby experimentů oddělujeme i třídu popisující roboty a práci s roboty do
-vlastního modulu \emph{robots}. Roboti knihovny \emph{Gymnasium} jsou
-popisováni pomocí XML konfiguračních souborů, které pro účely pokročilých
-experimentů můžeme měnit za běhu algoritmu, což nám umožňuje vyvíjet vedle
-pohybu i morfologii robotů. 
-
-\paragraph{Třída \texttt{BaseRobot}}
-Modul \emph{robots} je vytvořen podobným stylem jako modul \emph{gaAgents} (v sekci
-\ref{imp:gaAgents}), tedy obsahuje jednu hlavní třídu \texttt{BaseRobot},
-tvořící šablonu pro odvozené třídy jednotlivých robotů. Tato implementace
-zásadně zjednodušuje možné připojení vlastního robota do naší knihovny což
-umožní využívat vlastní roboty v experimentech s evolučním vývojem. 
-
-Třída \texttt{BaseRobot} obsahuje několik metod využívaných všemi odvozenými
-třídami a jednu abstraktní metodu, kterou každá z odvozených tříd musí
-implementovat sama (informace o robotovi, sloužící k jeho prezentaci v grafické
-aplikaci -- popsané v sekci \ref{imp:GUI}). Zároveň definuje všechna pole
-nesoucí informace o daném robotovi (identifikační hodnota \emph{MuJoCo}
-prostředí, slovník jmen částí těla robota, které mohou být použité při
-evolučním vývoji a odkaz na náhledový obrázek, zobrazující robota, pro
-\emph{GUI}). Tyto informace jsou uložené o každém robotovi voláním
-konstruktor rodičovské třídy s potřebnými parametry.
-
-Následuje seznam veřejných metod základní třídy
-\texttt{BaseRobot}:
-
-\begin{itemize}
-    \item \texttt{create(body\_part\_mask, individual, tmp\_file = None)}
-        -- metoda,\\která na vstupu dostane argument masky částí těla
-        popisující, které části budou moci být měněny evolučním algoritmem
-        (seznam hodnot -- buď hodnoty \texttt{False}/0 pro části těla, které se
-        nemají měnit, nebo specifikování rozsahu ve formátu \texttt{tupple} --
-        \texttt{(min, max)}) a argument jedince, ze kterého získává délky části
-        těla daného jedince (používané při vývoji morfologie robota). Tyto
-        hodnoty metoda použije při úpravě konfiguračního XML souboru, který
-        popisuje robota v simulačním prostředí, a vrací nově vytvořený soubor s
-        konfigurací (pokud metoda dostane argument \texttt{tmp\_file}, tak
-        konfiguraci vygeneruje do tohoto souboru),
-    \item \texttt{create\_default()} -- stejná funkcionalita jako předchozí
-        metoda, ale pro zjednodušení zápisu vytvoří konfiguraci robota s
-        výchozím nastavením,
-    \item \texttt{body\_part\_names()} -- metoda vracející jména všech
-        dostupných končetin robota.
-\end{itemize}
-
-\paragraph{Konfigurace vlastního robota}
-Roboti v simulátoru \emph{MuJoCo} jsou popisování konfiguračními soubory ve
-formátu XML (dokumentace k modelování v \emph{MuJoCo}
-\citep{modeling-mujocodocumentation}). Pro naši implementaci využíváme tento
-formát pro tvorbu šablony konfiguračních souborů, kde na místo některých
-číselných hodnot v konfiguraci můžeme dosadit speciální značky, které naší
-knihovně umožní konfigurační soubor upravovat za běhu algoritmu. Toto nám
-umožní vytvářet experimenty, které vedle pohybu mohou zároveň vyvíjet i
-morfologii robotů (např. velikost specifikovaných končetin). 
-
-Speciální značky mohou být ve tvaru např \texttt{\$L\_FRONT(0.75)\$} nebo
-\texttt{@...@}. 
-
-Značka ohraničená symbolem $\$$ se může nacházet na pozici teoreticky libovolné
-číselné hodnoty v konfiguračním souboru. Značka označuje a pojmenovává hodnotu
-(zde např. interně pojmenovaná jako \texttt{L\_FRONT} s výchozí hodnotou
-$0.75$), kterou bude možno zvolit pro vývoj pomocí evolučního algoritmu. 
-
-Značka ohraničená symbolem $@$ označuje část konfiguračního souboru, která může
-obsahovat základní aritmetické operace, které budou vyhodnoceny po dosazení
-hodnot za všechny značky ohraničené symbolem $\$$. Umožňuje tedy provádět
-jednoduché výpočty v konfiguračních souborech.
-
-Značky jsou při vytváření robota vyhledávány pomocí regulárních výrazů
-očekávajících značky předvedeného formátu.
-
-Pokud máme vytvořenou konfiguraci robota s korektním XML formátem v souboru 
-(např. soubor \emph{custom\_stick\_ant.xml}), můžeme ho jednoduše přidat mezi
-použitelné roboty, vytvořením odpovídající třídy v modulu \emph{robots} (podle
-následující ukázky -- tvorba robota \emph{StickAnt}). Tato třída dále potřebuje
-určit cestu k náhledovému obrázku (v tomto případě \emph{Basic-Ant.jpg}) a
-identifikační název \emph{MuJoCo} prostředí, ve kterém bude robot testován
-(nyní všichni roboti využívají stejné prostředí -- \emph{custom/CustomEnv-v0}).
-
-\begin{code}
-class StickAnt(BaseRobot): # tvorba robota StickAnt
-    def __init__(self):
-        # všechny soubory se nachází ve stejné složce jako 
-        # tento modul
-        DIR = os.path.dirname(__file__)
-
-        # cesta k šabloně konfiguračního souboru robota
-        source_file = DIR+"/custom_stick_ant.xml"
-
-        # cesta k náhledovému obrázku robota
-        picture_path = DIR+"/Basic-Ant.jpg"
-
-
-        # MuJoCo prostředí, ve kterém robot bude spuštěn
-        environment_id = "custom/CustomEnv-v0"
-
-        # 'custom/CustomEnv-v0' označuje naše prostředí 
-        # vytvořené tak, aby jednoduše podporovalo všechny základní 
-        # druhy robotů (bez robotů využívající NEAT)
-
-        # volání inicializační funkce třídy BaseRobot,
-        # která drží všechny informace v jednotném formátu
-        super(StickAnt, self).__init__(source_file, 
-                                       picture_path, 
-                                       environment_id)
-
-    # implementace vlastní abstraktní metody pro popis robota pro GUI
-    @property
-    def description(self):
-        return """ Libovolně rozsáhlý popis robota """
-\end{code}
-
-\subsubsection{Implementovaní roboti}
-Knihovna obsahuje tři implementované roboty. Roboti by měli být dostatečně
-rozdílní v obtížnosti ovládání, aby se na nich mohl demonstrovat rozdíl v
-efektivitě pokročilých evolučních algoritmů.
-
-\paragraph{Robot \emph{StickAnt}} \label{imp:robots.StickAnt}
-Základním robotem je robot pojmenovaný \emph{StickAnt} (ukázka na obrázku
-\ref{imp:fig:robots.StickAnt}). Výchozím robotem pro jeho tělo je výchozí
-\emph{AntV3} z knihovny \emph{Gymnasium}. Morfologie tohoto robota je velmi
-jednoduchá. Jeho tělo se skládá z koule fungující jako torso a čtyř
-jednoduchých končetin, kde každá je jedním pantovým kloubem připojena na torso.
-\begin{figure}[!htb]
-    \centering
-    \includegraphics[width=0.4\textwidth]{../img/crop_Basic-Ant.jpg}
-    \caption{Robot \emph{StickAnt}}
-    \label{imp:fig:robots.StickAnt}
-\end{figure}
-
-
-\paragraph{Robot \emph{AntV3}} \label{imp:robots.Ant}
-Jedná se o výchozího robota knihovny \emph{Gymnasium} (ukázka na obrázku
-\ref{imp:fig:robots.AntV3})). Morfologie tohoto robota je pokročilejší než
-morfologie robota \emph{StickAnt}. Každá noha má navíc jeden pantový kloub,
-který můžeme brát jako koleno. Ovládání tohoto robota již začíná být
-složitější, kvůli tomu, že robot se může převrátit a spadnout.
-\begin{figure}[!htb]
-    \centering
-    \includegraphics[width=0.4\textwidth]{../img/crop_Ant-v3.jpg}
-    \caption{Robot \emph{AntV3}}
-    \label{imp:fig:robots.AntV3}
-\end{figure}
-
-\paragraph{Robot \emph{SpotLike}} \label{imp:robots.Spot}
-Robot inspirovaný pokročilým robotem pojmenovaným \emph{Spot} od firmy
-\emph{Boston Dynamics} (popsaný v článku \citep{guizzo2019leaps}). Jedná se o
-čtyřnohého robota s morfologií těla, která připomíná psa (ukázka na obrázku
-\ref{imp:fig:robots.SpotLike}). Každou nohu ovládají tři klouby (dohromady tedy
-12 stupňů volnosti pro celého robota), což z tohoto robota dělá toho
-nejobtížnějšího na ovládání. Čtyři vysoké nohy jsou zároveň vratké a tudíž je o
-to těžší vyvinout stabilní pohyb, který ho udrží nepadat.
-
-\begin{figure}[!htb]
-    \centering
-    \includegraphics[width=0.4\textwidth]{../img/crop_SpotLike.jpg}
-    \caption{Robot \emph{SpotLike}}
-    \label{imp:fig:robots.SpotLike}
-\end{figure}
-
-\paragraph{}
-
-\paragraph{Roboti knihovny Gymnasium}
-Naše knihovna umožňuje jednoduché přidání robotů, volně dostupných v knihovně
-Gymnasium. Většina těchto robotů má ve svém prostředí definované složitější
-cíle, kterých mají dosáhnout (např. balancování kyvadla ve vertikální poloze).
-Tato prostředí jsou často smysluplně využitelná pouze pro experimenty s vývoj
-pomocí algoritmů neuroevoluce. Několik vybraných robotů jsou jako ukázky již
-implementováni v naší knihovně -- \emph{Walker2D}, \emph{InvertedPendulum},
-\emph{InvertedDoublePendulum}.
 
 \section{Třída experimentů} \label{imp:experimentsetter}
 Pro usnadnění vytváření, ukládání a výběru experimentů jsme v modulu

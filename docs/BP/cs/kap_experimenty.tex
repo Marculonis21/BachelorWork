@@ -17,11 +17,11 @@ vypočtena dle následující rovnice:
 \end{equation}
 kde $(x,y)$ jsou souřadnice bodu v simulovaném prostředí, do kterého jedinec
 dorazil (buď do vypršení limitovaného času na simulaci, nebo do dosažení
-podmínky předčasně ukončující simulační běh -- např. pád robota).
+podmínky předčasně ukončující simulační běh -- např. pádu robota).
 
 V prvním experimentu v sekci \ref{exp1} si ověříme přirozený předpoklad, že pro
 řízení jednoduchých robotů nám stačí základní evoluční algoritmy a pro
-složitější roboty (s větším množstvím stupňů volnost) potřebujeme pokročilé
+složitější roboty (s větším množstvím stupňů volnosti) potřebujeme pokročilé
 přístupy. V následujících dvou experimentech v sekci \ref{exp2} popíšeme
 experimenty demonstrující možnost evolučního vývoje jak řízení tak morfologie
 robotů.
@@ -32,7 +32,7 @@ V této sekci se zaměříme na vývoj řízení robotů. Řízení robota je sy
 který na základě vstupů z prostředí (senzory robota, čas, atd.) generuje
 signály do výkonných prvků robota (typicky motory). 
 
-Průběh vývoje řízení robota je ovlivněno zvoleným agentem, který definuje
+Průběh vývoje řízení robota je ovlivněn zvoleným agentem, který definuje
 genotyp jedinců a určuje, jaké genetické operátory budou při vývoji využívány.
 Podrobnější popis agentů se nachází v sekci \ref{imp:gaAgents}.
 
@@ -46,8 +46,8 @@ Podrobnější popis agentů se nachází v sekci \ref{imp:gaAgents}.
 První pokus se bude snažit vyvinout řízení pro pokročilého robota v projektu
 označovaném jako \emph{SpotLike} (na obrázku \ref{fig:robot:spotlike}, blíže
 popsaný v implementaci v sekci \ref{imp:robots.Spot}). Jedná se o robota
-kráčejícího na čtyřech nohách, kde každá noha má 3 stupně volnosti (tedy 12
-celkem pro celého robota). Můžeme ho tedy řadit mezi roboty, u kterých již bude
+kráčejícího na čtyřech nohách, kde každá noha má 3 stupně volnosti (tedy celkem
+12 pro celého robota). Můžeme ho tedy řadit mezi roboty, u kterých již bude
 obtížnější vyvinout stabilní pohyb v určeném směru.
 
 Kráčení, kterého bychom u robotů chtěli dosáhnout, si můžeme představit jako
@@ -55,40 +55,42 @@ periodický pohyb, kde každá noha cyklicky opakuje stejné pohyby. Proto se pr
 vývoj řízení pokusíme využít agenty, kteří interně podle parametrů generují
 periodické hodnoty pro motory robotů. 
 
-
 \paragraph{Volba parametrů velikosti experimentu}
 Pro tento typ experimentu inicializujeme populaci se \textbf{100 jedinci}.
 Abychom zjistili, kolik generací je potřeba pro rozumné výsledky, necháme
-nejprve proběhnout velký experiment, ve kterém vývoj evolučního algoritmu
+nejprve proběhnout delší experiment, ve kterém vývoj evolučního algoritmu
 poběží po \textbf{500 generací}. Abychom vyloučili vliv náhodné inicializace
 populace jedinců v genetickém algoritmu, pro vyhodnocení je celý
-běh algoritmu \textbf{20krát} nezávisle opakován a výsledky prezentujeme
+běh algoritmu \textbf{20 krát} nezávisle opakován a výsledky prezentujeme
+pomocí následujícího typu grafu.
 
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=1\textwidth]{../img/BIGexperiment1_TFS_10ticks.pdf}
-    \caption{Velký experiment, 20 opakování algoritmu po 500 generacích}
+    \caption{Velký experiment, 20 opakování algoritmu po 500 generacích, robot
+    \emph{SpotLike}, agent \emph{TFSAgent}}
     \label{fig:exp_big}
 \end{figure}
 
 \paragraph{Krabicový graf}
 Pro vizualizaci dat využíváme krabicový graf (boxplot). Tento graf vizualizuje
-data pomocí kvartilů. Uprostřed se nachází \emph{krabice} (obdélník), který je
-shora ohraničena 3. kvartilem a zespodu 1. kvartilem. Uvnitř \emph{krabice} se
-nachází (v našich grafech oranžovou barvou) linie, naznačující hodnotu mediánu.
+statistické rozložení dat pomocí kvartilů. Uprostřed se nachází \emph{krabice} (obdélník), který je
+shora ohraničena 3. kvartilem a zespodu 1. kvartilem. Rozsah pokrytý
+obdélníkem tedy obsahuje 50\% pozorovaných hodnot. Uvnitř \emph{krabice} se
+nachází (v našich grafech oranžovou barvou) čára, naznačující hodnotu mediánu.
 Dále krabicové grafy nad a pod střední \emph{krabicí} vykreslují tzv.
 \emph{vousy}, což vizualizuje variabilitu dat nad 3. a pod 1. kvartilem. Dále
 se v grafu mohou nacházet odlehlé body (\emph{outliers}), které jsou vykresleny
 jako samostatné kroužky.
-
-V našich grafech pro přehlednost dále vykreslujeme hodnotu maximální a
-minimální fitness v dané generaci.
 
 Grafy vznikají složením dat z průběhů fitness hodnot několika opakování daného
 evolučního algoritmu. Jeden krabicový diagram pro danou generaci zobrazuje
 rozložení hodnot fitness všech jedinců dané generace ze všech běhů. V grafu
 \ref{fig:exp_big} je to celkem 2000 hodnot. V poslední generaci dále červené
 značky označují hodnotu maximální fitness v jednotlivých bězích. 
+
+V našich grafech pro přehlednost dále vykreslujeme hodnotu maximální (modrou
+čarou) a minimální (červenou čarou) fitness v dané generaci.
 
 Krabicový graf na obrázku \ref{fig:exp_big} zobrazuje vyhodnocení popsaného
 velkého experimentu. Z grafu můžeme vidět, že největší růst fitness proběhl
@@ -106,23 +108,25 @@ opakování algoritmu jsme schopni na stejném systému následující experimen
 provést v řádech desítek minut.
 
 \paragraph{První experiment}
-Nejprve se pokusíme řízení robota vyvinout pomocí evolučního
-algoritmu, který kóduje nastavení motorů pomocí základních periodických funkcí
-(agent popisující tento algoritmus je popsán v implementaci v sekci
-\ref{imp:gaAgents.sinefuncfullagent}). Každý motor robota má v tomto případě
-přiřazenou vlastní periodickou funkci a genotyp jedinců specifikuje parametry
-těchto periodických funkcí (4 parametry pro každý kloub -- amplituda,
+Nejprve se pokusíme řízení robota \emph{SpotLike} (popsán v sekci
+\ref{imp:robots.Spot}) vyvinout pomocí evolučního algoritmu, který kóduje
+nastavení aktuátorů pomocí základních periodických funkcí (agent
+\emph{SineFuncFullAgent} popisující tento algoritmus je popsán v implementaci v
+sekci \ref{imp:gaAgents.sinefuncfullagent}). Každý aktuátor robota má v tomto
+případě přiřazenou vlastní periodickou funkci a genotyp jedinců specifikuje
+parametry těchto periodických funkcí (4 parametry pro každý kloub -- amplituda,
 frekvence, $x$ a $y$ posun). Funkce jsou popsány rovnicí (\ref{sinefunc}) v
 sekci implementace agentů.
 
-Evoluční algoritmus poběží \textbf{200 generací} se \textbf{100} náhodně
-inicializovanými jedinci. Pro vyhodnocení bude celý běh evolučního algoritmu
+Evoluční algoritmus běžel \textbf{200 generací} se \textbf{100} náhodně
+inicializovanými jedinci. Pro vyhodnocení byl celý běh evolučního algoritmu
 pětkrát opakován vždy s novou náhodně vygenerovanou počáteční populací.
 
 \begin{figure}[!h]
     \centering
     \includegraphics[width=1\textwidth]{../img/experiment1_Sine_10ticks.pdf}
-    \caption{Vývoj fitness populace v experimentu se základním agentem}
+    \caption{Vývoj fitness populace v experimentu se základním agentem\\
+    \emph{SineFuncFullAgent} a robotem \emph{SpotLike}}
     \label{exp:first_sinefull}
 \end{figure}
 
@@ -132,36 +136,37 @@ kombinací záznamů o fitness hodnotách v dané generaci ze všech pěti nezá
 běhů.
 
 Z grafu se ukazuje, že tento přístup vývoje řízení dosáhl maximální hodnotu
-fitness okolo 15 a populace na této hodnotě stagnuje a není schopna většího
+fitness okolo 15 a populace na této hodnotě stagnovala a nebyla schopna většího
 posunu.
 %TODO: popsat units
 
 \paragraph{Pokročilý agent}
-Pro porovnání zvolíme pokročilého agenta, generující signály do motorů pomocí
-omezených Fourierových řad (agent byl popsán v sekci
-\ref{imp:gaAgents.TFSagent}). Tento agent je na úkor malého zvětšení genotypu,
-oproti předchozímu agentovi schopný generovat mnohem komplexnější periodické
-funkce popsané skládáním několika funkcí sinus.
+Pro porovnání jsme zvolili pokročilého agenta \emph{TFSAgent}, který generuje
+signály do aktuátorů pomocí omezených Fourierových řad (agent byl popsán v
+sekci \ref{imp:gaAgents.TFSagent}). Tento agent je na úkor malého zvětšení
+genotypu, oproti předchozímu agentovi schopný generovat mnohem komplexnější
+periodické funkce popsané skládáním několika funkcí sinus.
 
-Stejně jako v předchozím běhu, algoritmus poběží 200 generací se 100 jedinci a
-bude opět pětkrát zopakován.
+Stejně jako v předchozím běhu, algoritmus běžel 200 generací se 100 jedinci a
+byl opět pětkrát zopakován.
 
 \begin{figure}[!h]
     \centering
     \includegraphics[width=1\textwidth]{../img/experiment1_TFS_10ticks.pdf}
-    \caption{Vývoj fitness populace v experimentu s pokročilým agentem}
+    \caption{Vývoj fitness populace v experimentu s pokročilým agentem
+    \emph{TFSAgent} a se stejným robotem \emph{SpotLike}}
     \label{exp:first_TFS}
 \end{figure}
 
 Graf \ref{exp:first_TFS} vývoje fitness hodnot z experimentu s pokročilým
-agentem ukazuje, že tento agent již je schopný vyvinout stabilní pohyb i pro
+agentem ukazuje, že tento agent již byl schopný vyvinout stabilní pohyb i pro
 zadaného komplexního robota. Maximální fitness hodnota, které při vývoji agent
-dosáhl se pohybovala okolo 60. Zároveň podle krabicového grafu vidíme, že
+dosáhl, se pohybovala okolo 60. Zároveň podle krabicového grafu vidíme, že
 poměrně velká část populace byla schopná dosáhnout výsledků, přesahující
 nejlepší výsledky jednoduššího agenta.
 
 \paragraph{}
-Z experimentů zároveň dostaneme i nejlepšího jedince z poslední generace
+Z experimentů jsme zároveň dostali i nejlepšího jedince z poslední generace
 evolučního algoritmu. Jelikož naše simulované fyzikální prostředí je
 deterministické, můžeme řešení nejlepšího jedince zpětně vizualizovat.
 
@@ -171,7 +176,7 @@ očekávali. Tělo v robota v těchto případech (až na menší odchylky) smě
 rovně, způsobem připomínající chůzi čtyřnohých zvířat podobné morfologie. Zbylé
 běhy vyvinuly stabilní, ale ne zcela estetickou chůzi. Roboti se v těchto
 případech posouvali stranou využitím většího rozsahu v rotaci
-(\emph{kyčelních}) kloubů pro stabilizaci.
+(\emph{kyčelních}) kloubů. Pravděpodobně kvůli lepší stabilitě robota.
 
 Osobně si myslím, že vývoj estetického pohybu pro tohoto robota je s malou
 úpravou hodnotící funkce možný. Ta by například mohla penalizovat rotaci těla
@@ -184,7 +189,7 @@ stabilnější. Navržená jednoduchá úprava hodnotící funkce by měla být 
 toto lokální optimum penalizovat a tedy přinutit estetičtější pohyb.
 
 \paragraph{}
-Ve srovnání s předchozími pokusy se nyní pokusíme pomocí stejných agentů
+Ve srovnání s předchozími pokusy jsme se pomocí stejných agentů snažili
 vyvinout řízení jednoduššího robota označeného jako \emph{Ant} (zobrazeného na
 obrázku \ref{fig:robot:ant}, blíže popsán v implementaci v sekci
 \ref{imp:robots.Ant}). Můžeme ho brát jako jednoduššího, protože obsahuje menší
@@ -194,37 +199,38 @@ jeho morfologie umožňuje snazší pohyb všemi směry s menším rizikem pádu
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=0.4\textwidth]{../img/crop_Ant-v3.jpg}
-    \caption{Robot \emph{Ant}}
+    \caption{Robot \emph{AntV3}}
     \label{fig:robot:ant}
 \end{figure}
 
-Řízení se budeme snažit vyvinout pomocí agentů se stejnými parametry jako v
-případě s pokročilým robotem. Celý běh bude opět pro statistické vyhodnocení
-pětkrát opakován se stejnou velikostí náhodně vygenerované populace
-(\textbf{100 jedinců}). Jelikož kvůli menšímu počtu stupňů volnosti očekáváme
-schopnost agentů vyvinout řízení rychleji, zkrátíme délku evoluci na
-\textbf{100 generací}.
+Řízení jsme vyvíjeli pomocí agentů se stejnými parametry jako v případě s
+pokročilým robotem. Celý běh byl opět pro statistické vyhodnocení pětkrát
+opakován se stejnou velikostí náhodně vygenerované populace (\textbf{100
+jedinců}). Jelikož jsme kvůli menšímu počtu stupňů volnosti očekávali schopnost
+agentů vyvinout řízení rychleji, zkrátili jsme délku evoluce na \textbf{100
+generací}.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=1\textwidth]{../img/experiment1_2_Sine_10ticks.pdf}
-    \caption{Vývoj fitness populace se základním agentem a jednodušším robotem}
+    \caption{Vývoj fitness populace se základním agentem
+    \emph{SineFuncHalfAgent} a jednodušším robotem \emph{AntV3}}
     \label{exp:first2_sinefull}
 \end{figure}
 \begin{figure}[h!]
     \includegraphics[width=1\textwidth]{../img/experiment1_2_TFS_10ticks.pdf}
-    \caption{Vývoj fitness populace s pokročilým agentem a jednodušším robotem}
+    \caption{Vývoj fitness populace s pokročilým agentem \emph{TFSAgent} a
+    jednodušším robotem \emph{AntV3}}
     \label{exp:first2_TFS}
 \end{figure}
 
-\pagebreak
 Z vývoje fitness (v grafu \ref{exp:first2_sinefull} a \ref{exp:first2_TFS})
 můžeme pozorovat, že oba agenti byli schopní u tohoto jednoduššího robota
 dosáhnout přijatelných výsledků i s omezeným počtem generací. Přijatelné
 výsledky jsou částečně podpořeny faktem, že i náhodné konfigurace mají dobrou
 šanci tohoto robota rozpohybovat v požadovaném směru a tedy již velmi brzy
 získat dobré ohodnocení. To se zároveň projevuje i na minimální fitness. Pro
-tohoto robota je totiž stejně jednoduché dostat takovou konfiguraci motorů,
+tohoto robota je totiž stejně jednoduché dostat takovou konfiguraci aktuátorů,
 které ho rozpohybují v opačném směru (jedinec z definice hodnotící funkce
 obdrží záporné ohodnocení).
 
@@ -254,42 +260,43 @@ robota (popsána v parametru \texttt{body\_part\_mask} v sekci
 zůstat beze změny a zároveň určuje povolené rozsahy hodnot pro části
 těla otevřených pro evoluční vývoj.
 
-Kvalita jedinců bude v tomto experimentu hodnocena stejně jako v předchozích
+Kvalita jedinců byla v tomto experimentu hodnocena stejně jako v předchozích
 experimentech. Cílem pro jedince je tedy dojít co nejdále v určeném směru.
 Přesný výpočet fitness je popsán rovnicí (\ref{fitness_calc}). 
 
-Pro experiment volíme robota \emph{AntV3} (popsán v implementaci v sekci
+Pro experiment jsme zvolili robota \emph{AntV3} (popsán v implementaci v sekci
 \ref{imp:robots.Ant}). Tento typ experimentů je ale samozřejmě povolen pro
 libovolného robota, který umožňující evoluční vývoj alespoň jedné části těla.
 
 \paragraph{Vývoj robota \emph{AntV3}}
-Jak bylo řečeno v této ukázce použijeme robota \emph{AntV3}. Pro vývoj robota
-využijeme agenta \emph{SineFuncHalfAgent} (popsaného v sekci
+Jak bylo řečeno v této ukázce jsme zvolili robota \emph{AntV3}. Pro vývoj
+robota byl využit agent \emph{SineFuncHalfAgent} (popsaného v sekci
 \ref{imp:gaAgents.sinefunchalfagent}). \emph{AntV3} je robot se složitější
 morfologií končetin a z tohoto důvodu ho vybíráme pro demonstraci tohoto typu
 vývoje.
 
 Tento experiment je nakonfigurovaný v modulu \emph{experiment\_setter} pod
-názvem \texttt{exp2\_body\_para}. Pro evoluční algoritmus volíme velikost
-populace na \textbf{150 jedinců} (větší velikost populace volíme kvůli
+názvem \texttt{exp2\_body\_para}. Pro evoluční algoritmus byla zvolena velikost
+populace na \textbf{150 jedinců} (větší velikost populace zvolena kvůli
 rozšíření prohledávaného prostoru, ve kterém evoluce hledá optimální řešení) a
-evoluci umožníme vývoj po \textbf{200 generací}. Zároveň volíme povolený rozsah
-délek částí končetin pro vývoj. Robot \emph{AntV3} (na obrázku
+evoluci byl umožněn vývoj po \textbf{200 generací}. Zároveň byl zvolen povolený
+rozsah délek částí končetin pro vývoj. Robot \emph{AntV3} (na obrázku
 \ref{fig:robot:ant}, popsán v sekci \ref{imp:robots.Ant}) má 4 končetiny
 složené ze dvou částí -- pro jednoduchost je označme jako \emph{stehno} a
 \emph{lýtko}. V základní konfiguraci je délka \emph{stehna} pro tohoto robota
-$0.2$ (pro vývoj volíme rozsah mezi $0.1$ a $0.5$) a délka \emph{lýtka} je
-$0.4$ (pro vývoj rozsah mezi $0.15$ a $0.5$). Délka libovolné části těla je při
+$0.2$ (pro vývoj zvolen rozsah mezi $0.1$ a $0.5$) a délka \emph{lýtka} je
+$0.4$ (pro vývoj umožníme rozsah mezi $0.15$ a $0.5$). Délka libovolné části těla je při
 vývoji nezávislá na ostatních.
 
 \begin{figure}[h!]
     \includegraphics[width=1\textwidth]{../img/experiment2_para_10ticks.pdf}
-    \caption{Vývoj fitness populace při současném vývoji řízení a morfologie}
+    \caption{Vývoj fitness populace při současném vývoji řízení a morfologie s
+    agentem \emph{SineFuncHalfAgent} a robotem \emph{AntV3}}
     \label{exp:exp2_para}
 \end{figure}
 
 Z grafu na obrázku \ref{exp:exp2_para} můžeme pozorovat, že tento typ vývoje
-zvládá stabilně produkovat vyšší fitness hodnoty než srovnatelný předchozí
+zvládl stabilně produkovat vyšší fitness hodnoty než srovnatelný předchozí
 experiment (využívající stejného agenta i robota) nevyužívající vývoje
 morfologie (graf na obrázku \ref{exp:first2_TFS}). Můžeme tedy odhadovat, že
 mohou existovat optimálnější konfigurace končetin tohoto robota, než jaká je
@@ -310,7 +317,6 @@ výchozí.
     \label{fig:exp2_para_body_show}
 \end{figure}
 
-\pagebreak
 Díky možnosti přehrávání nejlepších řešení jednotlivých běhů algoritmu můžeme
 zároveň prozkoumat, k jakým konfiguracím vývoj dospěl. Ukázalo se, že vývoj
 dospěl buď k robotům s velmi dlouhými končetinami, nebo (jak je na obrázcích
@@ -323,7 +329,6 @@ předvedeného experimentu, který je schopný své tělo díky kratší zadní 
 naklonit, a je tak schopný poměrně rychle skákat vpřed.
 
 \subsection{Oddělený vývoj řízení a morfologie} \label{exp2:split_evo}
-
 V tomto experimentu předvedeme druhý typ vývoje řízení a morfologie robota a to
 oddělený vývoj. V tomto typu evolučního vývoje se nejprve provede vývoj řízení
 robota s výchozí morfologií. Následně se vývoj řízení zafixuje ve stavu
@@ -335,23 +340,24 @@ prvním experimentu) a následně evolučním vývojem optimalizovat tělo pro
 specifický pohyb. Tímto přístupem by teoreticky jedinci měli být schopni
 dosáhnout lepších výsledků, než při vývoji samotného řízení.
 
-Pro tento experiment volíme stejného robota (s totožnými rozsahy velikostí
-končetin) a stejného agenta jako v předchozím experimentu. Konfigurace
-experimentu se nachází v modulu \emph{experiment\_setter} pod názvem
-\texttt{exp2\_body\_serial}. Evoluční algoritmus poběží nejprve 100 generací,
-při kterých bude vyvíjet řízení robotů a následně 100 generací pro vývoj
-morfologie.
+Pro tento experiment jsme zvolili stejného robota (s totožnými rozsahy
+velikostí končetin) a stejného agenta jako v předchozím experimentu.
+Konfigurace experimentu je v modulu \emph{experiment\_setter} pod
+názvem \texttt{exp2\_body\_serial}. Evoluční algoritmus běžel nejprve 100
+generací, při kterých se vyvíjelo řízení robota a následně 100 generací pro
+vývoj morfologie.
 
 \begin{figure}[h!]
     \includegraphics[width=1\textwidth]{../img/experiment2_serial_10ticks.pdf}
-    \caption{Vývoj fitness populace při odděleném vývoji řízení a morfologie}
+    \caption{Vývoj fitness populace při odděleném vývoji řízení a morfologie
+    s agentem \emph{SineFuncHalfAgent} a robota \emph{AntV3}}
     \label{exp:exp2_serial}
 \end{figure}
 
 V grafu na obrázku \ref{exp:exp2_serial} můžeme pozorovat vývoj fitness v
-jednotlivých generacích. Můžeme vidět, že po 100. generaci přijde malý pokles
-průměrných fitness hodnot, což je zapříčiněno začátkem vývoje morfologie
-robota. Ten začne vygenerováním zcela náhodných konfigurací těla robota (v
+jednotlivých generacích. Můžeme vidět, že po 100. generaci přišel malý pokles
+průměrných fitness hodnot, což bylo zapříčiněno začátkem vývoje morfologie
+robota. Ten začíná vygenerováním zcela náhodných konfigurací těla robota (v
 povoleném rozsahu délek končetin), a tedy může chvilkově vést k horším
 výsledkům. Časem ale vidíme, že evoluce byla schopná optimalizovat tělo robota
 pro již vyvinutý pohyb a tak celkově vylepšit výsledky jedinců.
@@ -368,7 +374,7 @@ Na obrázku \ref{fig:exp2_serial_body_show} můžeme vidět nejlepšího jedince
 experimentu s odděleným vývojem řízení a morfologie. Jedná se zároveň o dobrý
 příklad morfologie, ke které se řešení často blížila. Pro tento typ pohybu se 
 robotům hodilo mít mnohem delší části končetin vedoucí přímo od těla
-(\emph{stehno}), které tedy svém pohybu jsou schopny posunout robota o to
-dál a tak optimalizovat uraženou vzdálenost.
+(\emph{stehno}), které svým pohybem jsou schopny posunout robota dále a tak
+optimalizovat uraženou vzdálenost.
 
 % \section{Diskuze výsledků}

@@ -13,14 +13,14 @@ v oddílu \ref{NN - evolve} popíšeme neuroevoluci, kategorii pokročilých
 evolučních algoritmů sloužící přímo k vývoji umělých neuronových sítí
 (algoritmy NEAT v oddílu \ref{NN - NEAT} a HyperNEAT v oddílu \ref{NN -
 HyperNEAT}). Dále popíšeme simulátory prostředí (oddíl \ref{Simulované
-prostředí}) a fyzikální simulátory (oddíl \ref{Fyzikální simulátory}), které
-využijeme pro simulaci při vyvíjení našich robotů.
+prostředí}) a fyzikální simulátory (oddíl \ref{Fyzikální simulátory}),
+které~využijeme pro simulaci při vyvíjení našich robotů.
 
 \section{Evoluční algoritmy} \label{Evoluční algoritmy}
 
-Evoluční algoritmus je označení pro stochastické vyhledávací algoritmy, které
-svými procesy napodobují principy Darwinovy evoluční teorie o přirozeném výběru
-a přežívání nejlepších jedinců. Pomocí těchto algoritmů se často snažíme
+Evoluční algoritmus je označení pro stochastické vyhledávací algoritmy s
+procesy napodobujícími principy Darwinovy evoluční teorie o přirozeném výběru
+a~přežívání nejlepších jedinců. Pomocí těchto algoritmů se často snažíme
 optimalizovat nějaké procesy, nebo vlastnosti systémů, a tedy evoluční
 algoritmy můžeme označovat i jako optimalizační algoritmy. Mohou být úspěšné v
 řešení komplexních problémů (např. aproximace NP-úplných problémů) a problémů
@@ -86,11 +86,11 @@ jedince z turnaje). Existují i pravděpodobnostní varianty \emph{turnajové
 selekce}, kdy pořadí v turnaji určuje pravděpodobnost zvolení daného jedince
 (vítěz turnaje má nejvyšší pravděpodobnost zvolení, další v pořadí mají
 klesající šanci na zvolení). Výhodou \emph{turnajové selekce} je, že nedává
-žádná omezení na fitness jedinců. Stačí nám, když jdou jednotlivé hodnoty
+žádná omezení na fitness jedinců. Stačí nám, když je možné jednotlivé hodnoty
 fitness porovnat a rozlišit tak, která je lepší a která horší.
 
 \emph{Ruletová selekce} je abstrakce ruletového kola, kde každý jedinec má šanci
-na zvolení (šance, že jeho hodnota padne na ruletovém kole) přímo úměrnou jeho
+na~zvolení (šance, že jeho hodnota padne na ruletovém kole) přímo úměrnou jeho
 fitness. Tato selekce se potom provádí opakovaně, dokud nevybereme požadovaný
 počet jedinců, nad celou populací a ne pouze nad náhodně vybranou podmnožinou
 jedinců z populace (jak tomu bylo u \emph{turnajové selekce}). Pokud se v
@@ -98,7 +98,7 @@ populaci nachází jedinec s dominantní hodnotou fitness, která výrazně pře
 ostatní jedince v populaci, může se stávat, že bude docházet k opakovanému
 výběru jednoho a toho samého jedince, což může vést k velmi rychlému zúžení
 prohledávaného prostoru a tedy nalezení neoptimálního řešení (vývoj může
-uvíznout v tzv. \emph{lokálním optimu}).
+uvíznout v~tzv. \emph{lokálním optimu}).
 
 \paragraph{Křížení}
 Křížení je proces, při kterém nějakým stylem kombinujeme genetické informace
@@ -139,12 +139,12 @@ vývoji jakýchkoli výhodných vlastností jedinců, které by vedli k optimali
 řešení. Hodnotou mutace označujeme pravděpodobnost, že část genotypu bude
 pozměněna.
 
-Styl, jakým se genotyp mutuje, je závislý na typu evolučního algoritmu. Pro
-genetické algoritmy s genotypem tvořeným vektorem binárních hodnot se může
-jednat o např. náhodný \emph{bit flip} (tedy změnu dané hodnoty z 0 na 1 nebo
-naopak). U jiných typů evolučních algoritmů je možné používat např. přiřazení
-nové náhodně vygenerované hodnoty z rozsahu povolených hodnot pro danou část
-genotypu, nebo posun o malou náhodně vygenerovanou hodnotu.
+Styl, jakým se genotyp mutuje, je závislý na typu evolučního algoritmu.
+V~případě genetických algoritmů s genotypem tvořeným vektorem binárních hodnot
+se může jednat o např. náhodný \emph{bit flip} (tedy změnu dané hodnoty z 0 na
+1 nebo naopak). U jiných typů evolučních algoritmů je možné používat např.
+přiřazení nové náhodně vygenerované hodnoty z rozsahu povolených hodnot pro
+danou část genotypu, nebo posun o malou náhodně vygenerovanou hodnotu.
 
 \paragraph{Elitismus}
 Jelikož je evoluční vývoj proces postavený na náhodě, mohlo by se stát, že
@@ -154,7 +154,7 @@ vlastnosti mezi generacemi zachovat. Jedná se o speciální proces, řadící s
 většinou k \textbf{selekci}, který umožňuje zachovat určité množství jedinců
 mezi generacemi beze změny. Obvykle jeden nebo malé množství nejlepších jedinců
 je po každé generaci přesunuto beze změny do další (tedy neprojdou žádnou
-mutací a jejich genotyp je stejný mezi generacemi). 
+mutací a~jejich genotyp je stejný mezi generacemi). 
 
 \paragraph{}
 Následující ukázka pseudokódu předvede jednoduchý příklad běhu evolučního
@@ -403,10 +403,10 @@ Libovolná z těchto komponent pak může být nahrazena odpovídající vlastn�
 implementací \citep{tonda2020inspyred}.
 
 Následuje jednoduchý příklad z dokumentace knihovny Inspyred, který nám rychle
-představí možnou práci s knihovnou. Budeme řešit problém srovnatelný s
-problémem \emph{One Max} představeným u příkladu knihovny DEAP. Nyní je cílem,
-aby hodnota vektoru interpretována jako binární zápis celého čísla byla co
-nejvyšší (opět chceme, aby výsledný jedinec měl na všech místech vektoru
+představí možnou práci s knihovnou. Budeme řešit problém srovnatelný
+s~problémem \emph{One Max} představeným u příkladu knihovny DEAP. Nyní je
+cílem, aby hodnota vektoru interpretována jako binární zápis celého čísla byla
+co nejvyšší (opět chceme, aby výsledný jedinec měl na všech místech vektoru
 nastavené jedničky). 
 
 Na začátku se importuje knihovna Inspyred a modul \texttt{random}.
@@ -428,7 +428,7 @@ def generate_binary(random, args):
 
 Zde vytváříme vlastní funkci \texttt{generate\_binary}, která bude sloužit jako
 generátor jedinců. V této funkci nejdříve do proměnné \texttt{bits} načteme
-hodnotu z argumentu \texttt{num\_bits} (s jeho definicí se setkáme později) a
+hodnotu z~argumentu \texttt{num\_bits} (s jeho definicí se setkáme později) a
 poté vytvoříme jedince jako seznam, který naplníme náhodně zvolenými binárními
 hodnotami.
 
@@ -445,7 +445,7 @@ V knihovně se často setkáme s dekorátory metod. Přesněji metody, které tv
 pro \texttt{evaluator} vyžadují dekorátor \texttt{@evaluator}. Dekorátory se
 používají, protože vytváříme metody, které budou použité v rámci jiných
 interních metod (např. naše vlastní vyhodnocovací funkce pracuje pouze s
-jedním jedincem, ale funkce se bude při vyhodnocení fitness interně používat
+jedním jedincem, ale~funkce se bude při vyhodnocení fitness interně používat
 pro celou populaci).
 
 \begin{code}
@@ -493,7 +493,7 @@ Generation Evaluation   Worst    Best   Median   Average     Std Dev
 kde \texttt{Generation} je číslo aktuální generace, \texttt{Evaluation} udává
 počet vyhodnocení jedinců a hodnoty \texttt{Worst}, \texttt{Best},
 \texttt{Median}, \texttt{Average} a \texttt{Std Dev} udávají popořadě fitness
-hodnotu nejhoršího z jedinců, nejlepšího z jedinců, hodnotu mediánu a průměru
+hodnotu nejhoršího z jedinců, nejlepšího z jedinců, hodnotu mediánu a~průměru
 fitness hodnot a standardní odchylku fitness hodnot.
 
 Zároveň měníme i \texttt{terminator} za funkci \texttt{evaluation\_termination},
@@ -521,7 +521,7 @@ požadované parametry jako náš zvolený \texttt{evaluator} a \texttt{generato
 dále pro vybraný \texttt{terminator} volíme maximální počet vyhodnocení, které
 chceme při vývoji dovolit. Dále je možné pro tyto algoritmy specifikovat jevy
 jako třeba elitismus. \\Nakonec \texttt{pop\_size} určuje velikost populace, se
-kterou bude evoluce pracovat a vkládáme zde dříve zmíněný argument
+kterou bude evoluce pracovat a~vkládáme zde dříve zmíněný argument
 \texttt{num\_bits}, určující velikost vektoru jedince. 
 
 Další informace o příkladu a jednotlivých funkcích lze nalézt v oficiální
@@ -540,7 +540,7 @@ doplnit nějaké specifické části.
 Z vlastního pohledu, ačkoli knihovna DEAP umožňuje tvorbu asi
 libovolného evolučního algoritmu velmi kompaktním způsobem, potřeba pochopit a
 seznámit se s procesem tvorby vlastních tříd a objektů, na kterém je DEAP
-postavený, je poměrně velkou překážkou pro možného nového uživatele naší
+postavený, je~poměrně velkou překážkou pro možného nového uživatele naší
 knihovny, který by si mohl chtít upravit proces evolučních algoritmů dle
 svých požadavků. Ačkoli méně kompaktní, řešení knihovny Inspyred
 \ref{Inspyred}, které dělí algoritmy do základních stavebních bloků, kde každá
@@ -567,7 +567,7 @@ ulehčí to jejich další experimenty, třeba i s implementací vlastních blok
 evolučních algoritmů.
 
 \section{Neuronové sítě} \label{NN}
-Umělé neuronové sítě jsou matematickou abstrakcí biologických neuronů a jejich
+Umělé neuronové sítě jsou matematickou abstrakcí biologických neuronů a~jejich
 chování v nervové soustavě. Umělé neurony jsou zjednodušeně vrcholy v grafu,
 propojeného hranami s váhami (podobně jako reálné neurony jsou propojeny
 synapsemi). Každý neuron počítá svůj potenciál jako vážený součet příchozích
@@ -667,11 +667,11 @@ množství.
 Následující rovnice předvedou jeden dopředný průchod neuronovou sítí
 transformující vstupní vektor hodnot na výstupní vektor. V tomto příkladu si
 představíme průchod dat jednoduchou sítí, skládající se ze vstupní vrstvy
-(výstupy $n$ vstupních neuronů značíme $x_1,...,x_n$), jedné skryté vrstvy
-neuronů (výstupy $k$ neuronů v této vrstvě označíme $h_1,...,h_k$, s
-odpovídajícím vektorem prahů $b_1,...,b_k$ a váhami $w_{j,i}$ pro $i=1,...,k$ a
+(výstupy $n$~vstupních neuronů značíme $x_1,...,x_n$), jedné skryté vrstvy
+neuronů (výstupy $k$~neuronů v této vrstvě označíme $h_1,...,h_k$, s
+odpovídajícím vektorem prahů $b_1,...,b_k$ a~váhami $w_{j,i}$ pro $i=1,...,k$ a
 $j=1,...,n$) a výstupní vrstvy (výstupy $m$ neuronů výstupní vrstvy označíme
-jako $y_1,...,y_m$, matici vah $w'_{j,i}$ pro $j=1,...,k$ a $i=1,...,m$ a
+jako $y_1,...,y_m$, matici vah $w'_{j,i}$ pro $j=1,...,k$ a~$i=1,...,m$ a
 vektor prahů $b'_1,...,b'_m$).
 
 Výstup skrytých neuronů se spočítá jako,
@@ -695,8 +695,8 @@ na \emph{výstupní vrstvě}.
 
 Toto je nejčastější požadavek pro neuronové sítě při tzv. \emph{učení s
 učitelem} (\emph{supervised learning}). Při tomto učení síť dostává dvojice
-vektorů $(x, t)$, kde $x$ je vektor vstupních hodnot a $t$ je vektor
-požadovaných výstupů. Následně se $x$ nastaví jako potenciál vstupních neuronů
+vektorů $(x, t)$, kde $x$~je vektor vstupních hodnot a $t$ je vektor
+požadovaných výstupů. Následně se $x$~nastaví jako potenciál vstupních neuronů
 a síť spočítá výstupy na výstupních neuronech. Vektor výstupních neuronů
 (obvykle značený $y$) se porovná s požadovaným výstupem $t$. Na základě rozdílů
 (chyby) těchto hodnot se provede úprava vah jednotlivých spojů tak, aby se při
@@ -720,15 +720,15 @@ neuronových sítí pomocí principů evolučních algoritmů (popsaných sekci
 \ref{Evoluční algoritmy}). Vývoj pomocí neuroevoluce je obecnější než vývoj
 pomocí klasických trénovacích metod, jelikož vývoj, na rozdíl od trénovacích
 metod založených na principu \emph{učení s učitelem}, může probíhat i na sítích
-proměnlivé architektury a nepotřebuje znát korektní výstupy pro daný vstup
-sítě. Pro trénovaní stačí, když jsme schopni nějakým způsobem ohodnotit kvalitu
+proměnlivé architektury a~nepotřebuje znát korektní výstupy pro daný vstup
+sítě. Pro trénovaní stačí, když~jsme schopni nějakým způsobem ohodnotit kvalitu
 řešení, k jakému se s využitím dané konfigurace (architektura a váhy spojení)
 sítě dostaneme. Díky tomuto se neuroevoluce hodí pro vývoj neuronových sítí v
 případech, kdy nejsme schopni přesně určit správné výstupy sítě pro dané vstupy
 a pouze můžeme pozorovat kvalitu chování daného vyvíjeného systému.
 
 \paragraph{Vývoj neuronových sítí}
-Vývoj pomocí neuroevoluce probíhá stejně jako u jiných evolučních algoritmů.
+Vývoj pomocí neuroevoluce probíhá stejně jako u~jiných evolučních algoritmů.
 Neuronová síť je zakódovaná do genotypu jedinců, množina těchto jedinců potom
 tvoří populaci, procházející vývojem skrz opakované generace. V každé generaci
 je genotyp každého jedince dekódován a z těchto informací je vytvořena
@@ -736,10 +736,10 @@ neuronová síť podle dekódované architektury a vah spojení. Pro každého j
 je jeho dekódovaná síť následně otestována v testovacím prostředí, kde se
 ohodnotí kvalita jedince (fitness).
 
-Jednoduchým typem kódování může být uložení hodnot vah všech hran v neuronové
-síti do jediného vektoru. Takový vektor se použije jako genotyp jedince. To
-umožňuje optimalizaci vah sítě s fixní architekturou. Tento typ kódování může
-být ale výpočetně velmi náročný, kvůli rychle narůstající délce genotypu s
+Jednoduchým typem kódování může být uložení hodnot vah všech hran v~neuronové
+síti do jediného vektoru. Takový vektor se použije jako genotyp jedince.
+To~umožňuje optimalizaci vah sítě s fixní architekturou. Tento typ kódování
+může být ale výpočetně velmi náročný, kvůli rychle narůstající délce genotypu s
 velikostí architektury (počet vrstev a počet neuronů v síti) neuronové sítě.
 
 \paragraph{Pokročilé metody}
@@ -755,8 +755,8 @@ umožnilo evoluční vývoj sítí rozsáhlejších architektur s menšími nár
 velikost genotypu.
 
 Jiné metody se poté zaměřily na vývoj jak vah, tak topologie neuronové sítě.
-Navíc se ukázalo, že současný vývoj topologie často přináší lepší výsledky, než
-vývoj pouze vah sítě. Vývoj v těchto metodách začíná s nejzákladnější
+Navíc se ukázalo, že současný vývoj topologie často přináší lepší výsledky,
+než~vývoj pouze vah sítě. Vývoj v těchto metodách začíná s nejzákladnější
 strukturou sítě, která se podle nároků problému sama vyvíjí a rozšiřuje, dokud
 tyto změny přináší kvalitativní zlepšení. Často využívaným algoritmem
 využívající těchto metod je algoritmus NEAT (\emph{NeuroEvolution of Augmenting
@@ -785,8 +785,9 @@ algoritmy pracující s neuronovými sítěmi s fixní topologií.
 NEAT používá tzv. \emph{přímé kódování}, tedy genotyp každého jedince přímo
 popisuje celou topologii sítě (všechny neurony a všechny hrany mezi neurony).
 Každý genotyp obsahuje seznam \emph{genů synapsí} a seznam \emph{genů neuronů}.
-Seznam genů neuronů popisuje vstupní, výstupní a skryté neurony sítě, které
-mohou být spojené hranami. Každý gen synapse obsahuje následující informace:
+\\Seznam genů neuronů popisuje vstupní, výstupní a skryté neurony sítě,
+které~mohou být spojené hranami. Každý gen synapse obsahuje následující
+informace: 
 \begin{itemize}
     \item vstupní neuron -- neuron, do kterého synapse vchází,
     \item výstupní neuron -- neuron, ze kterého synapse vychází,
@@ -802,7 +803,7 @@ hranami mezi nimi. Tato jednoduchá topologie je rozšiřována pomocí
 následujících genetických operátorů.
 
 \paragraph{Mutace}
-Mutace v algoritmu NEAT má schopnost měnit jak spojení v síti, tak její
+Mutace v algoritmu NEAT má schopnost měnit jak spojení v síti, tak~její
 strukturu. Mutace synapsí sítě zahrnují jednoduchou změnu váhy spojení nebo
 změnu příznaku použití daného spojení v síti. Struktura sítě může mutovat
 dvěma způsoby. První typ mutace přidává nový gen synapsí, spojující dva doposud
@@ -817,10 +818,10 @@ sítí probíhá právě díky mutaci.
 \paragraph{Křížení}
 Křížení využívá \emph{historické značky}. Dva jedinci se nejdříve hranami
 zarovnají pomocí jejich \emph{historických značek}. Stejná čísla historických
-značek totiž v síti značí stejnou strukturu. Synapse, která se v obou jedincích
+značek totiž v~síti značí stejnou strukturu. Synapse, která se v obou jedincích
 schoduje se dědí náhodně z jednoho rodiče. Synapse, kterou má jen jeden z
 rodičů se dědí pouze když je v lepším z rodičů a pokud je v nějakém jedinci
-hrana neaktivní a v druhém aktivní, s danou pravděpodobností se tento stav v
+hrana neaktivní a~v~druhém aktivní, s danou pravděpodobností se tento stav v
 novém jedinci změní. Algoritmus je tímto stylem schopný vytvářet velké množství
 různých topologií. Tyto nové topologie, přestože jsou často důležité pro řešení
 zadaného problému, mají jen velmi malou šanci se v populaci menších topologií
@@ -834,19 +835,19 @@ genotypy poté primárně soutěží s jedinci stejného druhu a nové druhy tak
 šanci se vyvinout a optimalizovat na jejich úroveň. NEAT pro výpočet odlišností
 jedinců opět využívá \emph{historické značky}, pomocí kterých hledá společné
 hrany a vypočítá vzdálenost dvou genomů. Geny rozdělíme do několika kategorií.
-Buď se shodují (mají stejnou \emph{historickou značku}), a pak jsou označené
-jako shodné (\emph{matching genes}), nebo se neshodují. Neshodné geny, které
-mají historické značky v rozmezí hodnot \emph{historických značek} druhého z
-jedinců, se nazývají disjunktní (\emph{disjoint}) a zbylé geny se nazývají
-přesahující (\emph{excess}). Hodnota vzdálenosti dvou jedinců se poté počítá
-jednoduchou lineární kombinací počtu genů jako:
+Buď se shodují (mají stejnou \emph{historickou značku}), a~pak jsou označené
+jako shodné (\emph{matching genes}), nebo se neshodují. Neshodné geny,
+které~mají historické značky v rozmezí hodnot \emph{historických značek}
+druhého z~jedinců, se nazývají disjunktní (\emph{disjoint}) a zbylé geny se
+nazývají přesahující (\emph{excess}). Hodnota vzdálenosti dvou jedinců se poté
+počítá jednoduchou lineární kombinací počtu genů jako:
 
 \begin{equation}
     \delta = \frac{c_1E}{N} + \frac{c_2D}{N} + c_3\cdot\overline{W}
 \end{equation}
 kde $N$ je celkový počet genů ve větším z jedinců, $E$ je počet přesahujících
 genů, $D$ je počet disjunktních genů, $\overline{W}$ je průměrný rozdíl vah
-shodujících se genů a koeficienty $c_1$, $c_2$ a $c_3$ umožňují nastavovat
+shodujících se genů a~koeficienty $c_1$, $c_2$ a $c_3$ umožňují nastavovat
 důležitost těchto tří faktorů \citep{stanley2002evolving}.
 
 Na začátku generace se pak vytváří seznam druhů. Pokud se objeví genom, který
@@ -855,7 +856,7 @@ nezapadá do žádného z druhů, je pro něj vytvořen jeho vlastní nový druh
 \paragraph{Fitness}
 Rozdělení do druhů má vliv i na fitness jedinců. Kvalita každého jedince se při
 výpočtu fitness dělí počtem jedinců stejného druhu (vzorec
-(\ref{eq:neatfitness})). To zároveň omezuje druhy v ovládnutí celé generace a
+(\ref{eq:neatfitness})). To~zároveň omezuje druhy v ovládnutí celé generace a
 dál ochraňuje nové topologie.
 \begin{equation} \label{eq:neatfitness}
     f'_i = \frac{f_i}{\sum_{j=1}^n sh(\delta(i,j))}
@@ -868,7 +869,7 @@ jedince a $f'_i$ jeho upravená hodnota.
 Jak již bylo zmíněno, NEAT inicializuje celou populaci jedinců s minimální
 topologií, obsahující pouze nutný počet vstupních a výstupních neuronů,
 které jsou navzájem plně propojené a neobsahuje žádné skryté neurony. Nové
-topologie vznikají díky genetickým operátorům a všechna zvětšení genotypů jsou
+topologie vznikají díky genetickým operátorům a~všechna zvětšení genotypů jsou
 tedy v evoluci opodstatněná. Díky tomuto NEAT samovolně vede k vývoji
 minimálních topologií. To umožňuje, že tento algoritmus je často výkonnější než
 ostatní, protože prohledává minimální potřebný prostor pro nalezení řešení,
@@ -915,13 +916,13 @@ Protože v práci nebudeme HyperNEAT používat, detailnější popis vynecháme
 
 \section{Simulované prostředí} \label{Simulované prostředí}
 
-Jelikož chceme vyvíjet řízení robotů založené na interakcích s prostředím, je
-pro tuto práci důležité vybrat vhodný simulátor prostředí. Například při vývoji
-počítačových her se využívají různé výpočetně výhodné simulátory prostředí. My
-však chceme, aby se chování objektů v simulátoru virtuálního prostředí co
-nejvíce blížilo chování objektů v reálném prostředí. Proto budeme využívat
-pouze robustní simulátory prostředí, založené na fyzikálních zákonech. Budeme
-rozlišovat mezi \emph{simulátorem prostředí}, který eviduje objekty (a
+Jelikož chceme vyvíjet řízení robotů založené na interakcích s prostředím,
+je~pro tuto práci důležité vybrat vhodný simulátor prostředí. Například při
+vývoji počítačových her se využívají různé výpočetně výhodné simulátory
+prostředí. My však chceme, aby se chování objektů v simulátoru virtuálního
+prostředí co nejvíce blížilo chování objektů v reálném prostředí. Proto budeme
+využívat pouze robustní simulátory prostředí, založené na fyzikálních zákonech.
+Budeme rozlišovat mezi \emph{simulátorem prostředí}, který eviduje objekty (a
 vlastnosti objektů jako třeba rozměry, váha, atd.), a \emph{simulátorem
 fyziky}, který řeší interakce mezi objekty tak, aby odpovídaly fyzikálním
 zákonům. 
@@ -932,7 +933,7 @@ robotů. Zároveň chceme, abychom měli možnost do morfologie robotů nějaký
 způsobem zasahovat i v průběhu evolučního vývoje a aktivně ji za běhu měnit.
 Jelikož plánujeme v různých prostředích provádět experimenty s různými typy
 robotů, používajícími různé styly pohybu (typy motorů, kloubů, tvarů končetin,
-atd.), je potřebné, aby fyzikální simulátor (\emph{fyzikální řešič=solver}) byl
+atd.), je~potřebné, aby fyzikální simulátor (\emph{fyzikální řešič=solver}) byl
 schopný simulovat i složitější typy robotů. Takovými mohou být právě třeba
 kráčející roboti, neboli roboti používající k pohybu končetiny připomínající
 nohy, na rozdíl od jednodušších typů robotů, kteří se mohou pohybovat pomocí
@@ -960,8 +961,8 @@ v oddíle \ref{Fyzikální simulátory}.
 
 \subsection{Simulátory prostředí} \label{Simulátory prostředí}
 
-Při hledání simulátorů prostředí, které by vyhovovali našim požadavkům a
-umožňovali kontrolu a ovládání prostředí prostřednictvím zvoleného jazyka
+Při hledání simulátorů prostředí, které by vyhovovali našim požadavkům
+a zároveň umožňovali kontrolu a ovládání prostředí prostřednictvím zvoleného jazyka
 Python, jsme narazili na několik možností. Omezený výčet těchto simulátorů zde
 popíšeme -- Gazebo (v oddílu \ref{Gazebo}), Webots (v oddílu \ref{Webots}) a
 CoppeliaSim (v oddílu \ref{CoppeliaSim}).
@@ -978,8 +979,8 @@ simulátorem ODE, nicméně uživatel si již může vybrat celkem ze čtyř rů
 fyzikálních simulátorů -- Bullet (sekce \ref{Bullet}), Simbody, Dart (sekce
 \ref{Dart}) a ODE. Uživatel s knihovnou pracuje prostřednictvím grafického
 rozhraní založené na knihovně Open Scene Graph používající OpenGL, nebo
-prostřednictvím příkazové řádky. Prostředí a roboti mohou být tvořené buď z
-grafického rozhraní prostředí, nebo v textovém formátu XML. Limitací Gazebo je
+prostřednictvím příkazové řádky. Prostředí a~roboti mohou být tvořené buď z
+grafického rozhraní prostředí, nebo~v~textovém formátu XML. Limitací Gazebo je
 pak chybějící možnost rozdělit simulace mezi vícero vláken kvůli vnitřní
 architektuře spojené s fyzikální simulací \citep{koenig2004design}. 
 
@@ -987,14 +988,14 @@ architektuře spojené s fyzikální simulací \citep{koenig2004design}.
 Webots \citep{Webots} je open-source víceplatformní, robustní a deterministický
 robotický simulátor vyvíjený od roku 1998. Umožňuje programování a testování
 virtuálních robotů mnoha různých typů a jednoduchou následnou aplikaci softwaru
-v reálných robotech. Simulátor je možné použít pro simulaci prostředí s vícero
+v reálných robotech. Simulátor je možné použít pro simulaci prostředí s~vícero
 agenty najednou. Agenti spolu mohou komunikovat a to jak lokálně tak i
 globálně. Výpočty fyzikálních interakcí zajišťuje fyzikální simulátor ODE. Pro
 vývoj robotů a prostředí je možné využít řady programovacích jazyků a to C,
 C++, Python, Java, MATLAB nebo ROS (\emph{Robot Operating System}). Prostředí
 umožňuje práci v grafickém rozhraní a vizualizaci simulací pomocí OpenGL.
 Knihovna dále nabízí využití připravených modelů robotů, vlastní editor robotů
-a map a možnosti vložení vlastních robotů z 3D modelovacích softwarů v CAD
+a map a~možnosti vložení vlastních robotů z 3D modelovacích softwarů v CAD
 formátu \citep{michel2004cyberbotics}.
 
 \subsubsection{CoppeliaSim} \label{CoppeliaSim}
@@ -1046,11 +1047,11 @@ simulaci měkkých těles, kvůli nerealistickým metodám řešení simulace pr
 
 \subsubsection{Dart} \label{Dart}
 Dart (\emph{Dynamic Animation and Robotics Toolkit}) je víceplatformní otevřená
-knihovna pro simulace a animace robotů. Od předchozích se odlišuje stabilitou a
-přesností, díky zobecněné reprezentaci souřadnic pevných těles v simulaci. Na
-rozdíl od ostatních fyzikálních simulátorů, aby dal vývojáři plnou kontrolu nad
-simulací, umožňuje Dart plný přístup k interním hodnotám simulace. Zároveň se
-díky línému vyhodnocování hodí pro vývoj real-time ovladačů pro roboty
+knihovna pro simulace a animace robotů. Od předchozích se odlišuje stabilitou
+a~přesností, díky zobecněné reprezentaci souřadnic pevných těles v simulaci.
+Na~rozdíl od ostatních fyzikálních simulátorů, aby dal vývojáři plnou kontrolu
+nad simulací, umožňuje Dart plný přístup k interním hodnotám simulace. Zároveň
+se díky línému vyhodnocování hodí pro vývoj real-time ovladačů pro roboty
 \citep{lee2018dart}.
 
 \subsubsection{MuJoCo} \label{MuJoCo}
@@ -1082,12 +1083,12 @@ většinou industriálních a výzkumných aplikací \citep{coppeliarobotics}
 
 \subsubsection{Porovnání simulátorů} \label{Simulátory - Porovnání}
 V dnešní době se nám nabízí velké množství potencionálních kandidátů, vhodných
-k využití pro naši aplikaci. Prakticky každý z open-source simulátorů, které
-jsme našli a představili, by bylo možné použít pro simulaci robotů složitosti,
-jakou máme předběžně v plánu. Hlavním z rozhodujících faktorů pro tento projekt
-bude jak jednoduše půjde prostředí používat pro vývoj pomocí genetických
-algoritmů. Chceme tedy nějaký jednoduchý přístup k simulaci a ovládání robotů,
-rychlost a přesnost simulace. 
+k využití pro naši aplikaci. Každý z open-source simulátorů, které jsme našli a
+představili, by bylo možné použít pro simulaci robotů složitosti, jakou~máme
+předběžně v plánu. Hlavním z rozhodujících faktorů pro tento projekt bude jak
+jednoduše půjde prostředí používat pro vývoj pomocí genetických algoritmů.
+Chceme tedy nějaký jednoduchý přístup k simulaci a ovládání robotů, rychlost
+a~přesnost simulace. 
 
 Opět většina ze simulátorů prostředí toto nabízí. Osobně se nám ale nejvíce
 zalíbilo MuJoCo. Díky nedávnému převedení fyzikálního simulátoru MuJoCo do
@@ -1095,7 +1096,7 @@ open-source a změně prostředí (nejprve do \textbf{OpenAI Gym} a nyní do
 \textbf{Farama Foundation Gymnasium}) jsme dostali možnost využít jednoduché
 Python API pro ovládání robotů a zároveň konfiguraci celé simulace. 
 
-Tato abstrakce od vlastní simulace je pro tuto práci velmi přínosná, protože se
+Tato abstrakce od vlastní simulace je pro tuto práci velmi přínosná, protože~se
 především chceme zajímat o vývoj řízení robotů pomocí evolučních algoritmů.
 Řešit zároveň složité ovladače robotů, které by se mohly lišit pro různé typy
 robotů, by mohlo bezdůvodně komplikovat celý proces spojení evolučních
@@ -1104,10 +1105,10 @@ možného uživatele, který by si chtěl sám evoluční algoritmy upravovat.
 
 MuJoCo se zároveň ukazuje jako jeden z nejlepších volně dostupných fyzikálních
 simulátorů dnes. Z výsledků článku testujících různé vlastnosti známých fyzikálních
-simulátorů \citet{erez2015simulation} vychází, že MuJoCo má navrch jak v
-rychlosti, tak ve kvalitě simulací. Zároveň interně využívá kloubní
+simulátorů \citet{erez2015simulation} vychází, že MuJoCo má navrch jak
+v~rychlosti, tak ve kvalitě simulací. Zároveň interně využívá kloubní
 souřadnicový systém, který je přesnější, protože zabraňuje nepřesnostem v
-kloubech. To se hodí o to více, když v této práci chceme vyvíjet hlavně
+kloubech. To~se hodí o to více, když v této práci chceme vyvíjet hlavně
 kráčející roboty, u kterých můžeme mít i větší počty kloubů. 
 
 Simulátor MuJoCo a roboti, které můžeme používat, je zároveň možné

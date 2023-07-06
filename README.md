@@ -3,7 +3,7 @@
 # Semestral Work
 
 Semestral work in the summer semester 2021/22 MFF-CUNI.
-Work done under supervision of *RNDr. František Mrázek, CSc.* - Faculty MFF CUNI.
+Work done under supervision of *RNDr. František Mrázek, CSc.*.
 
 ### TASKS
 - [x] Try working with the mujoco environment in gym
@@ -19,6 +19,4 @@ Work done under supervision of *RNDr. František Mrázek, CSc.* - Faculty MFF CU
 - [x] New models - 3/... legged ant?, Spot-like robot
 - [x] Set up batch run possibility
 - [x] Stats collecting from batch runs - csv/...?
-
-### TODO:
-- [ ] School Gitlab migrating (low)
+- [x] School Gitlab migrating (low)

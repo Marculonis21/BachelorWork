@@ -60,7 +60,7 @@ def crossover_deco( func ):
     def wrapper(self, population):
         if self.gui:
             method, arguments = self.genetic_operators["crossover"] 
-            return method(population, *arguments)
+            return method(population, self, *arguments)
         else:
             return func( self, population)
     return wrapper
@@ -69,7 +69,7 @@ def mutation_deco( func ):
     def wrapper(self, population):
         if self.gui:
             method, arguments = self.genetic_operators["mutation"] 
-            return method(population, *arguments)
+            return method(population, self, *arguments)
         else:
             return func( self, population)
     return wrapper
@@ -182,14 +182,15 @@ class BaseAgent(ABC):
         self.body_range   = [] 
        
         file = robot.create_default()
-        file.close() # needs to be closed before gym opens it again (Windows)
         if file == None:
             default_env = gym.make(robot.environment_id)
         else:
+            file.close() # needs to be closed before gym opens it again (Windows)
             default_env = gym.make(robot.environment_id, xml_file=file.name)
+
+            file.close() 
+            os.unlink(file.name)
             
-        file.close() # ANOTHER ONE?
-        os.unlink(file.name)
 
         self.action_size = default_env.action_space.shape[0]
         self.observation_size = default_env.observation_space.shape[0]

@@ -39,10 +39,11 @@ def draw_chart(window):
     plt.title('Training')
     plt.xlabel('Episode')
     plt.ylabel('Fitness')
-    plt.plot(np.mean(roboEvo.EPISODE_HISTORY, axis=1), label='Mean')
-    plt.plot(np.min( roboEvo.EPISODE_HISTORY, axis=1), label='Min')
-    plt.plot(np.max( roboEvo.EPISODE_HISTORY, axis=1), label='Max')
-    plt.legend(loc='upper left', fontsize=9)
+    if len(roboEvo.EPISODE_HISTORY) > 0:
+        plt.plot(np.mean(roboEvo.EPISODE_HISTORY, axis=1), label='Mean')
+        plt.plot(np.min( roboEvo.EPISODE_HISTORY, axis=1), label='Min')
+        plt.plot(np.max( roboEvo.EPISODE_HISTORY, axis=1), label='Max')
+        plt.legend(loc='upper left', fontsize=9)
     plt.tight_layout()
     figure_aggregate = draw_figure(window['-FIG-'].TKCanvas, figure)
 
@@ -55,10 +56,11 @@ def update_chart(window):
     plt.title('Training')
     plt.xlabel('Episode')
     plt.ylabel('Fitness')
-    plt.plot(np.mean(roboEvo.EPISODE_HISTORY, axis=1), label='Mean')
-    plt.plot(np.min( roboEvo.EPISODE_HISTORY, axis=1), label='Min')
-    plt.plot(np.max( roboEvo.EPISODE_HISTORY, axis=1), label='Max')
-    plt.legend(loc='upper left', fontsize=9)
+    if len(roboEvo.EPISODE_HISTORY) > 0:
+        plt.plot(np.mean(roboEvo.EPISODE_HISTORY, axis=1), label='Mean')
+        plt.plot(np.min( roboEvo.EPISODE_HISTORY, axis=1), label='Min')
+        plt.plot(np.max( roboEvo.EPISODE_HISTORY, axis=1), label='Max')
+        plt.legend(loc='upper left', fontsize=9)
     plt.tight_layout()
 
     figure_aggregate = draw_figure(window['-FIG-'].TKCanvas, figure)
@@ -84,7 +86,22 @@ def get_params(values, robot_tab, agent_tab):
             else:
                 agent_arguments[arg_name] = arg_value
 
-    agent.arguments = agent_arguments
+    # Transfer argument options to agent
+    for key, value in agent.arguments.items():
+        if isinstance(value, dict): # min max range
+            if isinstance(value["MIN"], int):
+                agent.arguments[key]["MIN"] = int(agent_arguments[key]["MIN"])
+            else:
+                agent.arguments[key]["MIN"] = float(agent_arguments[key]["MIN"])
+
+            if isinstance(value["MAX"], int):
+                agent.arguments[key]["MAX"] = int(agent_arguments[key]["MAX"])
+            else:
+                agent.arguments[key]["MAX"] = float(agent_arguments[key]["MAX"])
+        elif isinstance(value, int):
+            agent.arguments[key] = int(agent_arguments[key])
+        else:
+            agent.arguments[key] = float(agent_arguments[key])
 
     # get genetic operators selected in evo_tab
     agents_gen_ops = {op_type : (evo_tab.ga_operators[op_type][values[f"-OP_{op_type.upper()}_TYPE-"]][0], []) for op_type in ["selection", "crossover", "mutation"]}
@@ -93,14 +110,14 @@ def get_params(values, robot_tab, agent_tab):
     for name, op_type in zip(agents_gen_ops_names, list(agents_gen_ops.keys())):
         for key in values.keys():
             if not isinstance(key, int) and name in key:
-                agents_gen_ops[op_type][1].append(values[key])
+                agents_gen_ops[op_type][1].append(float(values[key]))
 
     agent.genetic_operators = agents_gen_ops
 
     # mutation probabilities from evo_tab
-    agent.individual_mutation_prob = values["-INDIV_MUT_PROB-"] 
-    agent.action_mutation_prob     = values["-ACT_MUT_PROB-"]
-    agent.body_mutation_prob       = values["-BODY_MUT_PROB-"]
+    agent.individual_mutation_prob = float(values["-INDIV_MUT_PROB-"])
+    agent.action_mutation_prob     = float(values["-ACT_MUT_PROB-"])
+    agent.body_mutation_prob       = float(values["-BODY_MUT_PROB-"])
 
     population_size = int(values["-POP_SIZE-"])
     generation_count = int(values["-GEN_COUNT-"])

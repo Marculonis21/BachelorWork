@@ -91,7 +91,7 @@ class Operators:
 
         new_population = []
         for _ in range(len(population)):
-            idx = np.random.choice(len(population), size=k)
+            idx = np.random.choice(len(population), size=int(k))
             fitnesses = fitness_values[idx]
             new_population.append(population[np.argmax(fitnesses)])
 
@@ -109,7 +109,7 @@ class Operators:
 
         new_population = []
         for _ in range(len(population)):
-            idx = np.random.choice(len(population), size=k)
+            idx = np.random.choice(len(population), size=int(k))
 
             individuals = population[idx]
             fitnesses = fitness_values[idx]

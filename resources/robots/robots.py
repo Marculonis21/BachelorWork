@@ -50,6 +50,8 @@ class BaseRobot(ABC):
             # TMP files needs to stay existing after closing (windows does not
             # allow to use already opened files)
             tmp_file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_",delete=False)
+        else:
+            tmp_file = open(tmp_file.name, "w")
 
         _, body_part_adjustments = individual
 

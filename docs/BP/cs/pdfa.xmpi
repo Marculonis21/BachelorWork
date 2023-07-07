@@ -62,8 +62,8 @@
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"> 
    <dc:format>application/pdf</dc:format> 
-   <dc:title><rdf:Alt><rdf:li xml:lang="x-default">Název práce</rdf:li></rdf:Alt></dc:title>
-   <dc:creator><rdf:Seq><rdf:li>Jméno Příjmení</rdf:li></rdf:Seq></dc:creator>
+   <dc:title><rdf:Alt><rdf:li xml:lang="x-default">Evoluce robotů v simulovaném fyzikálním prostředí</rdf:li></rdf:Alt></dc:title>
+   <dc:creator><rdf:Seq><rdf:li>Marek Bečvář</rdf:li></rdf:Seq></dc:creator>
    <dc:publisher><rdf:Bag><rdf:li>Univerzita Karlova</rdf:li></rdf:Bag></dc:publisher>
    <dc:description><rdf:Alt><rdf:li xml:lang="x-default">Abstrakt práce</rdf:li></rdf:Alt></dc:description>
    <dc:subject><rdf:Bag><rdf:li>klíčová slova</rdf:li>
@@ -80,15 +80,15 @@
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmp="http://ns.adobe.com/xap/1.0/"> 
    <xmp:CreatorTool>LaTeX with hyperref</xmp:CreatorTool> 
-   <xmp:ModifyDate>2023-06-13T06:48:04+02:00</xmp:ModifyDate> 
-   <xmp:CreateDate>2023-06-13T06:48:04+02:00</xmp:CreateDate> 
-   <xmp:MetadataDate>2023-06-13T06:48:04+02:00</xmp:MetadataDate> 
+   <xmp:ModifyDate>2023-07-07T13:01:47+02:00</xmp:ModifyDate> 
+   <xmp:CreateDate>2023-07-07T13:01:47+02:00</xmp:CreateDate> 
+   <xmp:MetadataDate>2023-07-07T13:01:47+02:00</xmp:MetadataDate> 
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmpRights = "http://ns.adobe.com/xap/1.0/rights/"> 
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/"> 
    <xmpMM:DocumentID>uuid:E471EDA9-0143-B4EC-2929-27CBFE26697B</xmpMM:DocumentID> 
-   <xmpMM:InstanceID>uuid:81D3CBE5-8CBC-EF4F-7617-B681DA0454E8</xmpMM:InstanceID> 
+   <xmpMM:InstanceID>uuid:C86A8729-786C-687A-5434-A39B699C6739</xmpMM:InstanceID> 
   </rdf:Description> 
  </rdf:RDF> 
 </x:xmpmeta> 

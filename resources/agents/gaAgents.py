@@ -1,10 +1,14 @@
 #!/usr/bin/env python
-"""Module for genetic agents.
+"""Module for agents
 
 Module that stores base agent abstract class :class:`BaseAgent` from which all
 the other agent classes have to inherit.
 
-Agent class is heavily used as an information source for GUI.
+Agent class is heavily used as an information source for GUI and it can be
+basically fully configured through GUI.
+
+.. note::
+    For configuration of agent's genetic operations see also :ref:`decorators`.
 
 Usage example::
 
@@ -76,6 +80,7 @@ def mutation_deco( func ):
 
 class EvoType(Enum):
     """EvoType enum
+
     Enum used for naming different types of evolution that agent can perform.
     """
 
@@ -162,7 +167,7 @@ class BaseAgent(ABC):
                               else False
 
         self.evolve_control = True if evo_type == EvoType.CONTROL or \
-                                      evo_type == EvoType.CONTROL_BODY_PARALEL \
+                                      evo_type == EvoType.CONTROL_BODY_SERIAL \
                               else False
 
         self.evolve_body    = True if evo_type == EvoType.BODY or \
@@ -191,7 +196,6 @@ class BaseAgent(ABC):
             file.close() 
             os.unlink(file.name)
             
-
         self.action_size = default_env.action_space.shape[0]
         self.observation_size = default_env.observation_space.shape[0]
         default_env.close()
@@ -218,30 +222,126 @@ class BaseAgent(ABC):
         self.body_range   = [] 
 
     @abstractproperty
-    def description(self): pass
+    def description(self): 
+        """Abstract informative property
+
+        Method which should be filled with informative string describing each agent
+        and its basic informations. This description is accessed by GUI to present
+        information about agent on agent select.
+        """
+        pass
 
     @abstractmethod
-    def get_action(self, individual, step): pass
+    def get_action(self, individual, step):
+        """Abstract get action method
+
+        Method called when robot is evaluated in environment, generating
+        actions for robot at each timestep.
+
+        Args:
+            individual : Genotype of an individual from EA.
+            step (int) : Number of timestep in environment.
+
+        Returns:
+            List[float] : List of floats for - one for each of robot's motors.
+        """
+        pass
 
     @abstractmethod
-    def generate_population(self, population_size, load_dir=""): pass
+    def generate_population(self, population_size):
+        """Abstract generate population method
+
+        Method called when EA needs to generate population of certain size.
+
+        Args:
+            population_size (int) : Desired population size.
+
+        Returns:
+            List[individual] : Returns a single list of individuals.
+
+        """
+        pass
 
     @abstractmethod
-    def selection(self, population, fitness_values): pass
+    def selection(self, population, fitness_values):
+        """Abstract selection method
+
+        Method called when EA does selection on population of individuals.
+
+        Args:
+            population (List[individual]) : Full population.
+            fitness_values (List[float]) : List of corresponding fitness values
+                for each individual in the population.
+
+        Returns:
+            List[individual] : Returns a single list of selected individuals (**parents**).
+
+        """
+        pass
 
     @abstractmethod
-    def crossover(self, population): pass
+    def crossover(self, population):
+        """Abstract crossover method
+
+        Method called when EA does crossover on list of selected **parents**.
+
+        Args:
+            population (List["parents"]) : List of selected parents.
+
+        Returns:
+            List[individual] : Returns a single list of created **offsprings**.
+
+        """
+        pass
 
     @abstractmethod
-    def mutation(self, population): pass
+    def mutation(self, population):
+        """Abstract mutation method
+
+        Method called when EA does mutation on list of created **offsprings**.
+
+        Args:
+            population (List["offsprings"]) : List of created offsprings.
+
+        Returns:
+            List[individual] : Returns a list of mutated offsprings.
+
+        """
+        pass
 
     @staticmethod
     def save(agent, robot, individual, path):
+        """Agent save method
+
+        Methods used for saving data (best individual) after the evolution,
+        using `pickle` module
+
+        Args:
+            agent (BaseAgent) : Agent used in evolution.
+            robot (BaseRobot) : Robot used in evolution.
+            individual : Genotype of best individual.
+            path (string) : Path where to save the pickle file.
+        """
+
         with lzma.open(path, "wb") as save_file:
             pickle.dump((agent, robot, individual), save_file)
 
     @staticmethod
     def load(path):
+        """Agent load method
+
+        Methods used for loading pickled data for visualising past best
+        individuals.
+
+        Args:
+            path (string) : Path where to access the save data.
+
+        Returns:
+            Tuple[BaseAgent, BaseRobot, individual] :
+                Returns tuple of agent, robot and individual - corresponding to
+                the save method.
+        """
+
         with lzma.open(path, "rb") as save_file:
             agent, robot, individual = pickle.load(save_file)
 
@@ -374,7 +474,7 @@ class StepCycleHalfAgent(BaseAgent):
 
     @selection_deco
     def selection(self, population, fitness_values):
-        return Operators.tournament_selection(population, fitness_values, 5)
+        return Operators.tournament_selection(population, fitness_values, int(len(population)*0.1))
 
     @crossover_deco
     def crossover(self, population):
@@ -485,7 +585,6 @@ class SineFuncFullAgent(BaseAgent):
     @selection_deco
     def selection(self, population, fitness_values):
         return Operators.tournament_selection(population, fitness_values, int(len(population)*0.1))
-        # return Operators.roulette_selection(population, fitness_values)
 
     @crossover_deco
     def crossover(self, population):
@@ -493,6 +592,8 @@ class SineFuncFullAgent(BaseAgent):
 
     @mutation_deco
     def mutation(self, population):
+        print("mutation")
+        return Operators.uniform_shift_mutation(population, self, 0.05)
         return Operators.uniform_mutation(population, self)
 
 class SineFuncHalfAgent(BaseAgent):
@@ -598,7 +699,6 @@ class SineFuncHalfAgent(BaseAgent):
 
     @selection_deco
     def selection(self, population, fitness_values):
-        # return Operators.tournament_prob_selection(population, fitness_values, 0.8, int(len(population)*0.2))
         return Operators.roulette_selection(population, fitness_values)
 
     @crossover_deco
@@ -723,9 +823,9 @@ class NEATAgent(BaseAgent):
         super(NEATAgent, self).__init__(robot, body_part_mask, evo_type, gui)
 
         self.config_source_file = ""
-        with open("resources/agents/config_neat.txt") as file:
-            lines = file.readlines()
-            self.config_source_file= "".join(lines)
+        # with open("resources/agents/config_neat.txt") as file:
+        #     lines = file.readlines()
+        #     self.config_source_file= "".join(lines)
 
         raw_arguments = re.findall(r'\$[A-Za-z0-9_]+\([+-]?[0-9]*[.]?[0-9]+\)\$', self.config_source_file)
         for arg in raw_arguments:

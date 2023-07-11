@@ -95,6 +95,12 @@ class Experiments:
 
         Method used while experiments need to be saved from :mod:`GUI` .
         Saving to preset folder.
+
+        Args:
+            name (str) : Selected name under which the experiment preset will
+                be saved.
+            params (ExperimentParams) : Instance of experiment parameters to be
+                saved.
         """
 
         path = "experiment_params"
@@ -123,6 +129,9 @@ class Experiments:
                 print(f"Loaded exp: {name} - {path}/{name}.expp")
 
     def get_experiment_names(self):
+        """Method for listing all created experiments.
+        """
+
         return list(self.__experiments.keys());
 
     def get_experiment(self, name) -> ExperimentParams:
@@ -138,7 +147,7 @@ class Experiments:
         return copy.copy(self.__experiments[name])
 
     def neat_test(self, run=False):
-        robot = robots.Pendulum()
+        robot = robots.InvertedDoublePendulum()
         agent = gaAgents.NEATAgent(robot, [])
         note = "neat_robots_test"
 
@@ -146,7 +155,7 @@ class Experiments:
 
         params = ExperimentParams(robot, 
                                   agent,
-                                  population_size=150,
+                                  population_size=100,
                                   generation_count=100,
                                   show_best=False,
                                   save_best=True,

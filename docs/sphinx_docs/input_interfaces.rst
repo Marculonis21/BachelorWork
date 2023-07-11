@@ -2,7 +2,7 @@ Input Interfaces
 ================
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
    TUI
    GUI

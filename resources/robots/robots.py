@@ -1,4 +1,27 @@
 #!/usr/bin/env python
+"""Module for robots
+
+Module that stores base robot abstract class :class:`BaseRobot` from which all
+the other agent classes must to inherit. 
+
+This class is implemented in such a way that adding new robots is as easy as
+possible. 
+
+For creating new robot user simply needs:
+    * :attr:`source_file` - Path to the robot XML config file.
+    * :attr:`picture_path` - Path to a picture of robot/placeholder.
+    * :attr:`environment_id` - ID of Farama environment to be used (env used for custom robots ``"custom/CustomEnv-v0"``)
+
+Default implemented robots:
+    #. Custom robot/env
+        * :class:`StickAnt`
+        * :class:`AntV3`
+        * :class:`SpotLike`
+    #. Farama NEAT robots
+        * :class:`Walker2D`
+        * :class:`InvertedPendulum`
+        * :class:`InvertedDoublePendulum`
+"""
 
 from abc import ABC, abstractproperty, abstractclassmethod
 import os
@@ -7,9 +30,34 @@ import copy
 import tempfile
 import numpy as np
 
-class BaseRobot(ABC):
-    """Base robot class.
+DIR = os.path.dirname(__file__)
 
+class BaseRobot(ABC):
+    """Base robot abstract class.
+
+    This is the base class for all robots from which they must inherit and call
+    its :func:`__init__` constructor with parameters described above (:attr:`source_file`,
+    :attr:`picture_path`, :attr:`environment_id`).
+
+    The :func:`__init__` stores all needed information and parses the robot's XML
+    config file for possible changable body parts.
+
+    .. note:: 
+        Body parts are specified inside robot's XML config file with
+        specialised symbols ``$...$`` and ``@...@``. More about those symbols
+        in :ref:`body_parts_symbols`.
+
+    Every robot class stores following variables.
+
+    :ivar source_file: Path to robot's XML source file (or None for NEAT only robots)
+    :ivar picture_path: Path to a picture of the robot or a placeholder.
+    :ivar environment_id: ID of environment (example: ``"custom/CustomEnv-v0"`` or ``"Walker2d-v4"``)
+    :ivar body_parts: Dictionary of found body parts in XML (= parsed variable symbols)
+
+    :vartype source_file: str, Optional
+    :vartype picture_path: str
+    :vartype environment_id: str
+    :vartype body_parts: Dict[str, float]
     """
 
     def __init__(self, source_file, picture_path, env_id):
@@ -28,12 +76,48 @@ class BaseRobot(ABC):
 
     @abstractproperty
     def description(self):
-        return ""
+        """Robot description.
 
+        Informative property used in GUI robot selection, presenting
+        information on robot. 
+
+        Returns:
+            str : Informative text.
+        """
+        pass
 
     def create(self, body_part_mask, individual=([],[]), tmp_file=None):
         """
-            Writes XML file (in place) - robot specific XML string with changed body part variables
+        Creates/writes XML file (in place) - robot specific XML string with
+        changed body part variables. 
+
+        Robot's XML source file may include special symbols which we parse
+        and evaluate (symbols for body parts ``$...$``, symbols for arithmetic
+        evaluation ``@...@``). This method gets body part mask intended to show
+        which body parts can be changed and which should stay at default
+        values, individual (possibly empty for *default* robots) and possibly
+        file (if one is already created for this purpose - reuse) to which is
+        the parsed XML config going to be written.
+
+        Method uses specific regular expressions to find special symbols.
+        Method also uses :attr:`body_parts` dictionary created on init by
+        :func:`__collect_body_parts` method (also using robot's XML).
+
+        Args:
+            body_part_mask (List[Tuple[float]|False]) : Body part mask
+                including for each body part either range of allowed values or
+                False.
+            individual (Tuple[List[...],List[...]]) : Individual from EA -
+                containing actions in first item of tuple and adjustmetns for
+                body part lengths in second item.
+            tmp_file (TemporaryFileWrapper[str]|None) : Parameter used when
+                reusing already created temporary files for this purpose.
+                Parsed XML config is rewritten inside of the passed file (and
+                still returned).
+
+        Returns:
+            temporary file : Returns temporary file with parsed XML config (or 
+            none for robots without source file - robots for NEAT) 
         """
 
         def key_to_regex(key):
@@ -83,15 +167,22 @@ class BaseRobot(ABC):
         return tmp_file
 
     def create_default(self):
+        """
+        Method which uses the :func:`create` method to create default of
+        selected robot with default body part lengths (if any are included).
+        Used when initialising :class:`gaAgents.BaseAgent` to created simple
+        test environment to get the input and observation sizes.
+        """
         tmp_file = self.create(body_part_mask=np.zeros([len(self.body_parts)]))
 
         return tmp_file
 
     def __collect_body_parts(self):
         """
-            Get names and default lengths of all changable body parts from XML
-            source file
+        Uses regular expressions to parse names and default lengths of all
+        changable body parts from XML source file.
         """
+
         part_names = re.findall(r'\$[A-Za-z0-9_]+\([+-]?[0-9]*[.]?[0-9]+\)\$', self.source_text)
         for part in part_names:
             if not part in self.body_parts:
@@ -99,11 +190,15 @@ class BaseRobot(ABC):
 
     @property
     def body_part_names(self):
+        """
+        Property for listing found changable body parts - used in GUI for body
+        part unlocking.
+        """
+
         return list(self.body_parts.keys())
 
 class StickAnt(BaseRobot):
     def __init__(self):
-        DIR = os.path.dirname(__file__)
         source_file = DIR+"/assets/custom_stick_ant.xml"
         picture_path = DIR+"/assets/Basic-Ant"
         environment_id = "custom/CustomEnv-v0"
@@ -119,7 +214,6 @@ The simplest robot with body consisting of a single sphere and 4 one-part legs. 
 
 class AntV3(BaseRobot):
     def __init__(self):
-        DIR = os.path.dirname(__file__)
         source_file = DIR+"/assets/ant.xml"
         picture_path = DIR+"/assets/Ant-v3"
         environment_id = "custom/CustomEnv-v0"
@@ -132,7 +226,6 @@ class AntV3(BaseRobot):
 
 class SpotLike(BaseRobot):
     def __init__(self):
-        DIR = os.path.dirname(__file__)
         source_file = DIR+"/assets/spot_like.xml"
         picture_path = DIR+"/assets/SpotLike"
         environment_id = "custom/CustomEnv-v0"
@@ -148,7 +241,6 @@ Altogether there are 12 joints (12 actuators) - 2 for each hip free to rotate al
 
 class Walker2D(BaseRobot):
     def __init__(self):
-        DIR = os.path.dirname(__file__)
         source_file = None
         picture_path = DIR+"/assets/Walker2D"
         environment_id = "Walker2d-v4"
@@ -159,27 +251,25 @@ class Walker2D(BaseRobot):
     def description(self):
         return ""
 
-class DoublePendulum(BaseRobot):
+class InvertedDoublePendulum(BaseRobot):
     def __init__(self):
-        DIR = os.path.dirname(__file__)
         source_file = None
         picture_path = DIR+"/assets/double_invertedPendulum"
         environment_id = "InvertedDoublePendulum-v4"
 
-        super(DoublePendulum, self).__init__(source_file, picture_path, environment_id)
+        super(InvertedDoublePendulum, self).__init__(source_file, picture_path, environment_id)
 
     @property
     def description(self):
         return ""
 
-class Pendulum(BaseRobot):
+class InvertedPendulum(BaseRobot):
     def __init__(self):
-        DIR = os.path.dirname(__file__)
         source_file = None
         picture_path = DIR+"/assets/invertedPendulum"
         environment_id = "InvertedPendulum-v4"
 
-        super(Pendulum, self).__init__(source_file, picture_path, environment_id)
+        super(InvertedPendulum, self).__init__(source_file, picture_path, environment_id)
 
     @property
     def description(self):

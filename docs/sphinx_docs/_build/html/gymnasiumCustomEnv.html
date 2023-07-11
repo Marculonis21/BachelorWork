@@ -77,19 +77,9 @@
 <dt class="sig sig-object py" id="gymnasiumCustomEnv.CustomEnv">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gymnasiumCustomEnv.</span></span><span class="sig-name descname"><span class="pre">CustomEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xml_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ant.xml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminate_when_unhealthy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_noise_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'human'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gymnasiumCustomEnv.CustomEnv" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MujocoEnv</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">EzPickle</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="gymnasiumCustomEnv.CustomEnv._get_obs">
-<span class="sig-name descname"><span class="pre">_get_obs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gymnasiumCustomEnv.CustomEnv._get_obs" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
 <dl class="py attribute">
-<dt class="sig sig-object py" id="gymnasiumCustomEnv.CustomEnv.action_space">
-<span class="sig-name descname"><span class="pre">action_space</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">spaces.Space</span><span class="p"><span class="pre">[</span></span><span class="pre">ActType</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#gymnasiumCustomEnv.CustomEnv.action_space" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="gymnasiumCustomEnv.CustomEnv.done">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">done</span></span><a class="headerlink" href="#gymnasiumCustomEnv.CustomEnv.done" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="gymnasiumCustomEnv.CustomEnv.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'render_fps':</span> <span class="pre">20,</span> <span class="pre">'render_modes':</span> <span class="pre">['human',</span> <span class="pre">'rgb_array',</span> <span class="pre">'depth_array']}</span></em><a class="headerlink" href="#gymnasiumCustomEnv.CustomEnv.metadata" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -97,22 +87,10 @@
 <span class="sig-name descname"><span class="pre">is_flipped</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gymnasiumCustomEnv.CustomEnv.is_flipped" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gymnasiumCustomEnv.CustomEnv.metadata">
-<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'render_fps':</span> <span class="pre">20,</span> <span class="pre">'render_modes':</span> <span class="pre">['human',</span> <span class="pre">'rgb_array',</span> <span class="pre">'depth_array']}</span></em><a class="headerlink" href="#gymnasiumCustomEnv.CustomEnv.metadata" title="Permalink to this definition"></a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="gymnasiumCustomEnv.CustomEnv.done">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">done</span></span><a class="headerlink" href="#gymnasiumCustomEnv.CustomEnv.done" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gymnasiumCustomEnv.CustomEnv.observation_space">
-<span class="sig-name descname"><span class="pre">observation_space</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">spaces.Space</span><span class="p"><span class="pre">[</span></span><span class="pre">ObsType</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#gymnasiumCustomEnv.CustomEnv.observation_space" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gymnasiumCustomEnv.CustomEnv.reset_model">
-<span class="sig-name descname"><span class="pre">reset_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gymnasiumCustomEnv.CustomEnv.reset_model" title="Permalink to this definition"></a></dt>
-<dd><p>Reset the robot degrees of freedom (qpos and qvel).
-Implement this in each subclass.</p>
-</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gymnasiumCustomEnv.CustomEnv.step">
@@ -162,6 +140,28 @@ a certain timelimit was exceeded, or the physics simulation has entered an inval
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gymnasiumCustomEnv.CustomEnv._get_obs">
+<span class="sig-name descname"><span class="pre">_get_obs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gymnasiumCustomEnv.CustomEnv._get_obs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gymnasiumCustomEnv.CustomEnv.reset_model">
+<span class="sig-name descname"><span class="pre">reset_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gymnasiumCustomEnv.CustomEnv.reset_model" title="Permalink to this definition"></a></dt>
+<dd><p>Reset the robot degrees of freedom (qpos and qvel).
+Implement this in each subclass.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gymnasiumCustomEnv.CustomEnv.action_space">
+<span class="sig-name descname"><span class="pre">action_space</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">spaces.Space</span><span class="p"><span class="pre">[</span></span><span class="pre">ActType</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#gymnasiumCustomEnv.CustomEnv.action_space" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gymnasiumCustomEnv.CustomEnv.observation_space">
+<span class="sig-name descname"><span class="pre">observation_space</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">spaces.Space</span><span class="p"><span class="pre">[</span></span><span class="pre">ObsType</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#gymnasiumCustomEnv.CustomEnv.observation_space" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

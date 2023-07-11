@@ -61,8 +61,6 @@
     </body>
   </worldbody>
   <actuator>
-    <!-- <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="hip_4" gear="150"/> -->
-    <!-- <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="ankle_4" gear="150"/> -->
     <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="hip_1" gear="150"/>
     <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="hip_2" gear="150"/>
     <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="hip_3" gear="150"/>

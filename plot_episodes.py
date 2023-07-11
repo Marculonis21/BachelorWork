@@ -29,18 +29,12 @@ if __name__ == "__main__":
     per_gen_values = history.reshape(-1,history.shape[2])
 
     per_gen_max = np.max(history, axis=1)
-    # per_gen_min = np.min(history, axis=1)
 
     tick_step = args.tick_step
     n_ticks = int(np.ceil(per_gen_values.shape[1]/tick_step))
 
     index = np.arange(n_ticks)*tick_step
 
-    # for idx in index:
-    #     for i in range(len(history)):
-    #         plt.scatter(idx/10, per_gen_max[:, idx][i], s=25, c='r', marker="*", zorder=2)
-    # for i in range(len(history)):
-    #     plt.plot(index/10, per_gen_max[:, index][i], marker="o", zorder=2)
     for i in range(len(history)):
         plt.scatter(index[-1]/10, per_gen_max[:, -1][i], s=25, c='r', marker="*", zorder=2)
 
@@ -49,7 +43,6 @@ if __name__ == "__main__":
     plt.plot(np.min(per_gen_values[:,index], axis=0), c='r', label="min fitness", zorder=1)
     # plt.plot(np.mean(per_gen_max, axis=0)[index], label="mean max fitness")
     # plt.plot(np.mean(per_gen_min, axis=0)[index], label="mean min fitness")
-
     plt.xticks(ticks=np.arange(n_ticks),labels=np.arange(n_ticks)*tick_step, fontsize=12)
     plt.yticks(fontsize=12)
     plt.xlabel("Generace", fontsize=12)

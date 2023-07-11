@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 sys.path.insert(0, os.path.abspath('../../resources'))
 sys.path.insert(0, os.path.abspath('../../resources/agents'))
 sys.path.insert(0, os.path.abspath('../../resources/robots'))
+sys.path.insert(0, os.path.abspath('../../resources/GUI_tabs'))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -32,6 +33,7 @@ autodoc_default_options = {
     "private-members": True
 }
 
+autodoc_member_order = 'bysource'
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

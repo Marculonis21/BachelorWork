@@ -8,10 +8,10 @@ import resources.GUI_tabs.run_window as run_window
 
 experiments = Experiments()
 
-font = ("Helvetica", 15)
+FONT = "Arial"
 
 def tab():
-    frame_text = [[sg.Text("", font=("Helvetica", 14), size=(58, None), pad=(10,10), key="-MAIN_SETTINGS_OVERVIEW-")]]
+    frame_text = [[sg.Text("", font=(FONT, 14), size=(58, None), pad=(10,10), key="-MAIN_SETTINGS_OVERVIEW-")]]
 
     frame = [sg.Frame("Experiment overview", frame_text, size=(800, 350), pad=(10,10))]
     options = [sg.Checkbox("Save best", visible=False, default=True, key="-SAVE_BEST-"), sg.Checkbox("Show final run", visible=False, key="-SHOW_BEST-"), 
@@ -20,7 +20,7 @@ def tab():
                sg.Button("Save experiment", pad=((5,0),None), key="-SAVE_EXPERIMENT-"), 
                sg.Button("Load experiment", pad=((2,10),None), key="-LOAD_EXPERIMENT-")]
 
-    save_dir = [sg.Text("Save directory:", pad=((10,0),30)), sg.Text("./saves/individuals/", size=(40,None), font=("Helvetica", 10), key="-SAVE_DIR_TEXT-"), 
+    save_dir = [sg.Text("Save directory:", pad=((10,0),30)), sg.Text("./saves/individuals/", size=(40,None), font=(FONT, 10), key="-SAVE_DIR_TEXT-"), 
                 sg.Push(), 
                 sg.FolderBrowse("Browse", size=(6,None), initial_folder="./saves/individuals", pad=((0,10),None), target="-SAVE_DIR_TEXT-")]
 
@@ -38,7 +38,7 @@ def tab():
 def popup_view_individual():
     title = [sg.Text("Select individual for run view", size=(None,1), pad=(10,10))]
 
-    save_dir = [sg.Text("Selected directory: ", pad=((10,0),30)), sg.Text("", size=(40,None), font=("Helvetica", 10), key="DIR"), 
+    save_dir = [sg.Text("Selected directory: ", pad=((10,0),30)), sg.Text("", size=(40,None), font=(FONT, 10), key="DIR"), 
                 sg.Push(), 
                 # sg.FileBrowse("Browse", size=(6,None), initial_folder="./saves/", pad=((0,10),None), file_types=(("Best individual save files","*.save"), ("Population save files" ,"*last_population*")), target="DIR")]
                 sg.FileBrowse("Browse", size=(6,None), initial_folder="./saves/", pad=((0,10),None), file_types=(("Best individual save files","*.save")), target="DIR")]
@@ -51,7 +51,7 @@ def popup_view_individual():
               main]
 
     name = None
-    popup = sg.Window("Experiment name", layout, font=font, keep_on_top=True, modal=True)
+    popup = sg.Window("Experiment name", layout, font=(FONT, 14), keep_on_top=True, modal=True)
     while True:
         event, values = popup.read(1)
 
@@ -83,7 +83,7 @@ def popup_save_experiments():
               main]
 
     name = None
-    popup = sg.Window("Experiment name", layout, font=font, keep_on_top=True, modal=True)
+    popup = sg.Window("Experiment name", layout, font=(FONT, 14), keep_on_top=True, modal=True)
     while True:
         event, values = popup.read()
 
@@ -103,14 +103,14 @@ def popup_load_experiments():
 
     title = [sg.Text("Select experiment to be loaded in", size=(None,2), pad=(10,10))]
 
-    main = [[sg.Listbox(experiments.get_experiment_names(), select_mode=sg.SELECT_MODE_SINGLE, font=("Helvetica", 12), expand_x=True, expand_y=True, pad=(10,5), key="SELECTED_EXPERIMENT")],
+    main = [[sg.Listbox(experiments.get_experiment_names(), select_mode=sg.SELECT_MODE_SINGLE, font=(FONT, 12), expand_x=True, expand_y=True, pad=(10,5), key="SELECTED_EXPERIMENT")],
             [sg.Button("Load", key="LOAD")]]
 
     layout = [title,
               main]
 
     params = None
-    popup = sg.Window("Load experiment", layout, size=(700,400), font=font, keep_on_top=True, modal=True)
+    popup = sg.Window("Load experiment", layout, size=(700,400), font=(FONT, 14), keep_on_top=True, modal=True)
     while True:
         event, values = popup.read()
 

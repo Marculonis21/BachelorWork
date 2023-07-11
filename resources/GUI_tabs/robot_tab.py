@@ -16,8 +16,8 @@ robots = {robot.__class__.__name__ : robot for robot in [
     roboEvo.robots.StickAnt(),
     roboEvo.robots.SpotLike(),
     roboEvo.robots.Walker2D(),
-    roboEvo.robots.Pendulum(),
-    roboEvo.robots.DoublePendulum(),
+    roboEvo.robots.InvertedPendulum(),
+    roboEvo.robots.InvertedDoublePendulum(),
 ]}
 
 robot_names = list(robots.keys())

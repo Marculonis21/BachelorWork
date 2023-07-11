@@ -46,9 +46,9 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="main_modules.html">RoboEvo</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">roboEvo module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#roboEvo._run_evolution"><code class="docutils literal notranslate"><span class="pre">_run_evolution()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#roboEvo._simulation_run"><code class="docutils literal notranslate"><span class="pre">_simulation_run()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#roboEvo.render_run"><code class="docutils literal notranslate"><span class="pre">render_run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#roboEvo._run_evolution"><code class="docutils literal notranslate"><span class="pre">_run_evolution()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#roboEvo.run_experiment"><code class="docutils literal notranslate"><span class="pre">run_experiment()</span></code></a></li>
 </ul>
 </li>
@@ -125,31 +125,6 @@ between GUI and running experiments to enable drawing progress graphs.</p>
 </dd>
 </dl>
 <dl class="py function">
-<dt class="sig sig-object py" id="roboEvo._run_evolution">
-<span class="sig-prename descclassname"><span class="pre">roboEvo.</span></span><span class="sig-name descname"><span class="pre">_run_evolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ExperimentParams</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_population</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#roboEvo._run_evolution" title="Permalink to this definition"></a></dt>
-<dd><p>Function for setting up and running evolutionary algorithm.</p>
-<p>This function takes parameters from selected experiment and runs the
-evolution with parameters described by the experiment parameters.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>params</strong> (<a class="reference internal" href="experiment_params.html#experiment_params.ExperimentParams" title="experiment_params.ExperimentParams"><em>ExperimentParams</em></a>) – Class of multiple experiment parameters used in experiments.</p></li>
-<li><p><strong>client</strong> (<em>Client</em>) – Client from Dask library, used for running evaluations in paralel.</p></li>
-<li><p><strong>load_population</strong> (<em>list</em>) – Optional population parameter to be loaded in instead of creating entirely new population. Used with morphology evolution.</p></li>
-<li><p><strong>gui</strong> (<em>bool</em>) – Flag showing that module was started through GUI.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em>) – Debug flag. Used for testing features.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A tuple of <cite>best_individual</cite> genome and environment used to run evaluation of the best individual.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Tuple[<cite>best_individual</cite>, Env]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="roboEvo._simulation_run">
 <span class="sig-prename descclassname"><span class="pre">roboEvo.</span></span><span class="sig-name descname"><span class="pre">_simulation_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseAgent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">individual</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#roboEvo._simulation_run" title="Permalink to this definition"></a></dt>
 <dd><p>Performs run in simulated environment.</p>
@@ -198,6 +173,31 @@ rendering individuals.</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#roboEvo._simulation_run" title="roboEvo._simulation_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">_simulation_run()</span></code></a> : Function used for running the simulation.</p>
 </div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="roboEvo._run_evolution">
+<span class="sig-prename descclassname"><span class="pre">roboEvo.</span></span><span class="sig-name descname"><span class="pre">_run_evolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ExperimentParams</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_population</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#roboEvo._run_evolution" title="Permalink to this definition"></a></dt>
+<dd><p>Function for setting up and running evolutionary algorithm.</p>
+<p>This function takes parameters from selected experiment and runs the
+evolution with parameters described by the experiment parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<a class="reference internal" href="experiment_params.html#experiment_params.ExperimentParams" title="experiment_params.ExperimentParams"><em>ExperimentParams</em></a>) – Class of multiple experiment parameters used in experiments.</p></li>
+<li><p><strong>client</strong> (<em>Client</em>) – Client from Dask library, used for running evaluations in paralel.</p></li>
+<li><p><strong>load_population</strong> (<em>list</em>) – Optional population parameter to be loaded in instead of creating entirely new population. Used with morphology evolution.</p></li>
+<li><p><strong>gui</strong> (<em>bool</em>) – Flag showing that module was started through GUI.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em>) – Debug flag. Used for testing features.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple of <cite>best_individual</cite> genome and environment used to run evaluation of the best individual.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[<cite>best_individual</cite>, Env]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">

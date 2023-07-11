@@ -80,7 +80,7 @@ def simulationRun(agent, individual):
 
 if __name__ == "__main__":
     robot = roboEvo.robots.Walker2D()
-    agent = roboEvo.gaAgents.FullRandomAgent(robot, [])
+    agent = roboEvo.gaAgents.StepCycleFullAgent(robot, [])
     individual = agent.generate_population(1)[0]
 
     file = robot.create(agent.body_part_mask, individual)
@@ -94,6 +94,7 @@ if __name__ == "__main__":
 
     simulationRun(agent, individual)
     file.close()
+    os.unlink(file.name)
     env.close()
     input()
     print("DONE")

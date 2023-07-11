@@ -66,6 +66,16 @@ class Operators:
 
     @staticmethod
     def roulette_selection(population, fitness_values): # TOURNAMENT
+        """
+        Runs basic roulette selection between all individuals with probability
+        of selection corresponding to their fitness (needs all positive fitness
+        values).
+
+        Returns:
+            List[individual] : List of selected parents of the same size as
+            original population.
+        """
+
         num_positive = np.sum([1 if x > 0 else 0 for x in fitness_values])
         if num_positive < len(population)/3:
             return Operators.tournament_selection(population, fitness_values, int(len(population)*0.1))
@@ -84,7 +94,12 @@ class Operators:
     @staticmethod
     def tournament_selection(population, fitness_values, k=5): # TOURNAMENT
         """
-        Runs tournamnets between randomly chosen individuals and selects the best from each tournament.
+        Runs tournamnets between randomly chosen individuals and selects the
+        best from each tournament.
+
+        Returns:
+            List[individual] : List of selected parents of the same size as
+            original population.
         """
 
         fitness_values = np.array(fitness_values)
@@ -100,9 +115,18 @@ class Operators:
     @staticmethod
     def tournament_prob_selection(population, fitness_values, probability=0.9, k=5): # TOURNAMENT
         """
-        Runs tournamnets between randomly chosen individuals and selects one acording to probability based on their results
+        Runs tournamnets between randomly chosen individuals and selects one
+        according to probability based on their results. For each individual
+        with tournament placement X:
 
-        p-selection = p*(1-p)^(indiv_tournament_result-1)
+        .. math::
+            p(X) = probability*(1-probability)^{X-1}
+
+        (These probabilities are then normalised so they sum up to 1)
+
+        Returns:
+            List[individual] : List of selected parents of the same size as
+            original population.
         """
         population = np.array(population, dtype=object)
         fitness_values = np.array(fitness_values)
@@ -129,6 +153,15 @@ class Operators:
 
     @staticmethod
     def crossover_single_point(population, agent):
+        """
+        Single point crossover operator. Uses agent attributes -
+        :attr:`BaseAgent.evolve_control` and :attr:`BaseAgent.evolve_body`.
+
+        Returns:
+            List[individual] : List of created offsprings of the same size as 
+            original population.
+        """
+
         new_population = []
 
         for i in range(0,len(population)//2):
@@ -163,6 +196,16 @@ class Operators:
 
     @staticmethod
     def crossover_uniform(population, agent):
+        """
+        Uniform crossover operator - selects genetic information from each
+        parent with probability 1/2. Uses agent attributes -
+        :attr:`BaseAgent.evolve_control` and :attr:`BaseAgent.evolve_body`.
+
+        Returns:
+            List[individual] : List of created offsprings of the same size as 
+            original population.
+        """
+
         new_population = []
 
         for i in range(len(population)//2):
@@ -193,6 +236,17 @@ class Operators:
 
     @staticmethod
     def uniform_mutation(population, agent):
+        """
+        Uniform mutation operator - with set probabilities (set by agent attributes -
+        :attr:`BaseAgent.individual_mutation_prob`, :attr:`BaseAgent.action_mutation_prob`
+        and :attr:`BaseAgent.body_mutation_prob`) mutates a value to to new
+        from allowed range (allowed ranges of values are also set by agent
+        attributes - :attr:`BaseAgent.action_range` and :attr:`BaseAgent.body_range`).
+
+        Returns:
+            List[individual] : List of mutatted offsprings.
+        """
+
         new_population = []
 
         for individual in population:
@@ -223,6 +277,17 @@ class Operators:
 
     @staticmethod
     def uniform_shift_mutation(population, agent, max_shift_percentage=0.05):
+        """
+        Uniform shift mutation operator - works similarly to
+        :func:`uniform_mutation` but instead of generating random value from
+        the whole allowed range when mutation value, it only generates value in
+        small part of allowed range (argument :attr:`max_shift_percentage`) and
+        changes current value by this small generated shift.
+
+        Returns:
+            List[individual] : List of mutatted offsprings.
+        """
+
         new_population = []
 
         for individual in population:
@@ -236,8 +301,10 @@ class Operators:
                             action_shift = np.array([])
 
                             for part in range(len(agent.action_range)):
-                                # max 5% shift
-                                action_shift = np.concatenate([action_shift, np.random.uniform(agent.action_range[part][0]*max_shift_percentage, agent.action_range[part][1]*max_shift_percentage, size=agent.action_range[part][2])])
+                                shift = np.random.uniform(agent.action_range[part][0]*max_shift_percentage, agent.action_range[part][1]*max_shift_percentage, size=agent.action_range[part][2])
+                                signs = np.random.choice([-1,1],size=agent.action_range[part][2])
+                                shift = shift*signs
+                                action_shift = np.concatenate([action_shift, shift])
 
                             actions[a] += action_shift
 

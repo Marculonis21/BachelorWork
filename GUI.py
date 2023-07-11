@@ -1,4 +1,29 @@
 #!/usr/bin/env python
+"""GUI module
+
+Central GUI module. GUI splits into different tabs (modules described
+:ref:`GUI_tabs`). GUI is created with **PySimpleGUI**.
+
+GUI firstly initialises window with :func:`make_window` which collects windows
+(created tabs) from all created tabs and puts them inside one big tabgroup.
+More about those tabs inside individual sub-modules.
+
+User should have some knowledge of **PySimpleGUI** library to fully understand
+the GUI app. It is not in our capabilities to fully describe every part of
+this library in exhaustive detail (more about this library in the official
+`documentation <https://www.pysimplegui.org/en/latest/>`_).
+
+After initialisation the app runs in infinite loop, reading inputs as events,
+which are handled inside corresponding tabs.
+
+Each tab has to have 2 mandatory functions: 
+    * :func:`tab` - for initialising own tab
+    * :func:`events` - for receiving ALL events and deciding if the event should be handled inside that tab
+"""
+
+import PySimpleGUI as sg
+import threading
+import numpy as np
 
 import roboEvo
 
@@ -8,16 +33,18 @@ import resources.GUI_tabs.agent_tab as agent_tab
 import resources.GUI_tabs.run_window as run_window
 import resources.GUI_tabs.evo_tab as evo_tab
 
-import PySimpleGUI as sg
-import threading
-import numpy as np
-
-font = ("Helvetica", 15)
+FONT = "Arial Bold"
 
 def make_window():
+    """
+    Main function initialising all other tabs and putting everything together
+    inside single big ``TabGroup``. With this element the main app window is
+    created and returned to the main infinite event loop.
+    """
+
     tabGroup = [[sg.TabGroup([[main_tab.tab(), robot_tab.tab(), agent_tab.tab(), evo_tab.tab()]], size=(800,600))]]
 
-    window = sg.Window('Test GUI', tabGroup, size=(800,600), font=font, finalize=True,  use_default_focus=False)
+    window = sg.Window('RoboEvo GUI', tabGroup, size=(800,600), font=(FONT, 15), finalize=True,  use_default_focus=False)
 
     window['-AGENT_OVERVIEW_MORE-'].block_focus()
     window['-ROBOT_OVERVIEW_MORE-'].block_focus()

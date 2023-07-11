@@ -50,10 +50,11 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">experiment_setter module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#experiment_setter.Experiments"><code class="docutils literal notranslate"><span class="pre">Experiments</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#experiment_setter.Experiments.__create_batch_dir"><code class="docutils literal notranslate"><span class="pre">Experiments.__create_batch_dir()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#experiment_setter.Experiments.exp10_TFS_spotlike"><code class="docutils literal notranslate"><span class="pre">Experiments.exp10_TFS_spotlike()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#experiment_setter.Experiments.get_experiment"><code class="docutils literal notranslate"><span class="pre">Experiments.get_experiment()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#experiment_setter.Experiments.load_saved_experiments"><code class="docutils literal notranslate"><span class="pre">Experiments.load_saved_experiments()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#experiment_setter.Experiments.save_experiment"><code class="docutils literal notranslate"><span class="pre">Experiments.save_experiment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#experiment_setter.Experiments.load_saved_experiments"><code class="docutils literal notranslate"><span class="pre">Experiments.load_saved_experiments()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#experiment_setter.Experiments.get_experiment_names"><code class="docutils literal notranslate"><span class="pre">Experiments.get_experiment_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#experiment_setter.Experiments.get_experiment"><code class="docutils literal notranslate"><span class="pre">Experiments.get_experiment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#experiment_setter.Experiments.exp10_TFS_spotlike"><code class="docutils literal notranslate"><span class="pre">Experiments.exp10_TFS_spotlike()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -139,22 +140,34 @@ dictionary with selected custom name.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="experiment_setter.Experiments.exp10_TFS_spotlike">
-<span class="sig-name descname"><span class="pre">exp10_TFS_spotlike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#experiment_setter.Experiments.exp10_TFS_spotlike" title="Permalink to this definition"></a></dt>
-<dd><p>Example of experiment.</p>
-<p>This method is an example of how and experiment can be created through
-this class.</p>
+<dt class="sig sig-object py" id="experiment_setter.Experiments.save_experiment">
+<span class="sig-name descname"><span class="pre">save_experiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#experiment_setter.Experiments.save_experiment" title="Permalink to this definition"></a></dt>
+<dd><p>Method for saving experiments.</p>
+<p>Method used while experiments need to be saved from <a class="reference internal" href="GUI.html#module-GUI" title="GUI"><code class="xref py py-mod docutils literal notranslate"><span class="pre">GUI</span></code></a> .
+Saving to preset folder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>run</strong> (<em>bool</em>) – Flag argument stating if function returns ExperimentParams that should be run immediately.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Created experiment parameters.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="experiment_params.html#experiment_params.ExperimentParams" title="experiment_params.ExperimentParams">ExperimentParams</a></p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Selected name under which the experiment preset will
+be saved.</p></li>
+<li><p><strong>params</strong> (<a class="reference internal" href="experiment_params.html#experiment_params.ExperimentParams" title="experiment_params.ExperimentParams"><em>ExperimentParams</em></a>) – Instance of experiment parameters to be
+saved.</p></li>
+</ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="experiment_setter.Experiments.load_saved_experiments">
+<span class="sig-name descname"><span class="pre">load_saved_experiments</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#experiment_setter.Experiments.load_saved_experiments" title="Permalink to this definition"></a></dt>
+<dd><p>Method for loading saved experiments.</p>
+<p>Method used for loading previously saved experiments from <a class="reference internal" href="GUI.html#module-GUI" title="GUI"><code class="xref py py-mod docutils literal notranslate"><span class="pre">GUI</span></code></a> .</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="experiment_setter.Experiments.get_experiment_names">
+<span class="sig-name descname"><span class="pre">get_experiment_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#experiment_setter.Experiments.get_experiment_names" title="Permalink to this definition"></a></dt>
+<dd><p>Method for listing all created experiments.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -171,18 +184,22 @@ name validity.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="experiment_setter.Experiments.load_saved_experiments">
-<span class="sig-name descname"><span class="pre">load_saved_experiments</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#experiment_setter.Experiments.load_saved_experiments" title="Permalink to this definition"></a></dt>
-<dd><p>Method for loading saved experiments.</p>
-<p>Method used for loading previously saved experiments from <code class="xref py py-mod docutils literal notranslate"><span class="pre">GUI</span></code> .</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="experiment_setter.Experiments.save_experiment">
-<span class="sig-name descname"><span class="pre">save_experiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#experiment_setter.Experiments.save_experiment" title="Permalink to this definition"></a></dt>
-<dd><p>Method for saving experiments.</p>
-<p>Method used while experiments need to be saved from <code class="xref py py-mod docutils literal notranslate"><span class="pre">GUI</span></code> .
-Saving to preset folder.</p>
+<dt class="sig sig-object py" id="experiment_setter.Experiments.exp10_TFS_spotlike">
+<span class="sig-name descname"><span class="pre">exp10_TFS_spotlike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#experiment_setter.Experiments.exp10_TFS_spotlike" title="Permalink to this definition"></a></dt>
+<dd><p>Example of experiment.</p>
+<p>This method is an example of how and experiment can be created through
+this class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>run</strong> (<em>bool</em>) – Flag argument stating if function returns ExperimentParams that should be run immediately.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Created experiment parameters.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="experiment_params.html#experiment_params.ExperimentParams" title="experiment_params.ExperimentParams">ExperimentParams</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

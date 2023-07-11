@@ -176,7 +176,7 @@ def events(window, event, values, robot_tab, agent_tab, evo_tab):
 
             window["-ROBOT_SELECT-"].update(robot_name)
             window["-AGENT_SELECT-"].update(agent_name)
-            window["-EVO_TYPE_SELECT-"].update(experiment_params.agent.evo_type.name)
+            window["-EVO_TYPE_SELECT-"].update(experiment_params.agent.evo_type)
             robot_tab.set_robot(robot_name, window, values, experiment_params.agent)
             agent_tab.set_agent(agent_name, window)
             agent_tab.agents[agent_name] = experiment_params.agent

@@ -41,8 +41,6 @@ if __name__ == "__main__":
     plt.boxplot(per_gen_values[:,index], positions=np.arange(n_ticks), zorder=1)
     plt.plot(np.max(per_gen_values[:,index], axis=0), label="max fitness", zorder=1)
     plt.plot(np.min(per_gen_values[:,index], axis=0), c='r', label="min fitness", zorder=1)
-    # plt.plot(np.mean(per_gen_max, axis=0)[index], label="mean max fitness")
-    # plt.plot(np.mean(per_gen_min, axis=0)[index], label="mean min fitness")
     plt.xticks(ticks=np.arange(n_ticks),labels=np.arange(n_ticks)*tick_step, fontsize=12)
     plt.yticks(fontsize=12)
     plt.xlabel("Generace", fontsize=12)

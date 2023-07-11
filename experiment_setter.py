@@ -33,9 +33,9 @@ class Experiments:
     :func:`roboEvo.run_experiment` method are accessed via class methods or via
     :func:`get_experiment` method which takes an experiment name as an argument. 
 
-    When defining new experiments users need to create their own method for
+    **When defining new experiments users have to create their own method for
     parameter creation and then add the experiment to ``__experiments``
-    dictionary with selected custom name.
+    dictionary with selected custom name.**
 
     :cvar __experiment: Dictionary of experiments initialised in :func:`__init__`
     :vartype __experiment: dict[str, ExperimentParams]

@@ -31,7 +31,7 @@ minimalistický instalátor \emph{Miniconda} (dostupný na všech platformách
 z~oficiálních stránek \url{https://docs.conda.io/en/latest/miniconda.html}).
 
 Po stažení a instalaci tohoto instalátoru by měl uživatel mít z příkazové řádky
-(popřípadě s využitím specializované \emph{Conda} příkazové řádky)) přístup k
+(popřípadě s využitím specializované \emph{Conda} příkazové řádky) přístup k
 příkazu \texttt{conda}, který umožňuje ovládat prostředí pro správu balíčků. 
 
 \paragraph{Tvorba prostředí}
@@ -40,7 +40,7 @@ tvorbu prostředí pro naši aplikaci.
 \begin{code}
 conda env create -f conda_environment/environment.yml
 \end{code}
-Tento příkaz je volán přes příkaz \texttt{conda}. Pomocí spojení \texttt{env
+Tento příkaz je volání aplikace \texttt{conda}. Pomocí spojení \texttt{env
 create} specifikujeme, že chceme vytvářet nové prostředí pro běh aplikací.
 Parameter \texttt{-f} příkazu říká, že bude následovat vstupní soubor (cesta ke
 konfigurarčnímu souboru), pomocí kterého má být prostředí vytvořeno. Tento
@@ -69,13 +69,13 @@ záložky.
 \paragraph{Záložka \emph{Main}}
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=0.6\textwidth]{../img/GUI_main_tab.jpg}
+    \includegraphics[width=0.8\textwidth]{../img/GUI_main_tab.jpg}
     \caption{Úvodní okno aplikace}
     \label{doc_12_fig:GUI_main}
 \end{figure}
 Úvodní záložka grafické aplikace (obrázek \ref{doc_12_fig:GUI_main}), ve které
-si můžeme prohlédnout zkrácený popis aktuálně nakonfigurované experimentu.
-Tento popis je automaticky generován a aktualizovaná tak, aby reflektoval změny
+si můžeme prohlédnout zkrácený popis aktuálně nakonfigurovaného experimentu.
+Tento popis je automaticky generován a aktualizován tak, aby reflektoval změny
 konfigurace daného experimentu. 
 
 Dále pod popisem experimentu najdeme tlačítka pro uložení aktuální konfigurace
@@ -88,8 +88,11 @@ kterého si uživatel může podle jména vybrat (aktuální konfigurace bude be
 možnosti obnovy přepsána).
 
 Úvodní záložka dále nabízí tlačítko \emph{View individual}, které umožňuje v
-prohlížeči souborů vybrat uložený záznam nejlepšího jedince z nějakého
-předchozího experimentu a toho vizualizovat.
+prohlížeči souborů vybrat uložená data jedinců poslední generace libovolného
+experimentu. Po načtení a zpracování dat jedinců je uživateli prezentován
+seznam jedinců seřazených podle fitness hodnot. Uživatel v tomto seznamu má
+možnost vybrat libovolného jedince pro vizualizaci. Více o vizualizacích
+je jedinců popsáno v sekci \ref{doc_23_visualization}.
 
 V další řádce se nachází textové pole popisující cílovou cestu, kam bude
 uložena složka s daty z konfigurovaného experimentu a tlačítko pro změnu této
@@ -101,7 +104,7 @@ nakonfigurovaný experiment.
 \paragraph{Záložka \emph{Robot select}}
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=0.6\textwidth]{../img/GUI_robot_tab.jpg}
+    \includegraphics[width=0.8\textwidth]{../img/GUI_robot_tab.jpg}
     \caption{Okno pro volbu robota pro experiment}
     \label{doc_12_fig:GUI_robot}
 \end{figure}
@@ -121,7 +124,7 @@ vývoj (více o těchto značkách v kapitole o implementaci v sekci
 \paragraph{Záložka \emph{Agent config}}
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=0.6\textwidth]{../img/GUI_agent_tab.jpg}
+    \includegraphics[width=0.8\textwidth]{../img/GUI_agent_tab.jpg}
     \caption{Okno pro volbu agenta pro experiment}
     \label{doc_12_fig:GUI_agent}
 \end{figure}
@@ -140,7 +143,7 @@ všech parametrů).
 \paragraph{Záložka \emph{Evolution config}}
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=0.6\textwidth]{../img/GUI_evo_tab.jpg}
+    \includegraphics[width=0.8\textwidth]{../img/GUI_evo_tab.jpg}
     \caption{Okno pro úpravu specifických nastavení agenta}
     \label{doc_12_fig:GUI_evo}
 \end{figure}
@@ -168,7 +171,6 @@ hodnoty odpovídají hodnotám specifikovaným ve zdrojovém kódu agentů (pop�
 se jedná o~hodnoty specifikované načtenou konfigurací experimentu).
 
 \subsection{Textové rozhraní - \emph{TUI.py}} \label{doc_13_TUI}
-
 Textové rozhraní je druhým způsobem, jakým uživatel může pracovat s naší
 platformou. Jedná se o částečně omezený přístup v porovnání s grafickým
 rozhraním, jelikož textové rozhraní nedovoluje jen za pomocí interakce s
@@ -182,9 +184,77 @@ vizualizaci výsledků starších experimentů.
 
 \paragraph{Interakce s rozhraním}
 Uživatel interaguje s rozhraním z příkazové řádky, pomocí vstupních argumentů,
-které zadává při spouštění programu. Seznam a~popis vstupních argumentů
-dostupných pro práci s rozhraním společně s příklady využití se nacházejí v
-kapitole o implementaci v sekci \ref{imp:TUI}. 
+které zadává při spouštění programu. Textové rozhraní vytváří jednoduchý
+způsob, jak vybírat a spouštět vyhodnocení dostupných experimentů.
+
+\paragraph{Ovládání TUI} \label{doc_13_TUI_ovladani}
+Textové rozhraní ovládá uživatel z příkazové řádky zadáváním vstupních
+argumentů. Těmito argumenty jsou následující:
+
+\begin{itemize}
+    \item \texttt{-{}-experiment} -- argument, který obdrží textový vstup
+        specifikující jméno jednoho nebo více experimentu (oddělených mezerou),
+        jehož parametry chceme načíst a spustit (pracující s modulem
+        \emph{experiment\_setter} popsaného v oddíle
+        \ref{imp:experimentsetter}),
+    \item \texttt{-{}-experiment\_names} -- při uvedení tohoto argumentu
+        program vypíše názvy všech vytvořených experimentů z modulu
+        \emph{experiment\_setter} a následně se ukončí,
+    \item \texttt{-{}-batch} -- argument číselné hodnoty, specifikující
+        kolikrát se má nakonfigurovaný experiment opakovaně spustit (používané
+        pro statistické vyhodnocení výsledků experimentů),
+    \item \texttt{-{}-batch\_note} -- textový argument umožňující připojit
+        vlastní poznámku k~názvu složky, do které se experimenty z
+        několikanásobného spuštění ukládají (argument nemá žádný efekt pro
+        experimenty z modulu \\\emph{experiment\_setter}),
+    \item \texttt{-{}-open} -- textový argument, který obdrží cestu k uloženým
+        datům nejlepšího jedince z libovolného předchozího experimentu,
+        umožňující vizualizaci řešení daného jedince,
+    \item \texttt{-{}-no\_graph} -- argument, který značí, že za běhu algoritmu
+        nemá být vykreslován graf průběhu fitness hodnot v jednotlivých
+        generacích.
+\end{itemize}
+
+\paragraph{Ukázky možných vstupů}
+Textové rozhraní úzce spolupracuje s modulem \emph{experiment\_setter}, který
+udržuje definované experimenty. Jedním z užitečných parametrů je
+\texttt{-{}-experiment\_names}, který TUI nechá vypsat názvy všech definovaných
+experimentů.
+
+\begin{code}
+>>> python TUI.py --experiment_names
+<<< List of created experiments:
+     - exp10_TFS
+     - exp11_TFS_spot
+     - exp12_TFS_ant
+     ...
+\end{code}
+
+Pokud již známe jeden nebo více experimentů, které chceme spustit,
+můžeme je spustit výběrem parametru \texttt{-{}-experiment} a vypsáním seznamu 
+zvolených experimentů oddělených mezerou.
+
+\begin{code}
+>>> python TUI.py --experiment exp11_TFS_spot exp_12_TFS_ant
+<<< Starting experiment - exp11_TFS_spot 
+    ...
+\end{code}
+
+Ve spojení s parametrem \texttt{-{}-experiment} můžeme vybrat další parametry.
+Těmi mohou být parametr \texttt{-{}-batch} (\texttt{-{}-batch 5} bude
+opakovat běh všech zvolených experimentů 5krát), nebo parametr
+\texttt{-{}-no\_graph}, který zabrání průběžnému vykreslování grafů z běhu
+experimentu nebo parametr \texttt{-{}-note}, umožňující upravit název složky,
+do které se budou data ukládat.
+
+\paragraph{}
+Posledním často používaným parametrem je \texttt{-{}-open}, pomocí kterého
+si můžeme v simulačním prostředí přehrát běh nejlepšího jedince ze zvoleného
+předchozího experimentu.
+\begin{code}
+>>> python TUI.py --open saved_files/runs/run1/individual.save
+<<< (Simulace zvoleného jedince)
+\end{code}
 
 \section{Tvorba, provádění a evaluace experimentů} \label{doc_2_experimenty}
 
@@ -192,7 +262,7 @@ V této části popíšeme způsob, jakým může uživatel pracovat s experimen
 může experimenty vytvářet, spouštět a zpracovávat jejich výsledky.
 
 V podsekci \ref{doc_21_mise_en_place} si představíme jak vytvářet
-konfiguraci experiment. Dále v~podsekci \ref{doc_22_cooking} předvedeme
+konfiguraci experimentu. Dále v~podsekci \ref{doc_22_cooking} předvedeme
 způsoby, jakými spouštět experimenty a v poslední podsekci
 \ref{doc_23_seasoning} ukážeme možnosti evaluace výsledků experimentů.
 
@@ -230,7 +300,6 @@ nich změny (kvůli kompatibilitě s původními experimenty musí výchozí age
 zůstat bez změn -- úpravy ve vlastních kopiích agentů).
 
 \subsection{Spouštění experimentu} \label{doc_22_cooking}
-
 Když je připravená konfigurace experimentu, uživatel má možnost ji vybrat pro
 spuštění. Toho opět může být dosaženo dvěma způsoby, které jsme již dříve
 popsali a to pomocí grafického, nebo textového rozhraní.
@@ -252,7 +321,7 @@ nezávislými běhy, které následně mohou být součástí statistického roz
 větším množstvím hodnot. Následuje ukázka jak můžeme spustit vlastní
 experiment pomocí TUI (z kořenového adresáře projektu).
 \begin{code}
-./TUI.py --experiment <jmeno_experimentu> --batch 10 --no_graph
+python TUI.py --experiment <jmeno_experimentu> --batch 10 --no_graph
 \end{code}
 Tímto příkazem můžeme spustit libovolný uložený experiment. Celý běh bude 10
 krát opakován, kde výsledky jednotlivých nezávislých běhů budou uloženy
@@ -274,8 +343,7 @@ program je \emph{plot\_experiment.py} a~nachází se v kořenové složce
 tohoto projektu. Tento program přijímá dva vstupní argumenty: 
 \begin{itemize}
     \item \texttt{-{}-open} -- povinný argument, po kterém uživatel specifikuje
-        cestu ke složce experimentu (běhů experimentu), který chce vykreslit
-        uživatel vykreslit,
+        cestu ke složce experimentu (běhů experimentu), který chce vykreslit,
     \item \texttt{-{}-tick\_step} -- nepovinný argument, po kterém uživatel specifikuje
         celočíselnou hodnotu reprezentující mezery (počet generací) mezi
         vykreslenými záznamy v krabicovém grafu.
@@ -283,7 +351,50 @@ tohoto projektu. Tento program přijímá dva vstupní argumenty:
 Po spuštění program vykreslí graf ze zvolených dat. Vysvětlení krabicových
 grafů proběhlo v kapitole experimentů v sekci \ref{exp1}.
 
-\paragraph{Vizualizace nejlepších jedinců}
+Předvedeme příklad, jak tímto stylem generovat grafy pomocí dat z provedeného
+experimentu. Jako příklad využijeme data vygenerována posledním experimentem
+této práce -- oddělený vývoj řízení a morfologie robota z experimentu
+\ref{exp2:split_evo}. 
+
+Máme tedy provedený experiment, který 5 krát nezávisle opakoval běh evolučního
+algoritmu a jeho data máme uložená ve složce \texttt{saves/exp1}. Data ve
+složce mají přibližně následující tvar.
+\begin{code}
+složka saves/exp1/:
+    run1_<note>_episode_history<run1_timestamp>.npy
+    run1_<note>_individual_run<run1_timestamp>_rew<reward>.save
+    run1_<note>_last_popuplation<run1_timestamp>.npy
+    ...
+    run5_<note>_episode_history<run2_timestamp>.npy
+    run5_<note>_individual_run<run2_timestamp>_rew<reward>.save
+    run5_<note>_last_popuplation<run2_timestamp>.npy
+\end{code}
+Graf z těchto dat můžeme vygenerovat spuštěním modulu
+\emph{plot\_experiment.py} s~cestou ke složce s daty experimentu.
+
+\begin{code}
+# 1. vykreslení grafu s výchozí hodnotou tick_step = 10
+>>> python plot_experiment.py --open saves/exp1/ 
+
+# 2. vykreslení grafu s tick_step = 20
+>>> python plot_experiment.py --open saves/exp1/ --tick_step 20
+\end{code}
+
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=1\textwidth]{../img/experiment2_serial_10ticks.pdf}
+    \end{minipage}%
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=1\textwidth]{../img/experiment2_serial_20ticks.pdf}
+    \end{minipage}
+    \caption{Grafy vygenerované prvním (obrázek vlevo) a druhým (obrázek vpravo) příkazem z
+    ukázky.}
+\end{figure}
+
+\paragraph{Vizualizace jedinců} \label{doc_23_visualization}
 Všechny experimenty vždy ukládají nejlepší vyvinuté jedince. Naše platforma
 umožňuje tato data využít k vizualizacím běhů těchto nejlepších jedinců. 
 
@@ -314,3 +425,51 @@ prvky této aplikace jsou popsány následujícím výčtem.
     \item Průhledné vykreslování geometrie -- klávesa \texttt{R},
     \item Otevření/zavření nápovědy -- klávesa \texttt{H}.
 \end{itemize}
+
+Nyní si popíšeme kroky, které uživatel musí udělat pro vizualizace jedince
+pomocí grafického prostředí. Jako příklad opět využijeme data vygenerována
+posledním experimentem této práce.
+\begin{enumerate}
+    \item Uživatel spustí grafické rozhraní a v záložce \emph{Main} klikne na
+        tlačítko \emph{View Individual}, což otevře okno pro volbu jedince k
+        vizualizaci (ukázka je na~obrázku
+        \ref{doc_23_visualization_indiv_popup}).
+    \begin{figure}[!htb]
+        \centering
+        \includegraphics[width=0.8\textwidth]{../img/indiv_visualization_popup.jpg}
+        \caption{Okno pro volbu jedince k vizualizaci.}
+        \label{doc_23_visualization_indiv_popup}
+    \end{figure}
+    \item Kliknutím na tlačítko \emph{Browse} je uživateli prezentován
+        souborový prohlížeč (otevírá se v pevně definované složce, kam jsou
+        ukládány experimenty), ve~kterém uživatel dojde ke složce libovolného
+        experimentu. V této složce pak zvolí běh, ze kterého chce načíst data
+        poslední generaci jedinců. Načítání může chvíli trvat (průběh lze
+        sledovat v~animovaném indikátoru průběhu).
+    \item Následně je vyplněn seznam jedinci, kteří byli seřazeni podle jejich
+        fitness hodnoty. Jedinci jsou v seznamu prezentováni pomocí jména z
+        jejich indexu a fitness. Uživatel dále vybere jednoho z jedinců. Výběr
+        je znázorněn tmavší barvou vybraného řádku v seznamu.
+    \item Po výběru může uživatel spustit vizualizaci stisknutím
+        tlačítka \emph{Show}. Když je systém připraven k vizualizaci jedince,
+        upozorní uživatele \textbf{hláškou v textové konzoli}, kterou uživatel
+        potvrdí stisknutím klávesy \texttt{ENTER} v konzoli a prostředí se hned
+        spouští.
+    \item V tento moment může uživatel ovládat vizualizační prostředí pomocí
+        ovládacích prvků popsaných výše.
+    \item Jakmile vizualizace skončí, je prostředí automaticky zavřeno a
+        konzole vypíše odměnu, kterou byl jedinec za tento běh hodnocen.
+    \item Uživatel dále může ukončit výběr jedinců, vybrat dalšího jedince pro
+        vizualizovat, nebo úplně změnit experiment, ze kterého jedince vybírá.
+\end{enumerate}
+Potvrzování pomocí konzole při přechodech do vizualizačního prostředí je
+složitější postup, než bychom chtěli. Nicméně se jedná o uživatelsky
+nejbezpečnější způsob jak vyřešit problém aktuální verze grafické knihovny
+vytvářející vizualizace. 
+
+Zároveň se při ukončení vizualizace může v konzoli objevovat hláška
+upozorňující na chyby v~kódu grafické knihovny, což je chyba mimo naši
+platformu a~na~celkovou funkcionalitu naší platformy nemá žádný další dopad.
+Tyto chyby byly blíže popsány výše, v~kapitole o~implementaci v sekci
+\ref{imp:problems} o problémech implementace. Zároveň v této sekci byl popsán
+zdroj chyby a jednoduchý postup jak problémy vizualizačního prostředí opravit.

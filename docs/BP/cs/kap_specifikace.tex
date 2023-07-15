@@ -1,8 +1,8 @@
 \chapter{Specifikace} \label{chapter-specifikace}
 
-Vývoj pomocí evolučních algoritmů je možné nejlépe představit pomocí
+Vývoj pomocí evolučních algoritmů je možné nejlépe ilustrovat pomocí
 experimentů, na kterých může uživatel sám pozorovat změny, kterými postupný
-iterativní evoluční vývoj nachází možná řešení na zadaný problém. Je ale
+iterativní evoluční vývoj nachází možná řešení pro zadaný problém. Je ale
 složité vytvořit takový systém, ve kterém by uživatel mohl snadno ovládat
 interní části evolučních algoritmů a tak vytvářet vlastní různorodé
 experimenty. A právě tyto experimenty mohou být zásadní pro pochopení
@@ -15,7 +15,7 @@ robotů v simulovaném prostředí.
 
 I jednoduché problémy, které od robotů můžeme požadovat vyřešit (např. ujití co
 největší možné vzdálenosti za daný čas), poskytují pro roboty různé složitosti
-(různé morfologie, počtu kloubů, atd.) dobrou představu v nárůstu obtížnosti
+(různé morfologie, počtu kloubů, atd.) dobrou představu o nárůstu obtížnosti
 daného problému. Tímto zároveň experimenty s různými roboty vynucují využití
 různých pokročilejších metod pro dosažení požadovaných cílů daného experimentu.
 
@@ -25,16 +25,16 @@ budeme požadovat.
 
 \section{Funkční požadavky} \label{Specifikace-funkčnípožadavky}
 
-Tento projekt cílí vytvořit systém umožňující uživatelům vytvářet vlastní
+Cílem tohoto projektu je vytvořit systém umožňující uživatelům vytvářet vlastní
 experimenty s evolučním vývojem robotů v simulovaném fyzikálním prostředí.
 Uživatel by měl být schopný před spuštěním experimentu podrobně pochopit a
 upravit co nejvíce částí evolučního vývoje, který bude v době experimentu
 probíhat. Uživatel musí být v době běhu experimentu schopný sledovat průběžné
 výsledky z~jednotlivých generací a vizualizovat dosavadní výsledky v
-simulovaném prostředí. Po dokončení experimentu musí být možné uložit
-výsledky ve formě dále zpracovatelné, např. pro statistický rozbor většího
-množství experimentů s možností vizualizace dat nejlepších jedinců finálních
-generací a podobně.
+simulovaném prostředí. Po dokončení experimentu musí být možné uložit výsledky
+ve formě dále zpracovatelné, např. pro statistický rozbor většího množství
+experimentů s~možností vizualizace dat nejlepších jedinců finálních generací a
+podobně.
 
 Systém bude z hlavní části vytvořený v programovacím jazyce Python, vytvářející
 uživateli přístupnější kód a umožňující rychlejší experimentování a
@@ -57,10 +57,11 @@ průběžná nejlepší řešení, které evoluční vývoj najde.
 
 \paragraph{Python knihovna}
 Pro uživatele, kteří chtějí navrhovat vlastní experimenty, ale nechtějí všechno
-programovat od základů. Systém pro tvorbu experimentů vývoje robotů v simulovaném prostředí bude tvořit
-otevřenou Python knihovnu, kterou uživatel může připojit ke svému
-projektu a pomocí naší knihovny jednoduše vytvářet experimenty s požadovanou
-volností konfigurace jednotlivých parametrů evolučního vývoje.
+programovat od základů bude, projekt dostupný ve formě knihovny. Systém pro
+tvorbu experimentů vývoje robotů v simulovaném prostředí bude tvořit otevřenou
+Python knihovnu, kterou uživatel může připojit ke svému projektu a pomocí naší
+knihovny jednoduše vytvářet experimenty s požadovanou volností konfigurace
+jednotlivých parametrů evolučního vývoje.
 
 Knihovna bude mít dostatečnou dokumentaci na to, aby takový uživatel byl
 schopen provádět pokročilou konfiguraci experimentů přímo v kódu knihovny,

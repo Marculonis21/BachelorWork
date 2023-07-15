@@ -1,4 +1,4 @@
-\begin{thebibliography}{30}
+\begin{thebibliography}{31}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -138,6 +138,11 @@ Python guis for humans.
 \newblock In \emph{Proc. of The International Conference on Intelligent Robots
   and Systems (IROS)}.
 \newblock www.coppeliarobotics.com.
+
+\bibitem[Rojas(2013)]{rojas2013neural}
+{\sc Rojas, R.} (2013).
+\newblock \emph{Neural networks: a systematic introduction}.
+\newblock Springer Science \& Business Media.
 
 \bibitem[Salimans a~kol.(2017)Salimans, Ho, Chen, Sidor a
   Sutskever]{salimans2017evolution}

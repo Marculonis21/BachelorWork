@@ -110,9 +110,9 @@ křížení. Často využívanými variantami křížení jsou např. \emph{jedn
 křížení}, \emph{vícebodové křížení} nebo \emph{uniformní křížení}.
 
 Při \emph{jednobodovém křížení} (pro dva rodičovské jedince) vybereme náhodně
-jedno místo (bod dělení), ve kterém oba genotypy rozdělíme. Genetickou
-informaci potomků následně vytvoříme tak, že složíme zpět rozdělené části
-genotypů různých rodičů (např. první potomek vznikne složením první části
+jedno místo v genotypu (bod dělení), ve kterém oba genotypy rozdělíme.
+Genetickou informaci potomků následně vytvoříme tak, že složíme zpět rozdělené
+části genotypů různých rodičů (např. první potomek vznikne složením první části
 genotypu prvního rodiče a druhé části genotypu druhého rodiče a druhý potomek
 naopak). \emph{Vícebodové křížení} probíhá stejně, pouze na začátku volíme
 vícero bodů, ve kterých genotypy rozdělíme a tak máme více možností, jak
@@ -189,7 +189,7 @@ evolučních algoritmů, je tento krok možné poměrně jednoduše paralelizova
 našem případě tomu tak je. Jednotliví jedinci jsou v absolutní většině
 evolučních algoritmů naprosto nezávislí na ostatních. Pokud to simulační
 prostředí dovolí, je možné nechat každého robota simulovat nezávisle na
-ostatních ve vlastním vlákně (procesu) a tak využít moderní vícevláknové
+ostatních ve vlastním vlákně (procesu) a tak využít moderní vícejádrové
 procesory. Tato změna je poměrně jednoduchá na implementaci a absolutní většina
 evolučních algoritmů může tohoto využít pro mnohonásobné urychlení celého
 procesu evolučního vývoje.
@@ -198,10 +198,10 @@ procesu evolučního vývoje.
 
 Pro vývoj řízení robotů budeme využívat evoluční algoritmy. Naše knihovna tedy
 bude implementovat několik alespoň základních genetických operátorů,
-používaných při vývoji jedinců a co nejjednodušeji umožňovat jejich konfiguraci
-před spouštěním jednotlivých experimentů. Naším cílem je co možná nejvíce
-zpřístupnit knihovnu, která má být výsledkem této práce, aby uživatel se
-základní znalostí genetických algoritmů a programovacího jazyka byl schopný
+používaných při vývoji jedinců, a co nejjednodušeji umožňovat jejich
+konfiguraci před spouštěním jednotlivých experimentů. Naším cílem je co možná
+nejvíce zpřístupnit knihovnu, která má být výsledkem této práce, aby uživatel
+se základní znalostí genetických algoritmů a programovacího jazyka byl schopný
 pochopit běh algoritmu a v případě potřeby mohl jednoduše provádět zásahy do
 jeho běhu. Není tedy naším cílem najít tu nejefektivnější knihovnu, nýbrž tu,
 která přinese výhody jako přehlednost a snadnou úpravu algoritmů, bez větších
@@ -245,7 +245,7 @@ popis jedinců v našem evolučním algoritmu.
 \texttt{Creator} je třída sloužící jako \emph{factory} pro uživatelem
 definované třídy. Tedy s její pomocí můžeme vytvářet nové třídy za běhu
 programu. To se hodí, protože různé problémy mohou vyžadovat velmi rozdílné
-typy jedinců. Tvorba třídy probíhá pomocí metoda \texttt{create}, která jako
+typy jedinců. Tvorba třídy probíhá pomocí metody \texttt{create}, která jako
 argumenty přijímá jméno vytvářené třídy, dále třídu, od které nová třída bude
 dědit a poté může následovat řada argumentů, které mohou být využity jako další
 argumenty naší nové třídy.
@@ -266,11 +266,11 @@ třídy \texttt{list} a bude obsahovat parametr \texttt{fitness}, do nějž
 přiřadíme vytvořenou třídu \texttt{FitnessMax}.
 
 \paragraph{\texttt{Toolbox}}
-Dále využijeme vlastní třídy pro tvorbu specifických typů, reprezentujících
-jedince a celou populaci. \texttt{Toolbox} se stane úložištěm pro všechny
-objekty, které budeme při tvorbě evolučního algoritmu používat. Do tohoto
-úložiště můžeme objekty přidávat metodou \texttt{register} a můžeme je odebrat
-metodou \texttt{unregister}.
+Dále využijeme třídy pro tvorbu specifických typů, reprezentujících jedince a
+celou populaci. \texttt{Toolbox} se stane úložištěm pro všechny objekty, které
+budeme při tvorbě evolučního algoritmu používat. Do tohoto úložiště můžeme
+objekty přidávat metodou \texttt{register} a můžeme je odebrat metodou
+\texttt{unregister}.
 
 \pagebreak
 \begin{code}
@@ -304,9 +304,9 @@ populace.
 Pro vytvoření jedince používáme metodu \texttt{tools.initRepeat()}, jejíž první
 argument přijímá kontejner (v našem případě třídu jedince, kterou jsme
 definovali dříve jako potomka třídy \texttt{list}). Ten bude při inicializaci
-naplněn metodou\texttt{toolbox.attr\_bool()} zavolanou 100 krát, jak
+naplněn metodou \texttt{toolbox.attr\_bool()} zavolanou 100 krát, jak
 specifikují následující dva argumenty. Při inicializaci celé populace budeme
-postupovat stejně, jen jsme ještě v tento moment nespecifikovali, kolik jedinců
+postupovat stejně, jen jsme ještě v~tento moment nespecifikovali, kolik jedinců
 bude do populace vytvořeno.
 
 \paragraph{Hodnotící funkce}
@@ -388,7 +388,7 @@ Těmito komponenty jsou:
                 skončit,
             \item \texttt{selector} -- rozhoduje, kteří jedinci by se měli stát
                 rodiči další generace,
-            \item \texttt{variator} -- definuje jak jsou potomci vytvořeni z
+            \item \texttt{variator} -- definuje jak jsou potomci tvořeni z
                 rodičovských jedinců,
             \item \texttt{replacer} -- volí, kteří jedinci mají přežít do další
                 generace,
@@ -556,9 +556,9 @@ algoritmus na základní stavební bloky) a vytvořit vlastní implementaci vět
 základních stavebních bloků, které bude možné použít při tvorbě vlastních
 evolučních algoritmů v naší knihovně. Tyto bloky budou co možná nejvíce obecné
 a snadno konfigurovatelné funkce s předepsaným výstupním typem, aby uživatel
-mohl snadněji porozumět implementaci každého z bloků a zároveň aby měl možnost
-vytvářet vlastní bloky (Python funkce) a ty jednoduše zapojit do evolučního
-algoritmu. Právě tak jak tomu je v knihovně Inspyred. 
+mohl snadněji porozumět implementaci každého z bloků, a zároveň, aby měl
+možnost vytvářet vlastní bloky (Python funkce) a ty jednoduše zapojit do
+evolučního algoritmu. Právě tak jak tomu je v knihovně Inspyred. 
 
 Celý projekt je směřován zároveň jako možný studijní materiál, a tak navíc
 věřím, že pro studenty bude možnost vidět v kódu funkční implementaci
@@ -568,15 +568,15 @@ evolučních algoritmů.
 
 \section{Neuronové sítě} \label{NN}
 Umělé neuronové sítě jsou matematickou abstrakcí biologických neuronů a~jejich
-chování v nervové soustavě. Umělé neurony jsou zjednodušeně vrcholy v grafu,
-propojeného hranami s váhami (podobně jako reálné neurony jsou propojeny
-synapsemi). Každý neuron počítá svůj potenciál jako vážený součet příchozích
-vzruchů přicházejících korespondujícími vstupními hranami. Nakonec je
-na potenciál neuronu aplikována aktivační funkce dále transformující
-potenciál na výstupní hodnotu neuronu.
+chování v nervové soustavě \citep{rojas2013neural}. Umělé neurony jsou
+zjednodušeně vrcholy v grafu, propojeného hranami s váhami (podobně jako reálné
+neurony jsou propojeny synapsemi). Každý neuron počítá svůj potenciál jako
+vážený součet příchozích vzruchů přicházejících korespondujícími vstupními
+hranami. Nakonec je na potenciál neuronu aplikována aktivační funkce dále
+transformující potenciál na výstupní hodnotu neuronu.
 
 \paragraph{Neuron}
-Nejmenší jednotkou neuronových sítí je jeden neuron. Pro neuron s $n$ vstupy,
+Nejmenší jednotkou neuronových sítí je jeden neuron. Pro neuron s~$n$~vstupy,
 jejichž hodnoty označíme $x_1,...,x_n$ a váhy korespondujících hran označíme\\
 $w_1,...,w_n$, potom výstupní hodnotu tohoto neuronu, označenou $O$,
 můžeme spočítat jako,
@@ -612,16 +612,7 @@ nejpoužívanějšími aktivačními funkcemi jsou:
             f(\xi) = \max(0, \xi)
         \end{equation}
 \end{itemize}
-% \begin{equation} \label{eq:sigmoid}
 
-%     f(\xi) = \frac{1}{1+e^{-\xi}}
-% \end{equation}
-% \begin{equation} \label{eg:tanh}
-%     f(\xi) = tanh(\xi) = \frac{2}{1+e^{-2\xi}} - 1
-% \end{equation}
-% \begin{equation} \label{eg:relu}
-%     f(\xi) = \max(0, \xi)
-% \end{equation}
 \begin{figure}[!htb]
     \centering
     \begin{minipage}{0.5\textwidth}
@@ -643,24 +634,24 @@ nejpoužívanějšími aktivačními funkcemi jsou:
 
 \paragraph{Neuronová síť}
 Architektura neuronové sítě je tvořena ze třech základních typů neuronů --
-vstupní (ze kterých pouze vycházejí spojení), výstupní (do kterých pouze
-přicházení spojení) a skryté (mají vstupní i výstupní spoje). Neuronová síť pak jde
-popsat jako orientovaný graf. Pokud se jedná o graf bez orientovaných cyklů
-můžeme síť označit za \emph{dopřednou neuronovou síť}. Pokud obsahuje nějaké
-orientované cykly, označujeme ji jako \emph{rekurentní neuronovou síť}. Dále se
-budeme zaměřovat na \emph{dopředné vrstevnaté neuronové sítě}.
+vstupních (ze kterých pouze vycházejí spojení), výstupních (do kterých pouze
+přicházení spojení) a skrytých (mají vstupní i výstupní spoje). Neuronová síť
+se pak dá popsat jako orientovaný graf. Pokud se jedná o graf bez orientovaných
+cyklů můžeme síť označit za \emph{dopřednou neuronovou síť}. Pokud obsahuje
+nějaké orientované cykly, označujeme ji jako \emph{rekurentní neuronovou síť}.
+Dále se budeme zaměřovat na \emph{dopředné vrstevnaté neuronové sítě}.
 
 Dopředné neuronové sítě jsou často rozdělené do vrstev a nazývají se vrstevnaté
 neuronové sítě. V těchto sítích vstup přechází po orientovaných hranách
 vrstvami neuronů, kde každý neuron z předchozí vrstvy je spojen hranou s každým
-vrcholem následující vrstvě. První vrstva se nazývá \emph{vstupní vrstva}. Je
+vrcholem v následující vrstvě. První vrstva se nazývá \emph{vstupní vrstva}. Je
 tvořena ze \emph{vstupních neuronů} a slouží pro vstup parametrů (vstupů) do
 sítě. Vstupní neuron dostane hodnotu konkrétního vstupu a tuto hodnotu posílá
 beze změny dále (vstupní neurony nepoužívají aktivační funkci). Poslední vrstva
 se nazývá \emph{výstupní vrstva}. Je tvořena z \emph{výstupních neuronů} a
 výstup těchto neuronů je zároveň výstupem celé sítě. Každá neuronová síť musí
 nutně mít alespoň jeden vstupní a alespoň jeden výstupní neuron. Libovolná
-další vrstva mezi \emph{vstupní} a \emph{výstupní vrstvou} se nazývá
+další vrstva mezi \emph{vstupní} a~\emph{výstupní vrstvou} se nazývá
 \emph{skrytá vrstva}. Těchto vrstev může být v síti teoreticky libovolné
 množství.
 
@@ -669,8 +660,8 @@ transformující vstupní vektor hodnot na výstupní vektor. V tomto příkladu
 představíme průchod dat jednoduchou sítí, skládající se ze vstupní vrstvy
 (výstupy $n$~vstupních neuronů značíme $x_1,...,x_n$), jedné skryté vrstvy
 neuronů (výstupy $k$~neuronů v této vrstvě označíme $h_1,...,h_k$, s
-odpovídajícím vektorem prahů $b_1,...,b_k$ a~váhami $w_{j,i}$ pro $i=1,...,k$ a
-$j=1,...,n$) a výstupní vrstvy (výstupy $m$ neuronů výstupní vrstvy označíme
+odpovídajícím vektorem prahů $b_1,...,b_k$ a~váhami $w_{j,i}$ pro $j=1,...,n$ a
+$i=1,...,k$) a výstupní vrstvy (výstupy $m$ neuronů výstupní vrstvy označíme
 jako $y_1,...,y_m$, matici vah $w'_{j,i}$ pro $j=1,...,k$ a~$i=1,...,m$ a
 vektor prahů $b'_1,...,b'_m$).
 
@@ -722,10 +713,10 @@ pomocí klasických trénovacích metod, jelikož vývoj, na rozdíl od trénova
 metod založených na principu \emph{učení s učitelem}, může probíhat i na sítích
 proměnlivé architektury a~nepotřebuje znát korektní výstupy pro daný vstup
 sítě. Pro trénovaní stačí, když~jsme schopni nějakým způsobem ohodnotit kvalitu
-řešení, k jakému se s využitím dané konfigurace (architektura a váhy spojení)
-sítě dostaneme. Díky tomuto se neuroevoluce hodí pro vývoj neuronových sítí v
-případech, kdy nejsme schopni přesně určit správné výstupy sítě pro dané vstupy
-a pouze můžeme pozorovat kvalitu chování daného vyvíjeného systému.
+řešení, k jakému se s využitím dané konfigurace (architektura, váhy spojení a
+prahy) sítě dostaneme. Díky tomuto se neuroevoluce hodí pro vývoj neuronových
+sítí v případech, kdy nejsme schopni přesně určit správné výstupy sítě pro dané
+vstupy a pouze můžeme pozorovat kvalitu chování daného vyvíjeného systému.
 
 \paragraph{Vývoj neuronových sítí}
 Vývoj pomocí neuroevoluce probíhá stejně jako u~jiných evolučních algoritmů.
@@ -789,8 +780,8 @@ Každý genotyp obsahuje seznam \emph{genů synapsí} a seznam \emph{genů neuro
 které~mohou být spojené hranami. Každý gen synapse obsahuje následující
 informace: 
 \begin{itemize}
-    \item vstupní neuron -- neuron, do kterého synapse vchází,
-    \item výstupní neuron -- neuron, ze kterého synapse vychází,
+    \item koncový neuron -- neuron, do kterého synapse vchází,
+    \item počáteční neuron -- neuron, ze kterého synapse vychází,
     \item hodnotu váhy synapse,
     \item příznak, jestli je spojení v síti použito,
     \item \emph{historická značka} -- číslo, popisující kdy v historii
@@ -805,42 +796,43 @@ následujících genetických operátorů.
 \paragraph{Mutace}
 Mutace v algoritmu NEAT má schopnost měnit jak spojení v síti, tak~její
 strukturu. Mutace synapsí sítě zahrnují jednoduchou změnu váhy spojení nebo
-změnu příznaku použití daného spojení v síti. Struktura sítě může mutovat
-dvěma způsoby. První typ mutace přidává nový gen synapsí, spojující dva doposud
+změnu příznaku použití daného spojení v síti. Struktura sítě může mutovat dvěma
+způsoby. První typ mutace přidává nový gen synapsí, spojující dva doposud
 nespojené neurony. Druhý typ mutace přidává nový neuron. Tato mutace probíhá
 tak, že na místo existující synapse se přidá nový neuron. Původní synapse se
 označí jako nepoužívaná a namísto toho se vytvoří dvě nové rozdělující tu
 původní. Váha spojení je v tomto procesu zachována. Při těchto operacích je
-vždy novým genům synapsí navýšena jejich \emph{historická značka} (používá se
-globální čítač, jehož číslo je s každým novým genem navýšeno). Růst
-sítí probíhá právě díky mutaci.
+vždy novým genům synapsí přiřazena nová \emph{historická značka} (používá se
+globální čítač, jehož číslo je s každým novým genem navýšeno). Růst sítí
+probíhá právě díky mutaci.
 
 \paragraph{Křížení}
 Křížení využívá \emph{historické značky}. Dva jedinci se nejdříve hranami
 zarovnají pomocí jejich \emph{historických značek}. Stejná čísla historických
 značek totiž v~síti značí stejnou strukturu. Synapse, která se v obou jedincích
-schoduje se dědí náhodně z jednoho rodiče. Synapse, kterou má jen jeden z
-rodičů se dědí pouze když je v lepším z rodičů a pokud je v nějakém jedinci
-hrana neaktivní a~v~druhém aktivní, s danou pravděpodobností se tento stav v
-novém jedinci změní. Algoritmus je tímto stylem schopný vytvářet velké množství
-různých topologií. Tyto nové topologie, přestože jsou často důležité pro řešení
-zadaného problému, mají jen velmi malou šanci se v populaci menších topologií
-udržet, protože původní menší topologie jsou v době vzniku větší topologie
-často optimalizovanější než tyto nové topologie. Proto NEAT využívá systém, kterým
-chrání tyto nové topologie před vyhynutím z populace.
+shoduje (má stejnou historickou značku) se dědí náhodně z jednoho rodiče.
+Synapse, kterou má jen jeden z rodičů se dědí pouze když je v lepším z rodičů a
+pokud je v nějakém jedinci hrana neaktivní a~v~druhém aktivní, s danou
+pravděpodobností se tento stav v novém jedinci změní. Algoritmus je tímto
+stylem schopný vytvářet velké množství různých topologií. Tyto nové topologie,
+přestože jsou často důležité pro řešení zadaného problému, mají jen velmi malou
+šanci se v populaci menších topologií udržet, protože původní menší topologie
+jsou v době vzniku větší topologie často optimalizovanější než tyto nové
+topologie. Proto NEAT využívá systém, kterým chrání tyto nové topologie před
+vyhynutím z populace.
 
 \paragraph{Ochrana nových druhů}
 Nové topologie jsou chráněny rozřazením genotypů do odlišných druhů. Jednotlivé
 genotypy poté primárně soutěží s jedinci stejného druhu a nové druhy tak mají
 šanci se vyvinout a optimalizovat na jejich úroveň. NEAT pro výpočet odlišností
 jedinců opět využívá \emph{historické značky}, pomocí kterých hledá společné
-hrany a vypočítá vzdálenost dvou genomů. Geny rozdělíme do několika kategorií.
-Buď se shodují (mají stejnou \emph{historickou značku}), a~pak jsou označené
-jako shodné (\emph{matching genes}), nebo se neshodují. Neshodné geny,
-které~mají historické značky v rozmezí hodnot \emph{historických značek}
-druhého z~jedinců, se nazývají disjunktní (\emph{disjoint}) a zbylé geny se
-nazývají přesahující (\emph{excess}). Hodnota vzdálenosti dvou jedinců se poté
-počítá jednoduchou lineární kombinací počtu genů jako:
+hrany a vypočítá vzdálenost dvou genomů. Geny obou jedinců rozdělíme do
+několika kategorií. Buď se shodují (mají stejnou \emph{historickou značku}),
+a~pak jsou označené jako shodné (\emph{matching genes}), nebo se neshodují.
+Neshodné geny, které~mají historické značky v rozmezí hodnot \emph{historických
+značek} druhého z~jedinců, se nazývají disjunktní (\emph{disjoint}) a zbylé
+geny se nazývají přesahující (\emph{excess}). Hodnota vzdálenosti dvou jedinců
+se poté počítá jednoduchou lineární kombinací počtu genů jako:
 
 \begin{equation}
     \delta = \frac{c_1E}{N} + \frac{c_2D}{N} + c_3\cdot\overline{W}
@@ -877,10 +869,10 @@ oproti neuroevolučním algoritmům, které používají fixní topologie neuron
 sítí.
 
 \subsection{HyperNEAT} \label{NN - HyperNEAT}
-Pro porovnání algoritmus HyperNEAT (\emph{Hypercube-based NEAT})
-\citep{stanley2009hypercube} \citep{eplex} je neuroevoluční algoritmus
-rozšiřující algoritmus NEAT. HyperNEAT slouží pro vývoj umělých neuronových
-sítí fixní topologie. 
+Pro porovnání uvádíme jeden pokročilejší algoritmus. Algoritmus HyperNEAT
+(\emph{Hypercube-based NEAT}) \citep{stanley2009hypercube} \citep{eplex} je
+neuroevoluční algoritmus rozšiřující algoritmus NEAT. HyperNEAT slouží pro
+vývoj umělých neuronových sítí fixní topologie. 
 
 Na rozdíl od algoritmu NEAT, používá HyperNEAT nepřímou
 reprezentaci vah sítě. Tyto váhy jsou reprezentovány pomocí jiné neuronové
@@ -892,15 +884,15 @@ sítě libovolné topologie.
 Síť \emph{CPPN} je poté v algoritmu HyperNEAT vyvíjena pomocí NEAT.
 
 Díky této nepřímé reprezentaci vah má HyperNEAT schopnost efektivně vyvinout
-velmi rozsáhlé neuronové sítě s předem určenou strukturou (takto dokáže
+velmi rozsáhlé neuronové sítě s předem určenou strukturou (takto dokáže např.
 napodobit regularitu velkého množství spojů v lidském mozku).
 
 \paragraph{}
 Naznačení průběhu HyperNEAT algoritmu:
 \begin{enumerate}
     \item Zvolit konfiguraci vyvíjené sítě (vstupní a výstupní neurony a
-        rozložení skrytých neuronů),
-    \item Inicializovat NEAT algoritmus s \emph{CPPN} sítěmi,
+        rozložení skrytých neuronů).
+    \item Inicializovat NEAT algoritmus s \emph{CPPN} sítěmi.
     \item Běh NEAT algoritmu, dokud není nalezeno řešení:
         \begin{enumerate}
             \item pomocí \emph{CPPN} daného jedince vytvoř synapse pro původní
@@ -1008,7 +1000,7 @@ Simulaci ovladačů je možno jednoduše rozdistribuovat mezi vícero vláken do
 vícero strojů, což urychluje vývoj a snižuje nároky na procesor v době
 simulace. Navíc je možné vyvíjený ovladač nechat v době simulací běžet na
 samotném (bezdrátově) připojeném robotovi, co dále ulehčuje přenos finální
-verze ovladačů z vývoje do skutečného světa. Prostředí umožňuje práci s
+verze ovladačů z vývoje do reálného světa. Prostředí umožňuje práci s
 širokou řadou typů objektů, druhů kloubů, senzorů a dalších objektů obvykle
 používaných při vývojích robotických ovladačů. Obsahuje snadno použitelný
 editor prostředí a robotů samotných s řadou předem vytvořených modelů, které
@@ -1030,10 +1022,10 @@ ODE (\emph{Open Dynamics Engine}) \citep{opendynamicsengine} je víceplatformní
 open-source fyzikální simulátor, jehož vývoj začal v roce 2001. Je vhodný pro
 simulaci pevných těles s různými druhy kloubů a pro detekci kolizí. Byl navržen
 pro využití v interaktivních nebo real-time simulacích, upřednostňujících
-rychlost a stabilitu nad fyzikální přesností \citep{smith2007open}. Vyžaduje
-používat menší simulační kroky kvůli stabilitě. Hodí se pro simulaci vozidel,
-kráčejících robotů a virtuálních prostředí. Má široké využití v počítačových
-hrách a 3D simulačních nástrojích jako jsou CoppeliaSim (v sekci
+rychlost a stabilitu nad fyzikální přesností \citep{smith2007open}. Kvůli
+stabilitě vyžaduje používání menších simulačních kroků. Hodí se pro simulaci
+vozidel, kráčejících robotů a virtuálních prostředí. Má široké využití v
+počítačových hrách a 3D simulačních nástrojích jako jsou CoppeliaSim (v sekci
 \ref{CoppeliaSim}), Gazebo (v sekci \ref{Gazebo}), Webots (v sekci
 \ref{Webots}) a dalších.
 
@@ -1063,15 +1055,15 @@ zpětnovazebného učení \citep{salimans2017evolution}. V simulacích je pro ro
 možné nakonfigurovat využití mnoha druhů aktuátorů, včetně těch simulujících
 práci svalů a k dispozici je i velké množství kloubů. Simulátor zároveň
 umožňuje velký nárůst v rychlosti běhu simulace za pomoci plné podpory
-paralelizace na všech dostupných vláknech a stabilitě simulace i při velmi
-velkých simulačních krocích \citep{todorov2012mujoco}. Zároveň nabízí
+paralelizace na všech dostupných vláknech a dobrou stabilitu simulace i při
+velmi velkých simulačních krocích \citep{todorov2012mujoco}. Zároveň nabízí
 jednoduchý styl, jakým si může uživatel konfigurovat všechny detaily simulace a
 samotných simulovaných robotů pomocí jednoduchých XML konfiguračních souborů
-(XML formát modelů \emph{MJCF}). V komplexním rozboru řady četně používaných
+(XML formát modelů \emph{MJCF}). V komplexním rozboru řady často používaných
 fyzikálních simulátorů byl simulátor MuJoCo hodnocen jako jeden z nejlepších co
 se týče stability, přesnosti a rychlosti simulací. Další výhodou zlepšující
 přesnost tohoto simulátoru je, že MuJoCo pro simulaci používá kloubní
-souřadnicový systém, který předchází narušení fyzikálních pravidel a tedy
+souřadnicový systém, který předchází porušování fyzikálních pravidel a tedy
 nepřesností v kloubech \citep{erez2015simulation}.
 
 \subsubsection{Vortex} \label{Vortex}

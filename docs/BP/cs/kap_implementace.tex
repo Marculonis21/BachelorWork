@@ -49,9 +49,11 @@ Popis třídy implementující vlastní genetické operátorů se nachází v od
 \ref{imp:gaOperators}. V sekci \ref{imp:experimentsetter} představíme třídu
 \texttt{Experiment} modulu \emph{experiment\_setter}, sloužící k uchování
 a~předvolbě parametrů pro experimenty, usnadňující tak provádění většího
-množství experimentů. Jako poslední si představíme moduly umožňující uživateli
+množství experimentů. Dále si představíme moduly umožňující uživateli
 práci s knihovnou buď pomocí grafického prostředí (v sekci \ref{imp:GUI}), nebo
-pomocí příkazové řádky (v sekci \ref{imp:TUI}). 
+pomocí příkazové řádky (v sekci \ref{imp:TUI}). Jako poslední (v sekci
+\ref{imp:problems}) zmíníme problémy, se kterými jsme se setkali při
+implementaci.
 
 \section{RoboEvo a pomocné moduly}
 V této sekci popíšeme hlavní modul \emph{RoboEvo} a jeho pomocné moduly
@@ -708,12 +710,16 @@ z~navolených hodnot v aplikaci vytvoří parametry pro spuštění experimentu
 informace o právě běžícím experimentu. Z tohoto okna může uživatel v libovolném
 okamžiku zažádat o~prezentaci jedince s dosud nejlepším řešením.
 
+\paragraph{Ovládání GUI}
+Bližší popis jednotlivých záložek a ovládání grafického rozhraní je v
+uživatelské dokumentaci práce v~sekci o grafickém rozhraní \ref{doc_12_GUI}.
+
 \section{Textové rozhraní} \label{imp:TUI}
 Vedle grafického rozhraní lze knihovnu ovládat i pomocí zadávání příkazů do
 příkazové řádky. Tento přístup ke knihovně se může hodit při vypracování
 větších nebo vícero experimentů, kdy očekáváme, že experimenty poběží delší
 dobu (několik hodin). Pro tento účel nepotřebujeme a ani by nebylo
-nejvýhodnější po celou dobu sledovat okno grafické aplikace.
+výhodné po celou dobu sledovat okno grafické aplikace.
 
 Textové rozhraní (TUI) je tedy vytvořené hlavně za účelem spouštění
 experimentů. Proto toto rozhraní úzce spolupracuje se třídou experimentů
@@ -722,74 +728,113 @@ způsob, jak vybírat a spouštět vyhodnocení dostupných experimentů.
 
 \paragraph{Ovládání TUI}
 Textové rozhraní ovládá uživatel z příkazové řádky s různými vstupními
-argumenty. Těmito argumenty jsou následující:
-
-\begin{itemize}
-    \item \texttt{-{}-experiment} -- argument, který obdrží textový vstup
-        specifikující jméno jednoho nebo více experimentu (oddělených mezerou),
-        jehož parametry chceme načíst a spustit (pracující s modulem
-        \emph{experiment\_setter} popsaného v oddíle
-        \ref{imp:experimentsetter}),
-    \item \texttt{-{}-experiment\_names} -- při uvedení tohoto argumentu
-        program vypíše názvy všech vytvořených experimentů z modulu
-        \emph{experiment\_setter} a následně se ukončí,
-    \item \texttt{-{}-batch} -- argument číselné hodnoty, specifikující
-        kolikrát se má nakonfigurovaný experiment opakovaně spustit (používané
-        pro statistické vyhodnocení výsledků experimentů),
-    \item \texttt{-{}-batch\_note} -- textový argument umožňující připojit
-        vlastní poznámku k~názvu složky, do které se experimenty z
-        několikanásobného spuštění ukládají (argument nemá žádný efekt pro
-        experimenty z modulu \\\emph{experiment\_setter}),
-    \item \texttt{-{}-open} -- textový argument, který obdrží cestu k uloženým
-        datům nejlepšího jedince z libovolného předchozího experimentu,
-        umožňující vizualizaci řešení daného jedince,
-    \item \texttt{-{}-no\_graph} -- argument, který značí, že za běhu algoritmu
-        nemá být vykreslován graf průběhu fitness hodnot v jednotlivých
-        generacích.
-\end{itemize}
-
-\paragraph{Ukázky možných vstupů}
-Textové rozhraní úzce spolupracuje s modulem \emph{experiment\_setter}, který
-udržuje definované experimenty. Jedním z užitečných parametrů je
-\texttt{-{}-experiment\_names}, který TUI nechá vypsat názvy všech definovaných
-experimentů.
-
-\begin{code}
->>> TUI.py --experiment_names
-<<< List of created experiments:
-     - exp10_TFS
-     - exp11_TFS_spot
-     - exp12_TFS_ant
-     ...
-\end{code}
-
-Pokud již známe jeden nebo více experimentů, které chceme spustit,
-můžeme je spustit výběrem parametru \texttt{-{}-experiment} a vypsáním seznamu 
-zvolených experimentů oddělených mezerou.
-
-\begin{code}
->>> TUI.py --experiment exp11_TFS_spot exp_12_TFS_ant
-<<< Starting experiment - exp11_TFS_spot 
-    ...
-\end{code}
-
-Ve spojení s parametrem \texttt{-{}-experiment} můžeme vybrat další parametry.
-Těmi mohou být parametr \texttt{-{}-batch} (\texttt{-{}-batch 5} bude
-opakovat běh všech zvolených experimentů 5krát), nebo parametr
-\texttt{-{}-no\_graph}, který zabrání průběžnému vykreslování grafů z běhu
-experimentu nebo parametr \texttt{-{}-note}, umožňující upravit název složky,
-do které se budou data ukládat.
-
-\paragraph{}
-Posledním často používaným parametrem je \texttt{-{}-open}, pomocí kterého
-si můžeme v simulačním prostředí přehrát běh nejlepšího jedince ze zvoleného
-předchozího experimentu.
-\begin{code}
->>> TUI.py --open saved_files/runs/run1/individual.save
-<<< (Simulace zvoleného jedince)
-\end{code}
+argumenty. Seznam a~popis vstupních argumentů dostupných pro práci s rozhraním
+společně s příklady využití se nacházejí v uživatelské dokumentaci v~sekci o
+textovém rozhraní \ref{doc_13_TUI_ovladani}.
 
 \paragraph{Implementace TUI}
 Samotná implementace rozhraní je již velmi jednoduchá. Zpracovává uživatelské
 vstupy z argumentů, které buď předává dál do korespondujících funkcí, nebo
 hlásí a řeší problémy, které mohli při zadávání argumentů nastat.
+
+\section{Problémy implementace} \label{imp:problems}
+Absolutní většina implementace se vyvíjela podle plánu. Ale u stále aktivně
+vyvíjeného modulu \emph{MuJoCo} jsme narazili na několik problémů. Tyto
+problémy \textbf{neovlivňují} možnosti vytváření ani provádění experimentů.
+Problémy zasahují pouze do práce a zacházení s vizualizačním prostředí.
+
+V této sekci popíšeme problémy, se kterými jsme se setkali, kde je potká
+uživatel a co to pro něj znamená. Pro problémy zároveň prezentujeme jednoduchou
+opravu.
+
+\paragraph{Zapínání vizualizace -- běžící simulací}
+Prvním problémem je výchozí interní nastavení knihovny \emph{MuJoCo}, které
+v momentě kdy začíná probíhat vizualizace zároveň spouští i simulaci robota.
+Mohlo by se tedy jednoduše stát, že by uživatel ani nemusel zaregistrovat, že
+vizualizace běhu robota je již spuštěna, před tím než vizualizace opět skončí.
+
+Pro řešení tohoto problému jsme se rozhodli přidat jeden krok mezi poslední
+interakci s naší platformou a vizualizačním prostředím. Uživatel je tak nucen
+potvrdit v konzoli hlášku zmáčknutím \texttt{ENTER}. Po tomto potvrzení
+vizualizace okamžitě začíná a uživatel má větší šanci si průběhu vizualizace
+všimnout a včas ho začít ovládat.
+
+\paragraph{Okno vizualizace -- překreslování nápovědy}
+Druhý problém je čistě vizuální, ale pořád vhodný zmínit. Při vykreslování
+vizualizačního okna si uživatel může zvolit, zda chce vykreslovat i průhledná
+okno nápovědy a okno s informacemi ohledně rychlosti a času vykreslování. Tato
+okna jsou v každém cyklu smazána a vykreslena znova. Pokud ale uživatel
+simulaci zastaví, vykreslování stále běží (aby uživatel mohl pohybovat kamerou,
+měnit nastavení, atd.). V ten moment se přestanou okna nápovědy mazat, ale jsou
+stále vykreslována dál v~nekonečném cyklu, dokud se simulace opět nerozběhne.
+
+\paragraph{Ukončení vizualizace -- čištění \emph{glfw} zdrojů}
+Poslední a hlavní problém nastává při ukončení vizualizace po doběhnutí
+simulace. I při korektním ukončení prostředí vizualizace, knihovna
+\emph{MuJoCo} hlásí varování a interní chyby. Tyto chyby jsou způsobeny snahou
+grafického modulu \emph{glfw} o uvolňování zdrojů vizualizačního.
+
+Uživatel se s tímto problémem setká při ukončování okna vizualizace, které do
+konzole zahlásí upozornění na chyby v kódu s popisem chyby a místem, kde se
+nachází. Tato upozornění bohužel nejsme schopni od uživatele skrýt. Na samotnou
+funkcionalitu celé platformy nemají žádný vliv.
+
+\subsection{Problémy a řešení}
+Pro problémy jsme byli schopni najít velmi jednoduché opravy. Díky tomu,
+že~\emph{MuJoCo} je open source knihovna, úprava na naší straně by byla možná.
+V této práci jsme se ale rozhodli nechat všechny knihovny v jejich výchozím
+stavu tak, jak je uživatel dostane z balíčkovacích manažerů. Tím zachováme
+cenou vlastnost platformy a to jednoduchost instalace (informace o instalaci
+prostředí pro platformu v uživatelské dokumentaci v sekci \ref{doc_11_spust}).
+
+\paragraph{Návrh opravy}
+Všechny opravy můžeme vyřešit v jediném souboru modulu \emph{Gymnasium}.
+V \emph{conda} nainstalovaných balíčcích můžeme najít modul \emph{Gymnasium} s
+knihovnou \emph{MuJoCo}. Hledáme soubor \emph{mujoco\_rendering.py} v adresáři
+\emph{MuJoCo} modulu na následující cestě. 
+\begin{code}
+# příklad cesty na Linuxovém systému
+# <conda> = miniconda3
+~/<conda>/envs/roboEvo/lib/<python_packages>/gymnasium/envs/mujoco
+\end{code}
+
+\paragraph{Oprava druhého problému}
+Druhý problém lze vyřešit kopií jediného řádku. Nacházíme se ve
+zmíněném skriptu v metodě \texttt{render} třídy \texttt{WindowViewer}. Metoda
+končí práci vyčištěním \emph{překrytí} před začátkem dalšího cyklu pomocí
+metody \texttt{self.\_overlays.clear()}. O pár řádků výše, při zastavení
+simulace běží nekonečný cyklus, který toto čištění nedělá. 
+\begin{code}
+400.  if self._paused:                       
+401.      while self._paused:                
+402.          update()                      
+403.          if self._advance_by_one_step:
+...
+\end{code}
+Oprava je jednoduchá. Stačí přidat volání \texttt{self.\_overlays.clear()} na
+začátek \texttt{update} metody definované uvnitř \texttt{render} metody.
+\begin{code}
+351.  def update():
++++       self._overlays.clear()
+352.      # fill overlay items
+353.      self._create_overlay()
+...
+\end{code}
+
+\paragraph{Oprava třetího problému}
+Řešení třetího problému je jednoduché. Chyba nastane v metodě
+\texttt{free} třídy \texttt{WindowViewer} na řádku 330. Myslím si, že zde
+nastane chyba, protože odkaz na \texttt{self.window} již nemusí platit, což
+testuje podmínka hned nad tímto řádkem. Stačí tedy tento řádek posunout o jeden
+tabulátor dál tak, aby byl součástí bloku podmínky.
+
+\begin{code}
+326.  def free(self):
+327.      if self.window:
+328.          if glfw.get_current_context() == self.window:
+329.              glfw.make_context_current(None)
+330.      +++ glfw.destroy_window(self.window)
+331.      self.window = None
+\end{code}
+
+

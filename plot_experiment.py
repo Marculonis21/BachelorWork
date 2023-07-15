@@ -36,7 +36,7 @@ if __name__ == "__main__":
     index = np.arange(n_ticks)*tick_step
 
     for i in range(len(history)):
-        plt.scatter(index[-1]/10, per_gen_max[:, -1][i], s=25, c='r', marker="*", zorder=2)
+        plt.scatter(index[-1]/tick_step, per_gen_max[:, -1][i], s=25, c='r', marker="*", zorder=2)
 
     plt.boxplot(per_gen_values[:,index], positions=np.arange(n_ticks), zorder=1)
     plt.plot(np.max(per_gen_values[:,index], axis=0), label="max fitness", zorder=1)

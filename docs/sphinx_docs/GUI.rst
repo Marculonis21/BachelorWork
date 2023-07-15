@@ -10,6 +10,7 @@ GUI module
    robot_tab
    agent_tab
    evo_tab
+   run_window
 
 .. automodule:: GUI
    :no-undoc-members:

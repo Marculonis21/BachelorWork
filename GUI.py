@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """GUI module
 
-Central GUI module. GUI splits into different tabs (modules described
-:ref:`GUI_tabs`). GUI is created with **PySimpleGUI**.
+Central GUI module. GUI splits into different tabs. GUI is created with
+**PySimpleGUI** library.
 
 GUI firstly initialises window with :func:`make_window` which collects windows
 (created tabs) from all created tabs and puts them inside one big tabgroup.
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     _, values = window.read(timeout=0)
 
     agent_tab.set_agent(agent_tab.agent_names[0], window)
-    robot_tab.set_robot(robot_tab.robot_names[0], window, values)
+    robot_tab.set_robot(robot_tab.robot_names[0], window)
     main_tab.set_overview_text(window, values, robot_tab, agent_tab)
 
     window_values = {}

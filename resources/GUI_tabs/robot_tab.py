@@ -1,4 +1,13 @@
 #!/usr/bin/env python
+"""GUI Robot tab
+
+Robot tab is the second GUI tab used for selecting the robot with which we want
+to do the experiment (see also :mod:`robots`). It comes with a selection menu,
+image previewing the selected robot and small overview of the robot.
+Optionally, if the robot has any body parts which can be altered during
+evolution, the ``Select body parts for GA`` button will be enabled. When
+clicked it is going to show a menu for configuring allowed body part ranges.
+"""
 
 import roboEvo
 import resources.GUI_tabs.agent_tab as agent_tab
@@ -11,6 +20,15 @@ import numpy as np
 font = ("Helvetica", 15)
 
 robots : 'dict[str, roboEvo.robots.BaseRobot]'
+"""
+Dictionary of all available robots by name. 
+
+.. warning::
+    User must include new custom robots inside this dictionary to make them
+    available through GUI. The source code gives an example how to add new
+    entries.
+"""
+
 robots = {robot.__class__.__name__ : robot for robot in [
     roboEvo.robots.AntV3(),
     roboEvo.robots.StickAnt(),
@@ -46,7 +64,7 @@ def tab():
     tab = sg.Tab("Robot select", main, key="-ROBOT_TAB-")
     return tab
 
-def set_robot(robot_selected, window, values, agent=None):
+def set_robot(robot_selected, window, agent=None):
     robot = robots[robot_selected]
 
     im = Image.open(robot.picture_path)
@@ -65,7 +83,7 @@ def set_robot(robot_selected, window, values, agent=None):
     window["-ROBOT_OVERVIEW-"].update(TEXT)
     window["-ROBOT_PARTS-"].update(disabled = not (len(robot.body_parts) > 0)) # if robot has specified vars in XML, enable button
 
-    agent_tab.reload_agents(window, values, robot, agent)
+    agent_tab.reload_agents(window, robot, agent)
 
 def popup_robot_parts(robot_selected, agents, agent_selected, window, values):
     robot = robots[robot_selected]
@@ -131,7 +149,7 @@ def popup_robot_parts(robot_selected, agents, agent_selected, window, values):
             body_part_mask.append(False)
 
     agent = agent.__class__(robot, body_part_mask, evo_tab.evo_types[values["-EVO_TYPE_SELECT-"]], gui=True)
-    agent_tab.reload_agents(window, values, robot, agent)
+    agent_tab.reload_agents(window, robot, agent)
 
 def expand_description(text):
     frame = sg.Frame("Description", [[sg.Text(text, size=(60,None), font=("Helvetica", 14), pad=(10,10))]])
@@ -142,7 +160,7 @@ def events(window, event, values, agents):
         global __current_robot
         if values[event] == __current_robot: return
         __current_robot = values[event]
-        set_robot(values[event], window, values)
+        set_robot(values[event], window)
         window[event].widget.select_clear()
         window.refresh()
 

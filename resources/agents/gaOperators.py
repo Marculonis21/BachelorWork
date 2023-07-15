@@ -26,9 +26,9 @@ Default implemented operators:
     includes one of the types of operators (i.e. 'selection', 'crossover' or 
     'mutation').
 
-    There are "hidden" methods like :func:`__ops_dir__` which are used to 
-    automatically detect all operator methods and sort them by type to be later
-    used inside GUI without any additional work necessary.
+    There is a methods :func:`Operators._ops_dir` which is used to automatically
+    detect all operator methods and sort them by type to be later used inside
+    GUI without any additional work necessary.
 """
 
 import copy
@@ -38,7 +38,21 @@ from inspect import signature
 
 class Operators:
     @staticmethod
-    def __ops_dir__():
+    def _ops_dir():
+        """
+        Method for automatic collection of implemented genetic operators from
+        within this class.
+
+        Returns:
+            dict[str, dict[str, (func, func params*)]] : dictionary of all
+            recognised genetic operators by operator type and operator name.
+
+        .. warning:: 
+            For methods to be correctly recognize by this function, their names
+            must include the full name of the operator type which they are
+            implementing (i.e. 'selection', 'crossover' or 'mutation').
+        """
+
         methods = [(m, "Operators."+m) for m in dir(Operators) if not m.startswith("__")]
 
         filter = ["population", "agent", "fitness_values"]

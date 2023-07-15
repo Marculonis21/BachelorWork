@@ -51,6 +51,7 @@
 <li class="toctree-l2"><a class="reference internal" href="gaAgents.html">gaAgents module</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">gaOperators module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#gaOperators.Operators"><code class="docutils literal notranslate"><span class="pre">Operators</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gaOperators.Operators._ops_dir"><code class="docutils literal notranslate"><span class="pre">Operators._ops_dir()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#gaOperators.Operators.roulette_selection"><code class="docutils literal notranslate"><span class="pre">Operators.roulette_selection()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#gaOperators.Operators.tournament_selection"><code class="docutils literal notranslate"><span class="pre">Operators.tournament_selection()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#gaOperators.Operators.tournament_prob_selection"><code class="docutils literal notranslate"><span class="pre">Operators.tournament_prob_selection()</span></code></a></li>
@@ -128,14 +129,36 @@ only an instance of this class to be able to use operators.</p>
 this <a class="reference internal" href="#gaOperators.Operators" title="gaOperators.Operators"><code class="xref py py-class docutils literal notranslate"><span class="pre">Operators</span></code></a> class and name the function in a way that the name
 includes one of the types of operators (i.e. ‘selection’, ‘crossover’ or
 ‘mutation’).</p>
-<p>There are “hidden” methods like <code class="xref py py-func docutils literal notranslate"><span class="pre">__ops_dir__()</span></code> which are used to
-automatically detect all operator methods and sort them by type to be later
-used inside GUI without any additional work necessary.</p>
+<p>There is a methods <a class="reference internal" href="#gaOperators.Operators._ops_dir" title="gaOperators.Operators._ops_dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">Operators._ops_dir()</span></code></a> which is used to automatically
+detect all operator methods and sort them by type to be later used inside
+GUI without any additional work necessary.</p>
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="gaOperators.Operators">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gaOperators.</span></span><span class="sig-name descname"><span class="pre">Operators</span></span><a class="headerlink" href="#gaOperators.Operators" title="Permalink to this definition"></a></dt>
 <dd><dl class="py method">
+<dt class="sig sig-object py" id="gaOperators.Operators._ops_dir">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_ops_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gaOperators.Operators._ops_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Method for automatic collection of implemented genetic operators from
+within this class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dictionary of all
+recognised genetic operators by operator type and operator name.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict[str, dict[str, (func, func params*)]]</p>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>For methods to be correctly recognize by this function, their names
+must include the full name of the operator type which they are
+implementing (i.e. ‘selection’, ‘crossover’ or ‘mutation’).</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="gaOperators.Operators.roulette_selection">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">roulette_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaOperators.Operators.roulette_selection" title="Permalink to this definition"></a></dt>
 <dd><p>Runs basic roulette selection between all individuals with probability

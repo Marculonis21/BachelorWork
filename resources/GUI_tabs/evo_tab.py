@@ -1,4 +1,17 @@
 #!/usr/bin/env python
+"""Evolution Config tab
+
+Evolution config is the last tab. In this tab the user can see and configure
+parameters which are used during the evolutionary algorithm run. User can
+select the type of evolution they want to run as well as initial size of the
+population for evolutionary algorithm and wanted amount of generations for the
+algorithm (see also :mod:`gaAgents`).
+
+Then there are three frames for the three genetic operators - Selection,
+Crossover and Mutation. In these parts of the tab, user can configure which
+method will be used as the genetic operator (automatic operator finding in
+:mod:`gaOperators`), as well as all parameters of those operators.
+"""
 
 import PySimpleGUI as sg
 
@@ -10,7 +23,14 @@ import resources.GUI_tabs.robot_tab as robot_tab
 evo_types = {e_type.name : e_type for e_type in roboEvo.gaAgents.EvoType if e_type.name != "BODY"}
 evo_type_names = list(evo_types.keys())
 
-ga_operators = roboEvo.gaAgents.Operators.__ops_dir__()
+ga_operators = roboEvo.gaAgents.Operators._ops_dir()
+"""
+Dictionary of type ``[operator type, dict[operator name, (operator function, operator args*)]]``. 
+
+It contains all recognised implemented genetic operators inside the
+:class:`gaOperators.Operators`, which were collected by the
+:func:`gaOperators.Operators._ops_dir`.
+"""
 
 FONT = ("Helvetica", 14)
 def single_value_option(key, text, tooltip, default):
@@ -119,7 +139,7 @@ def events(window, event, values):
         agent = agent_tab.agents[values["-AGENT_SELECT-"]]
         agent.evo_type = values[event]
         robot = robot_tab.robots[values["-ROBOT_SELECT-"]]
-        agent_tab.reload_agents(window, values, robot, agent)
+        agent_tab.reload_agents(window, robot, agent)
         window.refresh()
 
     if event.startswith("-OP_"):

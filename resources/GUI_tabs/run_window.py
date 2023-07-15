@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+"""
+Window shown when running the experiment from GUI. It contains a graph which is
+actively updated while the experiment runs. It gives us the ability to
+preview the current best individual and to abort the experiment. When the
+experiment finishes, the ``Exit`` button turns green to show that the application
+has finished all after experiment procedures.
+"""
 
 import roboEvo
 
@@ -139,7 +146,7 @@ def get_params(values, robot_tab, agent_tab):
                                       generation_count, 
                                       show_best, 
                                       save_best, 
-                                      save_dir, 
-                                      note="")
+                                      save_dir,
+                                      note="GUIRun")
 
     return params

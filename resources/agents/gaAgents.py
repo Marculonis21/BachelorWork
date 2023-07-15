@@ -592,8 +592,6 @@ class SineFuncFullAgent(BaseAgent):
 
     @mutation_deco
     def mutation(self, population):
-        print("mutation")
-        return Operators.uniform_shift_mutation(population, self, 0.05)
         return Operators.uniform_mutation(population, self)
 
 class SineFuncHalfAgent(BaseAgent):

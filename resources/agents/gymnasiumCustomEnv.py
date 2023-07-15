@@ -77,6 +77,9 @@ class CustomEnv(MujocoEnv, utils.EzPickle):
             "is_flipped": self.is_flipped()
         }
 
+        if self.render_mode == "human":
+            self.render()
+
         return observation, 0, done, False, info
 
     def _get_obs(self):

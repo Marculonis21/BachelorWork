@@ -1,6 +1,18 @@
 #!/usr/bin/env python
+"""GUI Main tab
+
+This is the first of four tabs that opens with the graphical user interface. On
+this tab the user can see small overview of current experiment configuration.
+Then there are buttons for saving current configuration and loading previously
+created ones. User can also open a popup for viewing individual runs. Lastly,
+user can set save directory for the experiment results and start the current
+experiment.
+"""
 
 import PySimpleGUI as sg
+
+import os
+import numpy as np
 
 import roboEvo
 from experiment_setter import Experiments
@@ -36,21 +48,65 @@ def tab():
     return tab
 
 def popup_view_individual():
-    title = [sg.Text("Select individual for run view", size=(None,1), pad=(10,10))]
 
-    save_dir = [sg.Text("Selected directory: ", pad=((10,0),30)), sg.Text("", size=(40,None), font=(FONT, 10), key="DIR"), 
+    def load_individuals(file_path, popup):
+        """
+        A function to find load and evaluate all individuals from selected last 
+        generation to be used as items in the listbox.
+        """
+        parent_dir = os.path.dirname(file_path)
+
+        last_population = np.load(file_path, allow_pickle=True)
+
+        run_timestamp = file_path[file_path.find("population")+10:file_path.find(".npy")]
+        best_individual_path = [x for x in os.listdir(parent_dir) if  run_timestamp in x and x.endswith(".save")][0]
+
+        agent, robot, _ = roboEvo.gaAgents.BaseAgent.load(parent_dir+"/"+best_individual_path)
+
+        individual_items = []
+
+        # evaluation
+        for index, individual in enumerate(last_population):
+            popup["PBAR"].update(current_count=100*index//len(last_population))
+            file = robot.create(agent.body_part_mask, individual)
+            file.close()
+            env = roboEvo.gym.make(id=robot.environment_id,
+                                   xml_file=file.name,
+                                   reset_noise_scale=0.0,
+                                   disable_env_checker=True,
+                                   render_mode=None)
+            env = roboEvo.TimeLimit(env, max_episode_steps=500)
+
+            run_reward = roboEvo._simulation_run(env, agent, individual)
+
+            individual_items.append((index, run_reward, individual))
+
+        individual_items = sorted(individual_items, key=lambda x: x[1], reverse=True)
+        return individual_items, agent, robot
+
+    title = [sg.Text("Select last generation data for run selection", size=(None,1), pad=(10,10))]
+
+    save_dir = [sg.Text("Selected file: ", pad=((10,0),30)), sg.Text("", size=(40,None), font=(FONT, 10), key="DIR"),
                 sg.Push(), 
-                # sg.FileBrowse("Browse", size=(6,None), initial_folder="./saves/", pad=((0,10),None), file_types=(("Best individual save files","*.save"), ("Population save files" ,"*last_population*")), target="DIR")]
-                sg.FileBrowse("Browse", size=(6,None), initial_folder="./saves/", pad=((0,10),None), file_types=(("Best individual save files","*.save")), target="DIR")]
+                sg.FileBrowse("Browse", size=(6,None), initial_folder="./saves/", pad=((0,10),None), file_types=((("Last popuulation data","*last_population*")),), target="DIR")]
+
+    progress_bar = [sg.ProgressBar(100, orientation='h', expand_x=True, size=(10,20), key="PBAR", visible=False)]
+    indiv_list = [sg.Listbox([], select_mode=sg.SELECT_MODE_SINGLE, font=(FONT, 14), size=(None, 20), expand_x=True, pad=(10,5), key="SELECTION_LISTBOX", disabled=True)]
 
     show = [sg.Button("Show", pad=(10,10), key="SHOW")]
+
     main = [save_dir,
+            progress_bar,
+            indiv_list,
             show]
 
     layout = [title,
               main]
 
-    name = None
+    agent = None
+    robot = None
+    sorted_items = []
+    last_browse = ""
     popup = sg.Window("Experiment name", layout, font=(FONT, 14), keep_on_top=True, modal=True)
     while True:
         event, values = popup.read(1)
@@ -58,17 +114,33 @@ def popup_view_individual():
         if event == sg.WIN_CLOSED or event == 'Exit':
             break
 
-        if event == "SHOW" and values["Browse"] != "": # if indiv selected -> play
-            agent, robot, individual = roboEvo.gaAgents.BaseAgent.load(values["Browse"])
-            run_reward = roboEvo.render_run(agent, robot, individual)
-            print("Run reward:", run_reward)
-
         if popup["DIR"].get() != "":
             popup["DIR"].update(".../"+popup["DIR"].get().split("/").pop()) # makes nicer text
 
+        if last_browse != values["Browse"]:
+            popup["PBAR"].update(visible=True)
+            popup["PBAR"].update(current_count=0)
+
+            sorted_items, agent, robot = load_individuals(values["Browse"], popup)
+
+            item_texts = [f"Individual {x[0]} - Reward: {x[1]}" for x in sorted_items]
+            popup["SELECTION_LISTBOX"].update(values=item_texts, disabled=False)
+
+            popup["PBAR"].update(visible=False)
+            last_browse = values["Browse"]
+
+        if event == "SHOW" and values["Browse"] != "" and agent != None and robot != None: # if indiv selected -> play
+            selected_index = popup["SELECTION_LISTBOX"].Widget.curselection()
+            
+            # test for no selected item in listbox
+            if selected_index == set(): continue 
+
+            individual = sorted_items[selected_index[0]][2]
+            run_reward = roboEvo.render_run(agent, robot, individual)
+            print("Run reward:", run_reward)
+
         popup.refresh()
     popup.close()
-    return name
 
 def popup_save_experiments():
     title = [sg.Text("Set experiment name for saving:", size=(None,1), pad=(10,10))]
@@ -177,7 +249,7 @@ def events(window, event, values, robot_tab, agent_tab, evo_tab):
             window["-ROBOT_SELECT-"].update(robot_name)
             window["-AGENT_SELECT-"].update(agent_name)
             window["-EVO_TYPE_SELECT-"].update(experiment_params.agent.evo_type)
-            robot_tab.set_robot(robot_name, window, values, experiment_params.agent)
+            robot_tab.set_robot(robot_name, window, experiment_params.agent)
             agent_tab.set_agent(agent_name, window)
             agent_tab.agents[agent_name] = experiment_params.agent
 

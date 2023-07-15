@@ -3,6 +3,7 @@
 from experiment_setter import Experiments
 
 import roboEvo
+import lzma
 
 import argparse
 import sys
@@ -16,7 +17,16 @@ parser.add_argument("--debug"            , default=False , action="store_true" ,
 parser.add_argument("--no_graph"         , default=False , action="store_true" ,                                                      help="Hide graph of the algorithm showing fitness values in generations")
 
 def __experiments_valid(args, experiments):
-    # test if all selected experiments are valid
+    """Function for validating experiment names.
+
+    This function checks the validity of selected experiment names before
+    running them.
+
+    Raises: 
+        AssertionError : ``Unknown experiment name `<name>``` followed by list of valid experiment names. 
+            Error on invalid experiment name. 
+    """
+
     for exp in args.experiment:
         try: 
             experiments.get_experiment(exp)
@@ -25,17 +35,26 @@ def __experiments_valid(args, experiments):
             sys.exit()
 
 def main(args):
+    """Main TUI function
+
+    Function that receives all input arguments and performs operations based on
+    input arguments.
+    """
     experiments = Experiments()
 
     # Run selected saved individual
     if args.open: 
-        # try:
-        agent, robot, individual = roboEvo.gaAgents.BaseAgent.load(args.open)
-        run_reward = roboEvo.render_run(agent, robot, individual)
-        print("Run reward: ", run_reward)
-        # except Exception as e:
-        #     print("Problem occured while loading save file\n")
-        #     print(e)
+        try:
+            agent, robot, individual = roboEvo.gaAgents.BaseAgent.load(args.open)
+            run_reward = roboEvo.render_run(agent, robot, individual)
+            print("Run reward: ", run_reward)
+        except FileNotFoundError as e:
+            print("Problem while loading save file - File not found")
+            print(e)
+        except lzma.LZMAError as e:
+            print("Problem while loading save file - Incorrect file")
+            print("TUI only supports visualizing of best individuals (.save files)")
+            print("To visualize other individual than the best one, use visualization in GUI")
         sys.exit()
 
     # Show names of all created experiments
@@ -61,7 +80,11 @@ def main(args):
 
                 params = experiments.get_experiment(exp)
 
-                params.note = f"run{run+1}_{params.note}" 
+                if params.note == "":
+                    params.note = f"run{run+1}" 
+                else:
+                    params.note = f"run{run+1}_{params.note}" 
+
                 params.show_graph = not args.no_graph
                 roboEvo.run_experiment(params)
 
@@ -84,8 +107,6 @@ def main(args):
                                               agent=agent,
                                               note="")
 
-            # params = experiments.exp12_SineFull_spotlike(True)
-            # params.note = "motors_test_" + params.note
             params.show_graph = not args.no_graph
             roboEvo.run_experiment(params, args.debug)
 

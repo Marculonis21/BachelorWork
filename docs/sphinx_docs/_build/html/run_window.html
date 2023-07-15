@@ -18,7 +18,9 @@
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Experiments" href="experiments.html" />
+    <link rel="prev" title="evo_tab module" href="evo_tab.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,9 +43,21 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="main_modules.html">RoboEvo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="input_interfaces.html">Input Interfaces</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="input_interfaces.html">Input Interfaces</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="TUI.html">TUI module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="GUI.html">GUI module</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="main_tab.html">main_tab module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="robot_tab.html">robot_tab module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="agent_tab.html">agent_tab module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="evo_tab.html">evo_tab module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">run_window module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="GUI.html#GUI.make_window"><code class="docutils literal notranslate"><span class="pre">make_window()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="experiments.html">Experiments</a></li>
 </ul>
 
@@ -61,6 +75,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="input_interfaces.html">Input Interfaces</a></li>
+          <li class="breadcrumb-item"><a href="GUI.html">GUI module</a></li>
       <li class="breadcrumb-item active">run_window module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/run_window.rst.txt" rel="nofollow"> View page source</a>
@@ -73,37 +89,26 @@
              
   <section id="module-run_window">
 <span id="run-window-module"></span><h1>run_window module<a class="headerlink" href="#module-run_window" title="Permalink to this heading"></a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="run_window.window">
-<span class="sig-prename descclassname"><span class="pre">run_window.</span></span><span class="sig-name descname"><span class="pre">window</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#run_window.window" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="run_window.draw_figure">
-<span class="sig-prename descclassname"><span class="pre">run_window.</span></span><span class="sig-name descname"><span class="pre">draw_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">canvas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figure</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#run_window.draw_figure" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="run_window.draw_chart">
-<span class="sig-prename descclassname"><span class="pre">run_window.</span></span><span class="sig-name descname"><span class="pre">draw_chart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#run_window.draw_chart" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="run_window.update_chart">
-<span class="sig-prename descclassname"><span class="pre">run_window.</span></span><span class="sig-name descname"><span class="pre">update_chart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#run_window.update_chart" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="run_window.get_params">
-<span class="sig-prename descclassname"><span class="pre">run_window.</span></span><span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_tab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_tab</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#run_window.get_params" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
+<p>Window shown when running the experiment from GUI. It contains a graph which is
+actively updated while the experiment runs. It gives us the ability to
+preview the current best individual and to abort the experiment. When the
+experiment finishes, the <code class="docutils literal notranslate"><span class="pre">Exit</span></code> button turns green to show that the application
+has finished all after experiment procedures.</p>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="_images/GUI_run_window.jpg"><img alt="_images/GUI_run_window.jpg" src="_images/GUI_run_window.jpg" style="width: 402.0px; height: 370.8px;" /></a>
+<figcaption>
+<p><span class="caption-text">Experiment run window</span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
 </section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="evo_tab.html" class="btn btn-neutral float-left" title="evo_tab module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="experiments.html" class="btn btn-neutral float-right" title="Experiments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

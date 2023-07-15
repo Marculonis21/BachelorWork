@@ -1,4 +1,12 @@
 #!/usr/bin/env python
+"""GUI Agent tab
+
+Agent tab is the third GUI tab used for selecting and configuring genetic agent
+(fully described in the text of the project, see also :mod:`gaAgents`). User
+can select any agent available from the selection menu. Selected agent will
+display a small overview as well as its parameters in the bottom half of the
+tab. These parameters can be altered to change agent behaviour.
+"""
 
 import PySimpleGUI as sg
 import inspect
@@ -12,6 +20,16 @@ from typing import Dict
 font = ("Helvetica", 15)
 
 agents : Dict[str, roboEvo.gaAgents.BaseAgent]
+"""
+Dictionary of all available agents by name. 
+
+.. warning::
+    User must include new custom agents inside this dictionary to make them
+    available through GUI. The source code gives an example how to add new
+    entries.
+
+"""
+
 # default for gui init
 agents = {agent.__class__.__name__ : agent for agent in [
     roboEvo.gaAgents.StepCycleFullAgent(roboEvo.robots.AntV3(),    [], roboEvo.gaAgents.EvoType.CONTROL, gui=True),
@@ -61,7 +79,7 @@ def get_agent_arguments(agent_name):
 
     return [[sg.Column(names), sg.Column(inputs)]]
 
-def reset_agent_arguments(agent_name, window, values):
+def reset_agent_arguments(agent_name, window):
     agent = agents[agent_name]
     for arg in agent.arguments:
         if isinstance(agent.arguments[arg], dict):
@@ -94,9 +112,17 @@ def get_agent_gen_ops(agent_name):
             "mutation": mutation}
 
 agents_argument_options = {agent : sg.Column(get_agent_arguments(agent), pad=(130,None), scrollable=len(get_agent_arguments(agent)[0][0].Rows) > 7, vertical_scroll_only=True, expand_x=True, element_justification='c', key=f"options_{agent}") for agent in agent_names}
+"""
+Dictionary of agent arguments corresponding to each agent. Used when selecting
+different agent from the selection menu to show the correct arguments for
+current agent and to hide all other ones.
+
+This dictionary is filled automatically from the :attr: dictionary.
+"""
+
 agents_gen_ops_default = {agent : get_agent_gen_ops(agent) for agent in agent_names}
 
-def reload_agents(window, values, robot, agent):
+def reload_agents(window, robot, agent):
     # reload all agents with current body part settings and reset current agent arguments if agent is set
     for name in agent_names:
         agents[name] = agents[name].__class__(robot, 
@@ -105,10 +131,10 @@ def reload_agents(window, values, robot, agent):
                                               gui=True)
 
         if agent.__class__.__name__ == name:
-            reset_agent_arguments(name, window, values)
+            reset_agent_arguments(name, window)
             if not isinstance(agent, roboEvo.gaAgents.NEATAgent):
                 evo_tab.set_evo_ops(name, window)
-        reset_agent_arguments("NEATAgent", window, values)
+        reset_agent_arguments("NEATAgent", window)
 
 
 def tab():

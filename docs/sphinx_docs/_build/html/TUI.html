@@ -87,13 +87,88 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="TUI.__experiments_valid">
 <span class="sig-prename descclassname"><span class="pre">TUI.</span></span><span class="sig-name descname"><span class="pre">__experiments_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">experiments</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TUI.__experiments_valid" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Function for validating experiment names.</p>
+<p>This function checks the validity of selected experiment names before
+running them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>AssertionError</strong> – <code class="docutils literal notranslate"><span class="pre">Unknown</span> <span class="pre">experiment</span> <span class="pre">name</span> <span class="pre">`&lt;name&gt;`</span></code> followed by list of valid experiment names.
+    Error on invalid experiment name.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="TUI.main">
 <span class="sig-prename descclassname"><span class="pre">TUI.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TUI.main" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Main TUI function</p>
+<p>Function that receives all input arguments and performs operations based on
+input arguments.</p>
+</dd></dl>
 
+<dl>
+<dt>List of possible arguments:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--experiment</span></code> - takes one or more created experiment names (separated
+by white space),</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--experiment_names</span></code> - with this argument the program prints out a list
+of names of all created experiments,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--batch</span></code> - integer input argument, specifies how many times is each
+selected experiment going to be repeated (all repetitions saved inside
+single batch folder)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--batch_note</span></code> - optional note that can be added to the name of the batch
+folder, where batch results are going to be saved,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--no_graph</span></code> - flag argument, when selected the evolutionary algorithm
+disables progress graph drawing,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--open</span></code> - argument taking best individual file (<a href="#id1"><span class="problematic" id="id2">*</span></a>.save) from previous
+experiment for visualization.</p></li>
+</ul>
+</dd>
+<dt>Usage examples:</dt><dd><ul>
+<li><p>Listing all created experiment names:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">TUI</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">experiment_names</span>
+<span class="go">&lt;&lt;&lt; List of created experiments:</span>
+<span class="go">     - exp10_TFS</span>
+<span class="go">     - exp11_TFS_spot</span>
+<span class="go">     - exp12_TFS_ant</span>
+<span class="go">     ...</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Running an experiment batch size of 5 (experiment is going to be repeated 5 times):</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">TUI</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">experiment</span> <span class="n">exp11_TFS_spot</span> <span class="o">--</span><span class="n">batch</span> <span class="mi">5</span>
+<span class="go">&lt;&lt;&lt; Starting experiment - exp11_TFS_spot</span>
+<span class="go">    ...</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Running multiple experiments all with batch size of 10 (each of selected
+experiments is going to be repeated 10 times) and we disable drawing of
+the progress graph. Each batch will be saved in it’s own folder:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">TUI</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">experiment</span> <span class="n">exp11_TFS_spot</span> <span class="n">exp12_TFS_ant</span> <span class="o">--</span><span class="n">batch</span> <span class="mi">10</span> <span class="o">--</span><span class="n">no_graph</span>
+<span class="go">&lt;&lt;&lt; Starting experiment - exp11_TFS_spot</span>
+<span class="go">    ...</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Visualizing the best individual (loading best individual save file - <code class="docutils literal notranslate"><span class="pre">.save</span></code> file) of selected run from selected experiment:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">TUI</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="nb">open</span> <span class="n">saved_files</span><span class="o">/</span><span class="n">runs</span><span class="o">/</span><span class="n">run1</span><span class="o">/</span><span class="n">individual</span><span class="o">.</span><span class="n">save</span>
+<span class="go">&lt;&lt;&lt; Ready for simulation - Press ENTER</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">&lt;</span><span class="n">ENTER</span><span class="o">&gt;</span>
+<span class="go">&lt;&lt;&lt; *Visualization starts*</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</dd>
+</dl>
 </section>
 
 

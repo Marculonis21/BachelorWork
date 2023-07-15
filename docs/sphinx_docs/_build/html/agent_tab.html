@@ -50,8 +50,13 @@
 <li class="toctree-l2 current"><a class="reference internal" href="GUI.html">GUI module</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="main_tab.html">main_tab module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="robot_tab.html">robot_tab module</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">agent_tab module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">agent_tab module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#agent_tab.agents"><code class="docutils literal notranslate"><span class="pre">agents</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#agent_tab.agents_argument_options"><code class="docutils literal notranslate"><span class="pre">agents_argument_options</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="evo_tab.html">evo_tab module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="run_window.html">run_window module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="GUI.html#GUI.make_window"><code class="docutils literal notranslate"><span class="pre">make_window()</span></code></a></li>
 </ul>
 </li>
@@ -88,6 +93,39 @@
              
   <section id="module-agent_tab">
 <span id="agent-tab-module"></span><h1>agent_tab module<a class="headerlink" href="#module-agent_tab" title="Permalink to this heading"></a></h1>
+<p>GUI Agent tab</p>
+<p>Agent tab is the third GUI tab used for selecting and configuring genetic agent
+(fully described in the text of the project, see also <a class="reference internal" href="gaAgents.html#module-gaAgents" title="gaAgents"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gaAgents</span></code></a>). User
+can select any agent available from the selection menu. Selected agent will
+display a small overview as well as its parameters in the bottom half of the
+tab. These parameters can be altered to change agent behaviour.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="agent_tab.agents">
+<span class="sig-prename descclassname"><span class="pre">agent_tab.</span></span><span class="sig-name descname"><span class="pre">agents</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">BaseAgent</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'NEATAgent':</span> <span class="pre">&lt;resources.agents.gaAgents.NEATAgent</span> <span class="pre">object&gt;,</span> <span class="pre">'SineFuncFullAgent':</span> <span class="pre">&lt;resources.agents.gaAgents.SineFuncFullAgent</span> <span class="pre">object&gt;,</span> <span class="pre">'SineFuncHalfAgent':</span> <span class="pre">&lt;resources.agents.gaAgents.SineFuncHalfAgent</span> <span class="pre">object&gt;,</span> <span class="pre">'StepCycleFullAgent':</span> <span class="pre">&lt;resources.agents.gaAgents.StepCycleFullAgent</span> <span class="pre">object&gt;,</span> <span class="pre">'StepCycleHalfAgent':</span> <span class="pre">&lt;resources.agents.gaAgents.StepCycleHalfAgent</span> <span class="pre">object&gt;,</span> <span class="pre">'TFSAgent':</span> <span class="pre">&lt;resources.agents.gaAgents.TFSAgent</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#agent_tab.agents" title="Permalink to this definition"></a></dt>
+<dd><p>Dictionary of all available agents by name.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>User must include new custom agents inside this dictionary to make them
+available through GUI. The source code gives an example how to add new
+entries.</p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="agent_tab.agents_argument_options">
+<span class="sig-prename descclassname"><span class="pre">agent_tab.</span></span><span class="sig-name descname"><span class="pre">agents_argument_options</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'NEATAgent':</span> <span class="pre">&lt;PySimpleGUI.PySimpleGUI.Column</span> <span class="pre">object&gt;,</span> <span class="pre">'SineFuncFullAgent':</span> <span class="pre">&lt;PySimpleGUI.PySimpleGUI.Column</span> <span class="pre">object&gt;,</span> <span class="pre">'SineFuncHalfAgent':</span> <span class="pre">&lt;PySimpleGUI.PySimpleGUI.Column</span> <span class="pre">object&gt;,</span> <span class="pre">'StepCycleFullAgent':</span> <span class="pre">&lt;PySimpleGUI.PySimpleGUI.Column</span> <span class="pre">object&gt;,</span> <span class="pre">'StepCycleHalfAgent':</span> <span class="pre">&lt;PySimpleGUI.PySimpleGUI.Column</span> <span class="pre">object&gt;,</span> <span class="pre">'TFSAgent':</span> <span class="pre">&lt;PySimpleGUI.PySimpleGUI.Column</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#agent_tab.agents_argument_options" title="Permalink to this definition"></a></dt>
+<dd><p>Dictionary of agent arguments corresponding to each agent. Used when selecting
+different agent from the selection menu to show the correct arguments for
+current agent and to hide all other ones.</p>
+<p>This dictionary is filled automatically from the :attr: dictionary.</p>
+</dd></dl>
+
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="_images/GUI_agent_tab.jpg"><img alt="_images/GUI_agent_tab.jpg" src="_images/GUI_agent_tab.jpg" style="width: 480.0px; height: 360.0px;" /></a>
+<figcaption>
+<p><span class="caption-text">Agent tab</span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
 </section>
 
 

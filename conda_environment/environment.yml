@@ -6,11 +6,10 @@ dependencies:
   - python=3.9
   - matplotlib=3.6.2
   - mscorefonts
-  - gymnasium-mujoco=0.27.1
+  - gymnasium-mujoco=0.28.1
   - numpy=1.22.3
   - dask=2022.01.0
   - pysimplegui=4.60.4
-  - fonts-anaconda
   - pip
   - pip:
-    - neat-python
+    - neat-python==0.92

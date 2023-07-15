@@ -39,8 +39,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import copy
 from dask.distributed import Client
+import multiprocessing
 import time
 import os
+import glfw
 
 GUI_GEN_NUMBER = 0
 
@@ -81,17 +83,17 @@ def _simulation_run(env : gym.Env, agent : gaAgents.BaseAgent, individual, rende
         # obs, reward, terminated, truncated, info
         obs, reward, terminated, truncated, info = env.step(action)
 
-        if render:
-            env.render()
-
         """
-        Calculating an intricate reward might task user with redefining what
-        information is returned from the custom environment returns - which
-        shouldn't (is not) that hard.
+        Calculating an intricate reward might need the user to redefine what
+        information is returned from the custom environment.
         """
         if terminated or truncated: # calculate reward after finishing last step
             individual_reward = (info["x_position"]-0.5*abs(info["y_position"]))
             break
+
+    if render:
+        env.reset()
+        env.close()
 
     # Optionally for future - return REWARD + some colected information ??? 
     return individual_reward
@@ -275,17 +277,16 @@ def _run_evolution(params : ExperimentParams, client : Client, load_population=[
         file.close()
         os.unlink(file.name)
 
-    # CONTINUE EVO = serial control + body evolution - switching vars to body evo
-    if params.agent.continue_evo: 
-        print("switching evo")
-        params.agent.switch_evo_phase()
-        best_individual, best_individual_env = _run_evolution(params, client, population, gui, debug)
-        print("switch evo done")
-
     if not gui:
         plt.close()
 
-    LAST_POP = copy.deepcopy(population)
+    # CONTINUE EVO = serial control + body evolution - switching vars to body evo
+    if params.agent.continue_evo: 
+        print("Evo type change")
+        params.agent.switch_evo_phase()
+        best_individual, best_individual_env = _run_evolution(params, client, population, gui, debug)
+    else:
+        LAST_POP = copy.deepcopy(population)
 
     return best_individual, best_individual_env
 
@@ -318,8 +319,9 @@ def run_experiment(params : ExperimentParams, gui=False, debug=False):
         _params.agent.evo_override(_params)
         return
 
-    # Start threading client
-    client = Client(n_workers=11,threads_per_worker=1,scheduler_port=0)
+    # Start threading client - use a bit less cpu threads than MAX! 
+    # (GUI can have own thread)
+    client = Client(n_workers=multiprocessing.cpu_count()-2,threads_per_worker=1,scheduler_port=0)
 
     # Run evolution
     try:
@@ -335,7 +337,7 @@ def run_experiment(params : ExperimentParams, gui=False, debug=False):
     # Set final reward (render best if set)
     best_reward = 0
     if _params.show_best: best_reward = render_run(_params.agent, _params.robot, best_individual)
-    else:                 best_reward = _simulation_run(best_individual_env, _params.agent, best_individual, render=False)
+    else:                 best_reward = _simulation_run(best_individual_env, _params.agent, best_individual)
 
     # File saving
     if not os.path.exists(_params.save_dir):

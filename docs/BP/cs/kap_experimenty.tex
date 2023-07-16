@@ -1,7 +1,7 @@
 \chapter{Experimenty a výsledky} \label{chapter-experimenty}
 
 V této kapitole se podíváme na tři typy experimentů, které s naším systémem
-můžeme provádět. Knihovna implementuje několik různých přístupů jak roboty
+můžeme provádět. Knihovna implementuje několik různých přístupů, jak roboty
 řídit a jak je vyvíjet pomocí evolučních algoritmů. Následující experimenty
 předvedou vzorek z těchto přístupů. 
 
@@ -23,13 +23,13 @@ V prvním experimentu v sekci \ref{exp1} si ověříme přirozený předpoklad, 
 řízení jednoduchých robotů nám stačí základní evoluční algoritmy a pro
 složitější roboty (s větším množstvím stupňů volnosti) potřebujeme pokročilé
 přístupy. V~následujících dvou experimentech v sekci \ref{exp2} popíšeme
-experimenty demonstrující možnost evolučního vývoje jak řízení tak morfologie
+experimenty demonstrující možnost evolučního vývoje jak řízení, tak morfologie
 robotů.
 
 \section{Vývoj řízení robotů} \label{exp1}
 
 V této sekci se zaměříme na vývoj řízení robotů. Řízení robota je systém,
-který na základě vstupů z prostředí (senzory robota, čas, atd.) generuje
+který na základě vstupů z prostředí (senzory robota, čas atd.) generuje
 signály do výkonných prvků robota (typicky motory). 
 
 Průběh vývoje řízení robota je ovlivněn zvoleným agentem, který definuje
@@ -61,7 +61,7 @@ Abychom zjistili, kolik generací je potřeba pro rozumné výsledky, necháme
 nejprve proběhnout delší experiment, ve kterém vývoj evolučního algoritmu
 poběží po \textbf{500 generací}. Abychom vyloučili vliv náhodné inicializace
 populace jedinců v genetickém algoritmu, pro vyhodnocení je celý
-běh algoritmu \textbf{20 krát} nezávisle opakován a výsledky prezentujeme
+běh algoritmu \textbf{20krát} nezávisle opakován a výsledky prezentujeme
 pomocí následujícího typu grafu.
 
 \begin{figure}[!htb]
@@ -76,7 +76,7 @@ pomocí následujícího typu grafu.
 Pro vizualizaci dat využíváme krabicový graf (boxplot). Tento graf vizualizuje
 statistické rozložení dat pomocí kvartilů. Uprostřed se nachází \emph{krabice} (obdélník), který je
 shora ohraničena 3. kvartilem a zespodu 1. kvartilem. Rozsah pokrytý
-obdélníkem tedy obsahuje 50\% pozorovaných hodnot. Uvnitř \emph{krabice} se
+obdélníkem tedy obsahuje 50 \% pozorovaných hodnot. Uvnitř \emph{krabice} se
 nachází (v našich grafech oranžovou barvou) čára, naznačující hodnotu mediánu.
 Dále krabicové grafy nad a pod střední \emph{krabicí} vykreslují tzv.
 \emph{vousy}, což vizualizuje variabilitu dat nad 3. a pod 1. kvartilem. Dále
@@ -181,12 +181,12 @@ případech posouvali stranou využitím většího rozsahu v rotaci
 Osobně si myslím, že vývoj estetického pohybu pro tohoto robota je s malou
 úpravou hodnotící funkce možný. Ta by například mohla penalizovat rotaci těla
 od požadovaného směru pohybu. Chůze stranou je kvůli rozsahu (\emph{kyčelních})
-kloubů (hlavně v ose délky těla robota) mnohem snazší na vyvinutí a tak tento
+kloubů (hlavně v ose délky těla robota) mnohem snazší na vyvinutí, a tak tento
 způsob chůze tvoří silné lokální optimum. Agenti velmi rychle konvergují ke
 způsobům chůze, které jsou stabilní, což jim navyšuje šanci urazit větší
 vzdálenost bez pádu. Chůze stranou je oproti vratké chůzi rovně mnohem
 stabilnější. Navržená jednoduchá úprava hodnotící funkce by měla být schopna
-toto lokální optimum penalizovat a tedy přinutit estetičtější pohyb.
+toto lokální optimum penalizovat, a tedy vynutit estetičtější pohyb.
 
 \paragraph{}
 Ve srovnání s předchozími pokusy jsme se pomocí stejných agentů snažili
@@ -228,7 +228,7 @@ Z vývoje fitness (v grafu \ref{exp:first2_sinefull} a \ref{exp:first2_TFS})
 můžeme pozorovat, že oba agenti byli schopní u tohoto jednoduššího robota
 dosáhnout přijatelných výsledků i s omezeným počtem generací. Přijatelné
 výsledky jsou částečně podpořeny faktem, že~i~náhodné konfigurace mají dobrou
-šanci tohoto robota rozpohybovat v požadovaném směru a tedy již velmi brzy
+šanci tohoto robota rozpohybovat v požadovaném směru, a tedy již velmi brzy
 získat dobré ohodnocení. To se zároveň projevuje i na minimální fitness. Pro
 tohoto robota je totiž stejně jednoduché dostat takovou konfiguraci aktuátorů,
 které ho rozpohybují v opačném směru (jedinec z definice hodnotící funkce
@@ -329,16 +329,16 @@ předvedeného experimentu, který je schopný své tělo díky kratší zadní 
 naklonit, a je tak schopný poměrně rychle skákat vpřed.
 
 \subsection{Oddělený vývoj řízení a morfologie} \label{exp2:split_evo}
-V tomto experimentu předvedeme druhý typ vývoje řízení a morfologie robota a to
-oddělený vývoj. V tomto typu evolučního vývoje se nejprve provede vývoj řízení
-robota s výchozí morfologií. Následně se vývoj řízení zafixuje ve stavu
+V tomto experimentu předvedeme druhý typ vývoje řízení a morfologie robota, a
+to oddělený vývoj. V tomto typu evolučního vývoje se nejprve provede vývoj
+řízení robota s výchozí morfologií. Následně se vývoj řízení zafixuje ve stavu
 populace z poslední generace a začne druhá část vývoje, ve kterém se vyvíjí
 pouze morfologie robota.
 
 Jedinci tak dostanou možnost nejprve vyvinout samotný pohyb (jak tomu bylo v
 prvním experimentu) a následně evolučním vývojem optimalizovat tělo pro
 specifický pohyb. Tímto přístupem by teoreticky jedinci měli být schopni
-dosáhnout lepších výsledků, než při vývoji samotného řízení.
+dosáhnout lepších výsledků než při vývoji samotného řízení.
 
 Pro tento experiment jsme zvolili stejného robota (s totožnými rozsahy
 velikostí končetin) a stejného agenta jako v předchozím experimentu.
@@ -360,7 +360,7 @@ průměrných fitness hodnot, což bylo zapříčiněno začátkem vývoje morfo
 robota. Ten začíná vygenerováním zcela náhodných konfigurací těla robota (v
 povoleném rozsahu délek končetin), a tedy může chvilkově vést k horším
 výsledkům. Časem ale vidíme, že evoluce byla schopná optimalizovat tělo robota
-pro již vyvinutý pohyb a tak celkově vylepšit výsledky jedinců.
+pro již vyvinutý pohyb, a tak celkově vylepšit výsledky jedinců.
 
 \begin{figure}[h!]
     \centering
@@ -374,7 +374,5 @@ Na obrázku \ref{fig:exp2_serial_body_show} můžeme vidět nejlepšího jedince
 experimentu s odděleným vývojem řízení a morfologie. Jedná se zároveň o dobrý
 příklad morfologie, ke které se řešení často blížila. Pro tento typ pohybu se 
 robotům hodilo mít mnohem delší části končetin vedoucí přímo od těla
-(\emph{stehno}), které svým pohybem jsou schopny posunout robota dále a tak
+(\emph{stehno}), které svým pohybem jsou schopny posunout robota dále, a tak
 optimalizovat uraženou vzdálenost.
-
-% \section{Diskuze výsledků}

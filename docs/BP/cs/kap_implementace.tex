@@ -9,8 +9,8 @@ je vytvořit čitelnou rozšířitelnou platformu, která bude uživateli jednod
 dostupná. Pokud uživatel bude mít potřebu vytvořené moduly jakkoli měnit nebo
 rozšiřovat, implementace v Pythonu toto bez problémů umožní. Jednoduchá čitelnost Pythonu
 spojená s rychlostí, jakou mohou být prováděny iterace změn, bez potřeby
-zdlouhavého překladu celé knihovny, se nám zdají býti dostatečně užitečné
-vlastnosti volbu Pythonu jako jazyka pro tento projekt.
+zdlouhavého překladu celé knihovny, se nám zdají být dostatečně užitečné
+vlastnosti pro volbu Pythonu jako jazyka pro tento projekt.
 
 \paragraph{Struktura projektu}
 
@@ -24,7 +24,7 @@ vlastnosti volbu Pythonu jako jazyka pro tento projekt.
 
 Obrázek \ref{fig:struktura} popisuje na jaké části je projekt rozdělen.
 Centrální částí je modul \emph{RoboEvo}, pomocí kterého knihovna provádí
-evoluční experimenty. Tento modul se pro přehlednost a rozšířitelnost kódu
+evoluční experimenty. Tento modul se pro přehlednost a rozšiřitelnost kódu
 skládá z několika menších částí -- \emph{gaAgents} (popisující agenty a vlastní
 genetické operátory) a \emph{robots} (udržující jednotný způsob přístupu k
 různým robotům). 
@@ -355,8 +355,8 @@ Robot inspirovaný pokročilým robotem pojmenovaným \emph{Spot} od firmy
 čtyřnohého robota s morfologií těla, která připomíná psa (ukázka na obrázku
 \ref{imp:fig:robots.SpotLike}). Každou nohu ovládají tři klouby (dohromady tedy
 12 stupňů volnosti pro celého robota), což z tohoto robota dělá toho
-nejobtížnějšího na ovládání. Čtyři vysoké nohy jsou zároveň vratké a tudíž je o
-to těžší vyvinout stabilní pohyb, který ho udrží nepadat.
+nejobtížnějšího na ovládání. Čtyři vysoké nohy jsou zároveň vratké, a tudíž je
+o to těžší vyvinout stabilní pohyb, který ho udrží nepadat.
 
 \begin{figure}[!htb]
     \centering
@@ -379,7 +379,7 @@ implementováni v naší knihovně -- \emph{Walker2D}, \emph{InvertedPendulum},
 \subsection{Modul \emph{gaAgents}} \label{imp:gaAgents}
 Modul \emph{gaAgents} je kolekcí několika tříd popisující agenty využívané
 evolučními algoritmy. Každá třída agenta povinně obsahuje několik funkcí, které
-specifikují jak vypadá genotyp jedinců vytvořených podle tohoto agenta, jakým
+specifikují, jak vypadá genotyp jedinců vytvořených podle tohoto agenta, jakým
 způsobem se generuje populace takových jedinců, jaké genetické operátory budou
 při~evolučním vývoji použité a jakým stylem probíhá transformace genotypu
 jedince na nastavení odpovídajících aktuátorů robota. Agent zároveň uchovává
@@ -751,7 +751,7 @@ opravu.
 Prvním problémem je výchozí interní nastavení knihovny \emph{MuJoCo}, které
 v momentě kdy začíná probíhat vizualizace zároveň spouští i simulaci robota.
 Mohlo by se tedy jednoduše stát, že by uživatel ani nemusel zaregistrovat, že
-vizualizace běhu robota je již spuštěna, před tím než vizualizace opět skončí.
+vizualizace běhu robota je již spuštěna před tím, než vizualizace opět skončí.
 
 Pro řešení tohoto problému jsme se rozhodli přidat jeden krok mezi poslední
 interakci s naší platformou a vizualizačním prostředím. Uživatel je tak nucen
@@ -765,7 +765,7 @@ vizualizačního okna si uživatel může zvolit, zda chce vykreslovat i průhle
 okno nápovědy a okno s informacemi ohledně rychlosti a času vykreslování. Tato
 okna jsou v každém cyklu smazána a vykreslena znova. Pokud ale uživatel
 simulaci zastaví, vykreslování stále běží (aby uživatel mohl pohybovat kamerou,
-měnit nastavení, atd.). V ten moment se přestanou okna nápovědy mazat, ale jsou
+měnit nastavení atd.). V ten moment se přestanou okna nápovědy mazat, ale jsou
 stále vykreslována dál v~nekonečném cyklu, dokud se simulace opět nerozběhne.
 
 \paragraph{Ukončení vizualizace -- čištění \emph{glfw} zdrojů}
@@ -784,7 +784,7 @@ Pro problémy jsme byli schopni najít velmi jednoduché opravy. Díky tomu,
 že~\emph{MuJoCo} je open source knihovna, úprava na naší straně by byla možná.
 V této práci jsme se ale rozhodli nechat všechny knihovny v jejich výchozím
 stavu tak, jak je uživatel dostane z balíčkovacích manažerů. Tím zachováme
-cenou vlastnost platformy a to jednoduchost instalace (informace o instalaci
+cenou vlastnost platformy, a to jednoduchost instalace (informace o instalaci
 prostředí pro platformu v uživatelské dokumentaci v sekci \ref{doc_11_spust}).
 
 \paragraph{Návrh opravy}

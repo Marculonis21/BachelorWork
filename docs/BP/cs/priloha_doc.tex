@@ -1,18 +1,18 @@
 \chapter{Uživatelská dokumentace}
 Platforma je uživateli přístupná pomocí dvou aplikací -- grafického a textového
 rozhraní. Funkčnost aplikací byla otestována na operačních systémech Windows
-a~Linux. Všechny aplikace jsou vytvořené v jazyce Python a tedy všechny soubory
-mají přípony \emph{.py}. 
+a~Linux. Všechny aplikace jsou vytvořené v jazyce Python, a tedy všechny
+soubory mají přípony \emph{.py}. 
 
 Uživatelskou dokumentaci rozdělíme do dvou částí. V první v části
 \ref{doc_1_spust_a_kompon} si popíšeme kroky potřebné ke spuštění aplikací a
 předvedeme jednotlivá rozhraní a~práci s nimi. V druhé části
-\ref{doc_2_experimenty} si poté předvedeme jak se pomocí těchto rozhraní tvoří
+\ref{doc_2_experimenty} si poté předvedeme, jak se pomocí těchto rozhraní tvoří
 a provádějí experimenty.
 
 \section{Spuštění a komponenty rozhraní} \label{doc_1_spust_a_kompon}
 
-V této sekci se nejprve podíváme jak připravit prostředí se všemi potřebnými
+V této sekci se nejprve podíváme, jak připravit prostředí se všemi potřebnými
 knihovnami pro správné fungování celé platformy (v podsekci
 \ref{doc_11_spust}). Dále si předvedeme uživatelská rozhraní -- grafické v
 podsekci \ref{doc_12_GUI} a poté textové v~podsekci~\ref{doc_13_TUI}.
@@ -263,7 +263,7 @@ předchozího experimentu.
 V této části popíšeme způsob, jakým může uživatel pracovat s experimenty, jak
 může experimenty vytvářet, spouštět a zpracovávat jejich výsledky.
 
-V podsekci \ref{doc_21_mise_en_place} si představíme jak vytvářet
+V podsekci \ref{doc_21_mise_en_place} si představíme, jak vytvářet
 konfiguraci experimentu. Dále v~podsekci \ref{doc_22_cooking} předvedeme
 způsoby, jakými spouštět experimenty a v poslední podsekci
 \ref{doc_23_seasoning} ukážeme možnosti evaluace výsledků experimentů.
@@ -304,7 +304,7 @@ zůstat bez změn -- úpravy ve vlastních kopiích agentů).
 \subsection{Spouštění experimentu} \label{doc_22_cooking}
 Když je připravená konfigurace experimentu, uživatel má možnost ji vybrat pro
 spuštění. Toho opět může být dosaženo dvěma způsoby, které jsme již dříve
-popsali a to pomocí grafického, nebo textového rozhraní.
+popsali, a to pomocí grafického, nebo textového rozhraní.
 
 \paragraph{Spouštění s GUI}
 Při spouštění experimentu s GUI stačí spustit grafické rozhraní, načíst uložený
@@ -320,13 +320,13 @@ důvodu se nehodí pro provádění většího množství experimentů.
 \paragraph{Spouštění s TUI}
 V textovém prostředí je experimenty jednoduché spouštět opakovaně s vícero
 nezávislými běhy, které následně mohou být součástí statistického rozboru s
-větším množstvím hodnot. Následuje ukázka jak můžeme spustit vlastní
+větším množstvím hodnot. Následuje ukázka, jak můžeme spustit vlastní
 experiment pomocí TUI (z kořenového adresáře projektu).
 \begin{code}
 python TUI.py --experiment <jmeno_experimentu> --batch 10 --no_graph
 \end{code}
-Tímto příkazem můžeme spustit libovolný uložený experiment. Celý běh bude 10
-krát opakován, kde výsledky jednotlivých nezávislých běhů budou uloženy
+Tímto příkazem můžeme spustit libovolný uložený experiment. Celý běh bude
+10krát opakován, kde výsledky jednotlivých nezávislých běhů budou uloženy
 společně ve výsledném adresáři (se značkami ve jméně reflektující číslo běhu)
 a~v~průběhu evolučního algoritmu nebude generován graf.
 
@@ -358,7 +358,7 @@ experimentu. Jako příklad využijeme data vygenerována posledním experimente
 této práce -- oddělený vývoj řízení a morfologie robota z experimentu
 \ref{exp2:split_evo}. 
 
-Máme tedy provedený experiment, který 5 krát nezávisle opakoval běh evolučního
+Máme tedy provedený experiment, který 5krát nezávisle opakoval běh evolučního
 algoritmu a jeho data máme uložená ve složce \texttt{saves/exp1}. Data ve
 složce mají přibližně následující tvar.
 \begin{code}
@@ -466,7 +466,7 @@ posledním experimentem této práce.
 \end{enumerate}
 Potvrzování pomocí konzole při přechodech do vizualizačního prostředí je
 složitější postup, než bychom chtěli. Nicméně se jedná o uživatelsky
-nejbezpečnější způsob jak vyřešit problém aktuální verze grafické knihovny
+nejbezpečnější způsob, jak vyřešit problém aktuální verze grafické knihovny
 vytvářející vizualizace. 
 
 Zároveň se při ukončení vizualizace může v konzoli objevovat hláška
@@ -474,4 +474,4 @@ upozorňující na chyby v~kódu grafické knihovny, což je chyba mimo naši
 platformu a~na~celkovou funkcionalitu naší platformy nemá žádný další dopad.
 Tyto chyby byly blíže popsány výše, v~kapitole o~implementaci v sekci
 \ref{imp:problems} o problémech implementace. Zároveň v této sekci byl popsán
-zdroj chyby a jednoduchý postup jak problémy vizualizačního prostředí opravit.
+zdroj chyby a jednoduchý postup, jak problémy vizualizačního prostředí opravit.

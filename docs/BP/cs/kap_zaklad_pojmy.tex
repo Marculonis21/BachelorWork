@@ -92,12 +92,12 @@ fitness porovnat a rozlišit tak, která je lepší a která horší.
 \emph{Ruletová selekce} je abstrakce ruletového kola, kde každý jedinec má šanci
 na~zvolení (šance, že jeho hodnota padne na ruletovém kole) přímo úměrnou jeho
 fitness. Tato selekce se potom provádí opakovaně, dokud nevybereme požadovaný
-počet jedinců, nad celou populací a ne pouze nad náhodně vybranou podmnožinou
+počet jedinců, nad celou populací, a ne pouze nad náhodně vybranou podmnožinou
 jedinců z populace (jak tomu bylo u \emph{turnajové selekce}). Pokud se v
 populaci nachází jedinec s dominantní hodnotou fitness, která výrazně překonává
 ostatní jedince v populaci, může se stávat, že bude docházet k opakovanému
 výběru jednoho a toho samého jedince, což může vést k velmi rychlému zúžení
-prohledávaného prostoru a tedy nalezení neoptimálního řešení (vývoj může
+prohledávaného prostoru, a tedy nalezení neoptimálního řešení (vývoj může
 uvíznout v~tzv. \emph{lokálním optimu}).
 
 \paragraph{Křížení}
@@ -115,7 +115,7 @@ Genetickou informaci potomků následně vytvoříme tak, že složíme zpět ro
 části genotypů různých rodičů (např. první potomek vznikne složením první části
 genotypu prvního rodiče a druhé části genotypu druhého rodiče a druhý potomek
 naopak). \emph{Vícebodové křížení} probíhá stejně, pouze na začátku volíme
-vícero bodů, ve kterých genotypy rozdělíme a tak máme více možností, jak
+vícero bodů, ve kterých genotypy rozdělíme, a tak máme více možností, jak
 genotyp složit zpět.
 
 \emph{Uniformní křížení} při tvorbě potomků najednou prochází celý genotyp
@@ -179,14 +179,14 @@ fitness hodnoty), bude cyklicky v generacích probíhat vývoj populace, dokud s
 neobjeví takový jedinec, který zadaný problém vyřeší.
 
 \paragraph{Možnosti paralelizace}
-Všechny části evolučních algoritmů jsou ve své podstatě velmi jednoduché a tedy
-i rychlé na výpočet. Jediný bod, který může vývoj zpomalit je samotné testování
-jedinců. Například, když jedinec reprezentuje robota, tak jeho hodnocení
-vyžaduje simulaci robota po určitou dobu. Jelikož každý robot musí být
-simulován zvlášť, je tento krok v našem evolučním algoritmu zdaleka ten
+Všechny části evolučních algoritmů jsou ve své podstatě velmi jednoduché, a
+tedy i rychlé na výpočet. Jediný bod, který může vývoj zpomalit je samotné
+testování jedinců. Například, když jedinec reprezentuje robota, tak jeho
+hodnocení vyžaduje simulaci robota po určitou dobu. Jelikož každý robot musí
+být simulován zvlášť, je tento krok v našem evolučním algoritmu zdaleka ten
 nejnáročnější co se týče doby výpočtu. Naštěstí ve většině příkladů použití
-evolučních algoritmů, je tento krok možné poměrně jednoduše paralelizovat a i v
-našem případě tomu tak je. Jednotliví jedinci jsou v absolutní většině
+evolučních algoritmů, je tento krok možné poměrně jednoduše paralelizovat, a i
+v našem případě tomu tak je. Jednotliví jedinci jsou v absolutní většině
 evolučních algoritmů naprosto nezávislí na ostatních. Pokud to simulační
 prostředí dovolí, je možné nechat každého robota simulovat nezávisle na
 ostatních ve vlastním vlákně (procesu) a tak využít moderní vícejádrové
@@ -376,14 +376,14 @@ Těmito komponenty jsou:
 \begin{enumerate}[a)]
     \item komponenty specifické danému problému:
         \begin{itemize}
-            \item \texttt{generator} -- určuje jak se generují řešení
+            \item \texttt{generator} -- určuje, jak se generují řešení
                 (jedinci),
-            \item \texttt{evaluator} -- definuje jak se vypočítává fitness
+            \item \texttt{evaluator} -- definuje, jak se vypočítává fitness
                 jedinců,
         \end{itemize}
-    \item komponenty specifické danému danému evolučnímu algoritmu:
+    \item komponenty specifické danému evolučnímu algoritmu:
         \begin{itemize}
-            \item \texttt{observer} -- definuje jak uživatel sleduje evoluci,
+            \item \texttt{observer} -- definuje, jak uživatel sleduje evoluci,
             \item \texttt{terminator} -- rozhoduje, kdy by měla evoluce
                 skončit,
             \item \texttt{selector} -- rozhoduje, kteří jedinci by se měli stát
@@ -392,9 +392,9 @@ Těmito komponenty jsou:
                 rodičovských jedinců,
             \item \texttt{replacer} -- volí, kteří jedinci mají přežít do další
                 generace,
-            \item \texttt{migrator} -- určuje jak se přenáší jedinci mezi
+            \item \texttt{migrator} -- určuje, jak se přenáší jedinci mezi
                 různými \\populacemi/generacemi,
-            \item \texttt{archiver} -- definuje jak jsou jedinci ukládání mimo
+            \item \texttt{archiver} -- definuje, jak jsou jedinci ukládání mimo
                 stávající populaci.
         \end{itemize}
 \end{enumerate}
@@ -459,7 +459,7 @@ vyhodnotí výstup jako binární zápis nějakého celého čísla. Toto čísl
 výstupní ohodnocení pro daného jedince.
 
 \paragraph{Genetický algoritmu}
-Vytvořili jsme všechny potřebné části, specifické pro tento problém a tedy je
+Vytvořili jsme všechny potřebné části, specifické pro tento problém, a tedy je
 můžeme použít pro vytvoření výsledného genetického algoritmu. Knihovna Inspyred
 nabízí několik různých typů evolučních algoritmů (genetické algoritmy, evoluční
 strategie, simulované žíhání a další). Pro tento problém vybereme
@@ -530,7 +530,7 @@ dokumentaci Inspyred \citep{InspyredDocs}.
 % \subsubsection{PyEvolve} \label{PyEvolve}
 
 \subsubsection{Porovnání} \label{GA - Porovnání}
-Při srovnání těchto knihoven jsme převážně sledovali jak intuitivní práce s
+Při srovnání těchto knihoven jsme převážně sledovali, jak intuitivní práce s
 nimi je. Cílem této práce je vytvořit co možná nejvíce otevřenou platformu, se
 kterou bude moci uživatel provádět experimenty při vývoji řízení robotů.
 Uživatel se základní znalostí evolučních algoritmů by tak měl být schopný
@@ -746,7 +746,7 @@ umožnilo evoluční vývoj sítí rozsáhlejších architektur s menšími nár
 velikost genotypu.
 
 Jiné metody se poté zaměřily na vývoj jak vah, tak topologie neuronové sítě.
-Navíc se ukázalo, že současný vývoj topologie často přináší lepší výsledky,
+Navíc se ukázalo, že současný vývoj topologie často přináší lepší výsledky
 než~vývoj pouze vah sítě. Vývoj v těchto metodách začíná s nejzákladnější
 strukturou sítě, která se podle nároků problému sama vyvíjí a rozšiřuje, dokud
 tyto změny přináší kvalitativní zlepšení. Často využívaným algoritmem
@@ -784,7 +784,7 @@ informace:
     \item počáteční neuron -- neuron, ze kterého synapse vychází,
     \item hodnotu váhy synapse,
     \item příznak, jestli je spojení v síti použito,
-    \item \emph{historická značka} -- číslo, popisující kdy v historii
+    \item \emph{historická značka} -- číslo popisující kdy v historii
         byla daná hrana do sítě přidána; umožňuje nacházet
         odpovídající geny synapsí při křížení.
 \end{itemize}
@@ -915,7 +915,7 @@ prostředí. My však chceme, aby se chování objektů v simulátoru virtuáln�
 prostředí co nejvíce blížilo chování objektů v reálném prostředí. Proto budeme
 využívat pouze robustní simulátory prostředí, založené na fyzikálních zákonech.
 Budeme rozlišovat mezi \emph{simulátorem prostředí}, který eviduje objekty (a
-vlastnosti objektů jako třeba rozměry, váha, atd.), a \emph{simulátorem
+vlastnosti objektů jako třeba rozměry, váha atd.), a \emph{simulátorem
 fyziky}, který řeší interakce mezi objekty tak, aby odpovídaly fyzikálním
 zákonům. 
 
@@ -924,10 +924,10 @@ prostředí a zároveň mít co nejjednodušší přístup k morfologii simulova
 robotů. Zároveň chceme, abychom měli možnost do morfologie robotů nějakým
 způsobem zasahovat i v průběhu evolučního vývoje a aktivně ji za běhu měnit.
 Jelikož plánujeme v různých prostředích provádět experimenty s různými typy
-robotů, používajícími různé styly pohybu (typy motorů, kloubů, tvarů končetin,
+robotů, používajícími různé styly pohybu (typy motorů, kloubů, tvarů končetin
 atd.), je~potřebné, aby fyzikální simulátor (\emph{fyzikální řešič=solver}) byl
 schopný simulovat i složitější typy robotů. Takovými mohou být právě třeba
-kráčející roboti, neboli roboti používající k pohybu končetiny připomínající
+kráčející roboti neboli roboti používající k pohybu končetiny připomínající
 nohy, na rozdíl od jednodušších typů robotů, kteří se mohou pohybovat pomocí
 kol, jejichž simulace bývá mnohdy jednodušší. 
 
@@ -981,7 +981,7 @@ Webots \citep{Webots} je open-source víceplatformní, robustní a deterministic
 robotický simulátor vyvíjený od roku 1998. Umožňuje programování a testování
 virtuálních robotů mnoha různých typů a jednoduchou následnou aplikaci softwaru
 v reálných robotech. Simulátor je možné použít pro simulaci prostředí s~vícero
-agenty najednou. Agenti spolu mohou komunikovat a to jak lokálně tak i
+agenty najednou. Agenti spolu mohou komunikovat, a to jak lokálně, tak i
 globálně. Výpočty fyzikálních interakcí zajišťuje fyzikální simulátor ODE. Pro
 vývoj robotů a prostředí je možné využít řady programovacích jazyků a to C,
 C++, Python, Java, MATLAB nebo ROS (\emph{Robot Operating System}). Prostředí
@@ -1077,7 +1077,7 @@ většinou industriálních a výzkumných aplikací \citep{coppeliarobotics}
 V dnešní době se nám nabízí velké množství potencionálních kandidátů, vhodných
 k využití pro naši aplikaci. Každý z open-source simulátorů, které jsme našli a
 představili, by bylo možné použít pro simulaci robotů složitosti, jakou~máme
-předběžně v plánu. Hlavním z rozhodujících faktorů pro tento projekt bude jak
+předběžně v plánu. Hlavním z rozhodujících faktorů pro tento projekt bude, jak
 jednoduše půjde prostředí používat pro vývoj pomocí genetických algoritmů.
 Chceme tedy nějaký jednoduchý přístup k simulaci a ovládání robotů, rychlost
 a~přesnost simulace. 
@@ -1105,4 +1105,4 @@ kráčející roboty, u kterých můžeme mít i větší počty kloubů.
 
 Simulátor MuJoCo a roboti, které můžeme používat, je zároveň možné
 jednoduše konfigurovat pomocí vlastního XML formátu a spojení s Python API
-navíc umožní tyto konfigurace provádět jak často bude potřeba.
+navíc umožní tyto konfigurace provádět, jak často bude potřeba.

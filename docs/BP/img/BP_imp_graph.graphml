@@ -17,7 +17,7 @@
     <node id="n0">
       <data key="d6">
         <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
-          <y:Geometry height="557.4582946635733" width="423.51756530684264" x="403.5500920565555" y="320.9"/>
+          <y:Geometry height="557.4582946635733" width="423.51756530684264" x="598.2412173465787" y="321.2708526682134"/>
           <y:Fill color="#E6E6E6" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#E6E6E6" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="21.4609375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="159.9912109375" x="131.76317718467135" xml:space="preserve" y="4.0">ŘEŠIČ EXPERIMENTŮ</y:NodeLabel>
@@ -38,10 +38,10 @@
     <node id="n1">
       <data key="d6">
         <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
-          <y:Geometry height="71.20000000000005" width="116.79999999999995" x="451.59999999999997" y="774.4"/>
+          <y:Geometry height="71.20000000000005" width="116.79999999999995" x="646.291125290023" y="774.7708526682134"/>
           <y:Fill color="#C8F08C" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#C8F08C" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="21.4609375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="86.78564453125" x="15.007177734374977" xml:space="preserve" y="4.0">gaMethods</y:NodeLabel>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#C8F08C" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="21.4609375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="97.66943359375" x="9.565283203124977" xml:space="preserve" y="4.0">gaOperators</y:NodeLabel>
           <y:NodeLabel alignment="left" autoSizePolicy="content" configuration="com.yworks.entityRelationship.label.attributes" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" hasText="false" height="4.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="top" visible="true" width="4.0" x="2.0" y="33.4609375">
             <y:LabelModel>
               <y:ErdAttributesNodeLabelModel/>
@@ -59,7 +59,7 @@
     <node id="n2">
       <data key="d6">
         <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
-          <y:Geometry height="100.0" width="150.0" x="645.0" y="640.0"/>
+          <y:Geometry height="100.0" width="150.0" x="839.6911252900231" y="640.3708526682135"/>
           <y:Fill color="#C8F08C" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#C8F08C" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="21.4609375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="51.7392578125" x="49.13037109375" xml:space="preserve" y="4.0">robots</y:NodeLabel>
@@ -80,7 +80,7 @@
     <node id="n3">
       <data key="d6">
         <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
-          <y:Geometry height="100.0" width="150.0" x="434.99999999999994" y="640.0"/>
+          <y:Geometry height="100.0" width="150.0" x="629.6911252900231" y="640.3708526682135"/>
           <y:Fill color="#C8F08C" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#C8F08C" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="21.4609375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="74.927734375" x="37.5361328125" xml:space="preserve" y="4.0">gaAgents</y:NodeLabel>
@@ -101,7 +101,7 @@
     <node id="n4">
       <data key="d6">
         <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
-          <y:Geometry height="152.0" width="150.0" x="540.3088747099769" y="404.0"/>
+          <y:Geometry height="152.0" width="150.0" x="735.0" y="404.37085266821344"/>
           <y:Fill color="#8CC86E" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#8CC86E" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="21.4609375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="69.830078125" x="40.0849609375" xml:space="preserve" y="4.0">RoboEvo</y:NodeLabel>
@@ -123,12 +123,12 @@
       <data key="d4" xml:space="preserve"/>
       <data key="d6">
         <y:UMLNoteNode>
-          <y:Geometry height="84.09338747099764" width="283.7344630427573" x="878.1327684786213" y="437.2855278422274"/>
+          <y:Geometry height="84.09338747099764" width="283.7344630427573" x="1085.437702265372" y="437.9533062645012"/>
           <y:Fill color="#99CCFF" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
           <y:NodeLabel alignment="left" autoSizePolicy="node_width" borderDistance="10.0" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="56.3828125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="283.7344630427573" x="0.0" xml:space="preserve" y="13.85528748549882"> Výsledky experimentů použitelné 
  pro statistický rozbor 
- a vizualizaci nejlepších řešení 
+ a zpětnou vizualizaci řešení 
 <y:LabelModel><y:SmartNodeLabelModel distance="10.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
         </y:UMLNoteNode>
       </data>
@@ -136,10 +136,10 @@
     <node id="n6">
       <data key="d6">
         <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
-          <y:Geometry height="298.20000000000005" width="229.12459546925567" x="125.43770226537215" y="320.9"/>
+          <y:Geometry height="298.20000000000005" width="229.12459546925567" x="305.43770226537214" y="320.9"/>
           <y:Fill color="#E6E6E6" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#E6E6E6" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="21.4609375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="52.9697265625" x="88.07743445337785" xml:space="preserve" y="4.0">VSTUP</y:NodeLabel>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#E6E6E6" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="21.4609375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="153.49462890625" x="37.81498328150286" xml:space="preserve" y="4.0">VSTUPNÍ ROZHRANÍ</y:NodeLabel>
           <y:NodeLabel alignment="left" autoSizePolicy="content" configuration="com.yworks.entityRelationship.label.attributes" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" hasText="false" height="4.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="top" visible="true" width="4.0" x="2.0" y="33.4609375">
             <y:LabelModel>
               <y:ErdAttributesNodeLabelModel/>
@@ -157,7 +157,7 @@
     <node id="n7">
       <data key="d6">
         <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
-          <y:Geometry height="100.0" width="150.0" x="165.0" y="370.0"/>
+          <y:Geometry height="100.0" width="150.0" x="345.0" y="370.0"/>
           <y:Fill color="#64C8BE" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#64C8BE" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="21.4609375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="31.0263671875" x="59.48681640625" xml:space="preserve" y="4.0">GUI</y:NodeLabel>
@@ -178,7 +178,7 @@
     <node id="n8">
       <data key="d6">
         <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
-          <y:Geometry height="100.0" width="150.0" x="165.0" y="490.0"/>
+          <y:Geometry height="100.0" width="150.0" x="345.0" y="490.0"/>
           <y:Fill color="#64C8BE" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#64C8BE" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="21.4609375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="28.5654296875" x="60.71728515625" xml:space="preserve" y="4.0">TUI</y:NodeLabel>
@@ -201,8 +201,8 @@
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
-            <y:Point x="615.3088747099769" y="600.0"/>
-            <y:Point x="720.0" y="600.0"/>
+            <y:Point x="810.0" y="600.3708526682135"/>
+            <y:Point x="914.6911252900231" y="600.3708526682135"/>
           </y:Path>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="diamond" target="none"/>
@@ -215,8 +215,8 @@
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
-            <y:Point x="615.3088747099769" y="600.0"/>
-            <y:Point x="510.0" y="600.0"/>
+            <y:Point x="810.0" y="600.3708526682135"/>
+            <y:Point x="704.6911252900231" y="600.3708526682135"/>
           </y:Path>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="diamond" target="none"/>
@@ -240,8 +240,8 @@
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
-            <y:Point x="379.05619489559166" y="480.0"/>
-            <y:Point x="379.05619489559166" y="420.0"/>
+            <y:Point x="570.0" y="480.0"/>
+            <y:Point x="570.0" y="420.0"/>
           </y:Path>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="white_diamond" target="none"/>
@@ -254,8 +254,8 @@
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
-            <y:Point x="379.05619489559166" y="480.0"/>
-            <y:Point x="379.05619489559166" y="540.0"/>
+            <y:Point x="570.0" y="480.0"/>
+            <y:Point x="570.0" y="540.0"/>
           </y:Path>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="white_diamond" target="none"/>
@@ -270,6 +270,18 @@
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
           <y:LineStyle color="#000000" type="dashed" width="2.0"/>
           <y:Arrows source="none" target="none"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e6" source="n4" target="n0">
+      <data key="d8" xml:space="preserve"/>
+      <data key="d9"/>
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="white_diamond" target="none"/>
           <y:BendStyle smoothed="false"/>
         </y:PolyLineEdge>
       </data>

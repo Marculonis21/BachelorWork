@@ -18,7 +18,7 @@ import PySimpleGUI as sg
 
 import numpy as np
 
-font = ("Helvetica", 15)
+DEFAULT_FONT = ("Arial", 15)
 
 figure = None
 figure_aggregate = None
@@ -30,7 +30,7 @@ def window():
               [sg.Text("Mean Fit: "), sg.Text("", key="-MEANFIT-")], 
               [sg.Text("Min Fit: "), sg.Text("", key="-MINFIT-"), sg.Push(), sg.Button("Preview best", key="-RUN_PREVIEW-"), sg.Button("Exit", button_color='red', mouseover_colors='orange red', key="-EXIT-")]]
 
-    window = sg.Window('Process running', layout, font=font, finalize=True, keep_on_top=True)
+    window = sg.Window('Process running', layout, font=DEFAULT_FONT, finalize=True, keep_on_top=True)
 
     return window
 

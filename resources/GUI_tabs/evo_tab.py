@@ -32,17 +32,18 @@ It contains all recognised implemented genetic operators inside the
 :func:`gaOperators.Operators._ops_dir`.
 """
 
-FONT = ("Helvetica", 14)
+DEFAULT_FONT = ("Arial", 15)
+
 def single_value_option(key, text, tooltip, default):
-    text = [sg.Text(text, font=FONT, tooltip=tooltip)]
-    input = [sg.Input(default, font=FONT, size=(8,None), enable_events=True, key=key)]
+    text = [sg.Text(text, tooltip=tooltip)]
+    input = [sg.Input(default, size=(8,None), enable_events=True, key=key)]
 
     return text, input
 
 def create_op_frame(name, key):
     op_types = list(ga_operators[key].keys())
 
-    combo_type = [sg.Text(f"{name} operator: ", pad=(10,None)), sg.Combo(op_types, op_types[0], font=FONT, size=(25,None), readonly=True, enable_events=True, key=f"-OP_{name.upper()}_TYPE-")]
+    combo_type = [sg.Text(f"{name} operator: ", pad=(10,None)), sg.Combo(op_types, op_types[0], size=(25,None), readonly=True, enable_events=True, key=f"-OP_{name.upper()}_TYPE-")]
 
     options = []
 
@@ -62,7 +63,7 @@ def create_op_frame(name, key):
     return combo_type, options
 
 def tab():
-    evo_type = [sg.Text("Select evolution type: ", pad=(10,None)), sg.Combo(evo_type_names, evo_type_names[0], font=FONT, size=(25,None), pad=(0,20,0,20), readonly=True, enable_events=True, key="-EVO_TYPE_SELECT-")]
+    evo_type = [sg.Text("Select evolution type: ", pad=(10,None)), sg.Combo(evo_type_names, evo_type_names[0], size=(25,None), pad=(0,20,0,20), readonly=True, enable_events=True, key="-EVO_TYPE_SELECT-")]
 
     sizes = [sg.Text("Generation count: ", pad=(10,None)), sg.Input("150", size=(5,None), enable_events=True, key="-GEN_COUNT-"),
              sg.Text("Starting population: "),             sg.Input("100", size=(5,None), enable_events=True, key="-POP_SIZE-")]
@@ -75,9 +76,9 @@ def tab():
 
     mutation_type, mutation_inputs = create_op_frame("Mutation", "mutation")
     mutation_probs = [[sg.Text("Mutation probabilities: ", pad=(10,None))],
-                      [sg.Text("Individual: ", pad=(10, None)), sg.Input("0.75", font=FONT, size=(6,None), enable_events=True, key="-INDIV_MUT_PROB-"),
-                       sg.Text("Action mutation: "),            sg.Input("0.1",  font=FONT, size=(6,None), enable_events=True, key="-ACT_MUT_PROB-"),
-                       sg.Text("Body mutation: "),              sg.Input("0.1",  font=FONT, size=(6,None), enable_events=True, key="-BODY_MUT_PROB-")]]
+                      [sg.Text("Individual: ", pad=(10, None)), sg.Input("0.75", size=(6,None), enable_events=True, key="-INDIV_MUT_PROB-"),
+                       sg.Text("Action mutation: "),            sg.Input("0.1",  size=(6,None), enable_events=True, key="-ACT_MUT_PROB-"),
+                       sg.Text("Body mutation: "),              sg.Input("0.1",  size=(6,None), enable_events=True, key="-BODY_MUT_PROB-")]]
 
     mutation = [sg.Frame("Mutation", [mutation_type, *mutation_probs, [*mutation_inputs]], pad=(10,10), expand_x=True)]
 

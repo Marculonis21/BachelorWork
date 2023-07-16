@@ -207,10 +207,10 @@ class StickAnt(BaseRobot):
 
     @property
     def description(self):
-        return \
-"The simplest robot with body consisting of a single sphere and 4 one-part legs. Lengths of each leg can be adjusted by GA on its own.\n\
-The simplest robot with body consisting of a single sphere and 4 one-part legs. Lengths of each leg can be adjusted by GA on its own.\n\
-The simplest robot with body consisting of a single sphere and 4 one-part legs. Lengths of each leg can be adjusted by GA on its own.\n"
+        return "The simplest robot similar to the original Ant, missing the \
+last part of its legs - legs are using only single Z direction hinge joint. It \
+is the simplest default robot in this library with only 4 degrees of freedom. \
+Same as the Ant, the length of each leg part can also be evolved independantly." 
 
 class AntV3(BaseRobot):
     def __init__(self):
@@ -222,7 +222,14 @@ class AntV3(BaseRobot):
 
     @property
     def description(self):
-        return "More complex robot. Body made of a single sphere with 4 legs, each having 2 parts - 2 joints per leg (hip, knee)."
+        return "Copy of the original MuJoCo Ant. Its body is made of a single \
+sphere with 4 legs, each having 2 parts. Each leg has 2 joints - 1 hip \
+joint (hinge joint in Z direction) and 1 knee joint (hinge joint parallel \
+to the ground). The robot is augmented with changable body parts - the length \
+of each leg part can be separately evolved during morphology evolution. \
+The robot inside the original and our custom environment is tested for flip \
+over which is deemed as unhealthy position - causes termination of the \
+simulation."
 
 class SpotLike(BaseRobot):
     def __init__(self):
@@ -234,10 +241,16 @@ class SpotLike(BaseRobot):
 
     @property
     def description(self):
-        return \
-"Homage to the greatest Spot from BostonDynamics.\n\
-The robot has 4 legs made of 2 parts each (thigh and calf ended with fixed foot). \n\
-Altogether there are 12 joints (12 actuators) - 2 for each hip free to rotate along X and Y axis and 1 for each knee along Y axis\n"
+        return "Homage to BostonDynamics and their great dog like robot Spot \
+used as an inspiration when modeling our custom SpotLike robot. \
+The robot has 4 legs made of 2 parts each (thigh and calf ended with fixed foot). \
+All together the robot has 12 joints (12 degrees of freedomo) - 2 hinge joints \
+for each hip free to rotate along X and Y axis and 1 hinge joint for each knee \
+along Y axis. This robot can have 3 possible body parts enabled for evolution: \n\
+    * THIGH_X - how far back will the thigh go alongside the body. \n\
+    * THIGH_Z - how low will the thigh go (height of knee). \n\
+    * CALF_X  - how far forward will the calf go (opposite direction to THIGH_X). \
+"
 
 class Walker2D(BaseRobot):
     def __init__(self):
@@ -249,7 +262,13 @@ class Walker2D(BaseRobot):
 
     @property
     def description(self):
-        return ""
+        return "The 2D walker robot from the MuJoCo environment. It is a \
+2D two-legged figure with a single torso and thigh, calf and foot for \
+each leg. The robot is controlled with 6 hinge joints (3 for each leg): \n\
+    * thigh_joint \n\
+    * leg_joint \n\
+    * foot_joint \n\
+This robot is good for testing NEAT agents."
 
 class InvertedDoublePendulum(BaseRobot):
     def __init__(self):
@@ -261,7 +280,10 @@ class InvertedDoublePendulum(BaseRobot):
 
     @property
     def description(self):
-        return ""
+        return "A classical InvertedDoublePendulum robot improving on the \
+cartpole environment idea with second pole on top of the first one. The \
+cart can move only on single axis. The goal is to balance the second pole \
+on top of the first one. Only useful for NEAT experiments."
 
 class InvertedPendulum(BaseRobot):
     def __init__(self):
@@ -273,4 +295,8 @@ class InvertedPendulum(BaseRobot):
 
     @property
     def description(self):
-        return ""
+        return "Easier version of InvertedDoublePendulum, using only single \
+pole on top of the cart. With much more predictable motion the balancing goal \
+is pretty easy to satisfy - might be useful to implement other penalties (for \
+example distance from the center - even on long sims, the carts tend to drift \
+slowly to the edge)."

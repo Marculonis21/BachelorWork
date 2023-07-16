@@ -360,7 +360,11 @@ class StepCycleFullAgent(BaseAgent):
 
     @property
     def description(self):
-        return "Full Random agent\n    Starts off as a sequence of random actions for each motor for chosen amount of steps. Behavior of the agent is then made by repeating this sequence till end state is reached periodically."
+        return "Step Cycle Full Agent\n\
+This agent starts by generating a sequence of random actions (from the allowed \
+action range) for each motor of length CYCLE REPEAT. Sequences are then \
+periodically applied to the corresponding motors.\
+"
 
     def get_action(self, individual, step):
         actions = []
@@ -429,7 +433,14 @@ class StepCycleHalfAgent(BaseAgent):
 
     @property
     def description(self):
-        return "Step Cycle Half agent\n    Combination of random and half agent. STEPCOUNT long sequences of random actions for half of the motors are created and and then by symmetry transfered to opposing motors. During runtime, sequences of actions are repeatedly performed"
+        return "Step Cycle Half agent\n\
+Combination of randomness and mirroring motor inputs. CYCLE REPEAT long \
+sequences of random actions are generated for half of the robot's motors. When \
+creating actions, motor inputs are symmetrically transfered to the opposite \
+side with the value multiplied by -1 (for example: for robot with 6 motors - \
+motor 1 to motor 4, motor 2 to motor 5 and motor 3 to motor 6). These sequences \
+are then periodically repeated.\
+"
 
     def get_action(self, individual, step):
         actions, _ = individual
@@ -510,7 +521,13 @@ class SineFuncFullAgent(BaseAgent):
 
     @property
     def description(self):
-        return "Sine Function Full agent\n    Each motor of the robot is controlled by sine wave. Values of these agents are made of only 4 parameters (amplitude, frequency, shiftX, shiftY) for each motor."
+        return "Sine Function Full agent\n\
+Each motor of the robot is controlled by a sine wave. Genetic information of \
+this robot which hold information used for generating actions consists of only \
+4 parameters (amplitude, frequency, shiftX, shiftY) for each motor. When \
+generating action the agent for each motor constructs the sine wave from \
+available information and samples the sine wave at specific point determined by \
+step (parameter showing number of steps ellapsed inside simulation environment)."
 
     def get_action(self, individual, step):
         values, _ = individual
@@ -621,7 +638,13 @@ class SineFuncHalfAgent(BaseAgent):
 
     @property
     def description(self):
-        return "Sine Function Half agent\n    Similar to Sine Function Full agent, however only half of robot's motors are controlled by sine waves. The other half is symmetrical (point symmetry through center of the body)."
+        return "Sine Function Half agent\n\
+This agent works the same as Sine Function Full Agent, however only half of \
+robot's motors are controlled by sine waves. The other half is transfered from \
+the first half (the same transfer other Half Agent). This agent often works \
+really fast as even natural gait is describable as periodical movement, \
+symmetrical between legs.\
+"
 
     def get_action(self, individual, step):
         values, _ = individual
@@ -715,7 +738,7 @@ class TFSAgent(BaseAgent):
 
         self.arguments = {"period":4,
                           "series_length":3,
-                          "coeficient_range":1}
+                          "coefficient_range":1}
 
         self.individual_mutation_prob = 0.75
         self.action_mutation_prob     = 0.1
@@ -723,7 +746,7 @@ class TFSAgent(BaseAgent):
 
         # Get min and max of actions for remapping
         _N = np.arange(self.arguments["series_length"]) + 1
-        _amps   = np.ones([self.arguments["series_length"]]) * self.arguments["coeficient_range"]
+        _amps   = np.ones([self.arguments["series_length"]]) * self.arguments["coefficient_range"]
         _shifts = np.zeros([self.arguments["series_length"]])
         _step = np.linspace(0, 2*self.arguments["period"], 100000).reshape(-1,1)
         _min_max_search = np.sum(_amps*np.sin((_N*2*np.pi*_step)/self.arguments["period"] + _shifts), axis=1)
@@ -732,7 +755,19 @@ class TFSAgent(BaseAgent):
 
     @property
     def description(self):
-        return "TFSAgent\n    TFSAgent uses Truncated Fourier Series for each motor with potential of developing more complex periodical sequences with comparison to simpler sine wave agents."
+        return "TFSAgent\n\
+TFSAgent uses Truncated Fourier Series for each motor. This creates potential \
+of developing more complex periodical sequences with comparison to simpler sine \
+wave agents. Simple gait can be done with only one periodical function, but for \
+advanced ones more complex periodical movements are necessary. TFSAgent has \
+arguments which have impact on the size of the genetical code: \n\
+    * period - fixed value for the period of the wave \n\
+    * series_length - number of sine waves to be summed up for each motor \n\
+    * coefficient_range - MAX of the possible generated amplitude values - MIN always 0. \n\
+The agent generates amplitudes and shifts for each sine wave for each of the \
+motors. We also find possible MIN/MAX and map that range to -1 to 1 so the \
+robots are more responsive to your inputs.\
+"""
 
     def get_action(self, individual, step):
         values, _ = individual
@@ -760,7 +795,7 @@ class TFSAgent(BaseAgent):
 
         # Get min and max of actions for remapping
         _N = np.arange(self.arguments["series_length"]) + 1
-        _amps   = np.ones([self.arguments["series_length"]]) * self.arguments["coeficient_range"]
+        _amps   = np.ones([self.arguments["series_length"]]) * self.arguments["coefficient_range"]
         _shifts = np.zeros([self.arguments["series_length"]])
         _step = np.linspace(0, 2*self.arguments["period"], 100000).reshape(-1,1)
         _min_max_search = np.sum(_amps*np.sin((_N*2*np.pi*_step)/self.arguments["period"] + _shifts), axis=1)
@@ -771,10 +806,10 @@ class TFSAgent(BaseAgent):
             values = []
             body_parts = []
 
-            # for each motor gen TFS coeficients
+            # for each motor gen TFS coefficients
             for _ in range(self.action_size):
 
-                amps = np.random.uniform(-self.arguments["coeficient_range"], self.arguments["coeficient_range"], size=self.arguments["series_length"])
+                amps = np.random.uniform(-self.arguments["coefficient_range"], self.arguments["coefficient_range"], size=self.arguments["series_length"])
                 shifts = np.random.uniform(0, 2*np.pi, size=self.arguments["series_length"])
 
                 values.append(np.concatenate([amps,shifts]))
@@ -793,7 +828,7 @@ class TFSAgent(BaseAgent):
             population.append(individual)
 
         # set ranges for actions and body parts
-        self.action_range = [(-self.arguments["coeficient_range"], self.arguments["coeficient_range"], self.arguments["series_length"]), 
+        self.action_range = [(-self.arguments["coefficient_range"], self.arguments["coefficient_range"], self.arguments["series_length"]), 
                              (-2*np.pi, 2*np.pi, self.arguments["series_length"])]
         self.body_range    = [] 
 
@@ -836,7 +871,10 @@ class NEATAgent(BaseAgent):
 
     @property
     def description(self):
-        return "NEATAgent\n    Agent using neuroevolution algorithm - NEAT"
+        return "NEATAgent\n\
+Agent for experiments with neuroevolutionay algorithms. This implementation uses \
+neat-python library. User is exposed to most of the parameters which are \
+available through the NEAT configuration file."
 
     def evo_override(self, experiment_params):
         from dask.distributed import Client

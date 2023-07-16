@@ -17,7 +17,7 @@ import PySimpleGUI as sg
 from PIL import Image, ImageTk
 import numpy as np
 
-font = ("Helvetica", 15)
+DEFAULT_FONT = ("Arial", 15)
 
 robots : 'dict[str, roboEvo.robots.BaseRobot]'
 """
@@ -48,7 +48,7 @@ def tab():
 
     img = sg.Image(source="", size=(400, 400), key="-ROBOT_IMAGE-")
 
-    overview = sg.Frame("Robot overview", [[sg.Text(robots[robot_names[0]].description,font=("Helvetica", 14), size=(24, None), pad=(10,10), key="-ROBOT_OVERVIEW-")], 
+    overview = sg.Frame("Robot overview", [[sg.Text(robots[robot_names[0]].description, size=(24, None), pad=(10,10), key="-ROBOT_OVERVIEW-")], 
                                            [sg.VPush()], 
                                            [sg.Push(), sg.Button("...", button_color=sg.theme_background_color(), border_width=0, key="-ROBOT_OVERVIEW_MORE-")]], expand_x=True, expand_y=True)
 
@@ -104,11 +104,11 @@ def popup_robot_parts(robot_selected, agents, agent_selected, window, values):
         default_min = agent.orig_body_part_mask[i][0] if unlocked else robot.body_parts[body_part]
         default_max = agent.orig_body_part_mask[i][1] if unlocked else robot.body_parts[body_part]
 
-        input = [sg.Text("MIN", font=("Helvetica", 12),pad=(10,8)), sg.Input(default_min, size=(6,None),pad=(10,8), enable_events=True, key=body_part+"_min", disabled=not unlocked),
-                 sg.Text("MAX", font=("Helvetica", 12),pad=(10,8)), sg.Input(default_max, size=(6,None),pad=(10,8), enable_events=True, key=body_part+"_max", disabled=not unlocked)]
+        input = [sg.Text("MIN", font=(DEFAULT_FONT[0], 10),pad=(10,8)), sg.Input(default_min, size=(6,None),pad=(10,8), enable_events=True, key=body_part+"_min", disabled=not unlocked),
+                 sg.Text("MAX", font=(DEFAULT_FONT[0], 10),pad=(10,8)), sg.Input(default_max, size=(6,None),pad=(10,8), enable_events=True, key=body_part+"_max", disabled=not unlocked)]
 
         names.append([sg.Text(body_part,pad=(0,8))])
-        buttons.append([sg.Button("" if unlocked else "", key=f"{body_part}|switch")])
+        buttons.append([sg.Button("UNLOCKED" if unlocked else "LOCKED", size=(9,1), key=f"{body_part}|switch")])
         inputs.append(input)
 
     column_layout = [[sg.Column(names), sg.Column(buttons), sg.Column(inputs)]]
@@ -116,7 +116,7 @@ def popup_robot_parts(robot_selected, agents, agent_selected, window, values):
     layout = [[title],
               [sg.Column(column_layout, expand_x=True, element_justification='c')]]
 
-    popup = sg.Window("Select body parts for GA", layout, size=(700,400), font=font, keep_on_top=True, modal=True)
+    popup = sg.Window("Select body parts for GA", layout, size=(700,400), font=DEFAULT_FONT, keep_on_top=True, modal=True)
     out_popup_values = None
     while True:
         event, popup_values = popup.read()
@@ -128,7 +128,7 @@ def popup_robot_parts(robot_selected, agents, agent_selected, window, values):
             index = int(np.argwhere(body_parts == bp))
             unlocked_mask[index] = not unlocked_mask[index]
 
-            popup[event].update("" if unlocked_mask[index] else "")
+            popup[event].update("UNLOCKED" if unlocked_mask[index] else "LOCKED")
             popup[f"{bp}_min"].update(disabled = not unlocked_mask[index])
             popup[f"{bp}_max"].update(disabled = not unlocked_mask[index])
 
@@ -152,8 +152,8 @@ def popup_robot_parts(robot_selected, agents, agent_selected, window, values):
     agent_tab.reload_agents(window, robot, agent)
 
 def expand_description(text):
-    frame = sg.Frame("Description", [[sg.Text(text, size=(60,None), font=("Helvetica", 14), pad=(10,10))]])
-    sg.Window("Description long", [[frame]], font=font, keep_on_top=True, modal=True).read(close=True)
+    frame = sg.Frame("Description", [[sg.Text(text, size=(60,None), pad=(10,10))]])
+    sg.Window("Description long", [[frame]], font=DEFAULT_FONT, keep_on_top=True, modal=True).read(close=True)
 
 def events(window, event, values, agents):
     if event == "-ROBOT_SELECT-":

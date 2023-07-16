@@ -17,7 +17,7 @@ import resources.GUI_tabs.evo_tab as evo_tab
 import roboEvo
 from typing import Dict
 
-font = ("Helvetica", 15)
+DEFAULT_FONT = ("Arial", 15)
 
 agents : Dict[str, roboEvo.gaAgents.BaseAgent]
 """
@@ -50,9 +50,8 @@ def single_value_option(key, text, tooltip, default, disabled=False):
 
 def range_value_option(key, text, tooltip, default_min, default_max):
     text = [sg.Text(text, tooltip=tooltip)]
-    FONT = ("Helvetica", 12)
-    input = [sg.Text("MIN", font=FONT), sg.Input(default_min, size=(8,None), enable_events=True, key=key+"_min"),
-             sg.Text("MAX", font=FONT), sg.Input(default_max, size=(8,None), enable_events=True, key=key+"_max")]
+    input = [sg.Text("MIN", font=(DEFAULT_FONT[0], 10)), sg.Input(default_min, size=(8,None), enable_events=True, key=key+"_min"),
+             sg.Text("MAX", font=(DEFAULT_FONT[0], 10)), sg.Input(default_max, size=(8,None), enable_events=True, key=key+"_max")]
 
     return text, input
 
@@ -141,7 +140,7 @@ def tab():
     default_name = agent_names[0]
     options_menu = [sg.Text("Select agent type: ", pad=(10,None)), sg.Combo(agent_names, default_name, pad=(0,20,0,20), readonly=True, enable_events=True, key="-AGENT_SELECT-")]
 
-    frame = [sg.Frame("Agent overview", [[sg.Text(agents[default_name].description, font=("Helvetica", 14), size=(58, 6), pad=(10,10), key="-AGENT_OVERVIEW-")],
+    frame = [sg.Frame("Agent overview", [[sg.Text(agents[default_name].description, size=(58, 6), pad=(10,10), key="-AGENT_OVERVIEW-")],
                                          [sg.Push(), sg.Button("...", button_color=sg.theme_background_color(), border_width=0, key="-AGENT_OVERVIEW_MORE-")]], expand_x=True, pad=(10,0))]
 
     agent_options = []
@@ -183,8 +182,8 @@ def set_agent(agent_selected, window):
 
 
 def expand_description(text):
-    frame = sg.Frame("Description", [[sg.Text(text, size=(60,None), font=("Helvetica", 14), pad=(10,10))]])
-    sg.Window("Description long", [[frame]], font=font, keep_on_top=True, modal=True).read(close=True)
+    frame = sg.Frame("Description", [[sg.Text(text, size=(60,None), pad=(10,10))]])
+    sg.Window("Description long", [[frame]], font=DEFAULT_FONT, keep_on_top=True, modal=True).read(close=True)
 
 def handle_argument_inputs(window, values, key):
     out = ""

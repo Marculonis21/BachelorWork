@@ -33,7 +33,7 @@ import resources.GUI_tabs.agent_tab as agent_tab
 import resources.GUI_tabs.run_window as run_window
 import resources.GUI_tabs.evo_tab as evo_tab
 
-FONT = "Arial Bold"
+DEFAULT_FONT = ("Arial", 15)
 
 def make_window():
     """
@@ -44,7 +44,7 @@ def make_window():
 
     tabGroup = [[sg.TabGroup([[main_tab.tab(), robot_tab.tab(), agent_tab.tab(), evo_tab.tab()]], size=(800,600))]]
 
-    window = sg.Window('RoboEvo GUI', tabGroup, size=(800,600), font=(FONT, 15), finalize=True,  use_default_focus=False)
+    window = sg.Window('RoboEvo GUI', tabGroup, size=(800,600), font=DEFAULT_FONT, finalize=True,  use_default_focus=False)
 
     window['-AGENT_OVERVIEW_MORE-'].block_focus()
     window['-ROBOT_OVERVIEW_MORE-'].block_focus()

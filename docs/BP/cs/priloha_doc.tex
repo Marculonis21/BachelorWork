@@ -55,7 +55,7 @@ Po doběhnutí instalace prostředí může být prostředí aktivováno pomocí
 deactivate}. Pokud máme aktivované prostředí \emph{roboEvo}, všechny aplikace
 naší platformy budou funkční.
 
-\subsection{Grafické rozhraní - \emph{GUI.py}} \label{doc_12_GUI}
+\subsection{Grafické rozhraní -- \emph{GUI.py}} \label{doc_12_GUI}
 
 S aktivovaným prostředím \emph{roboEvo} můžeme spustit grafické rozhraní.
 Rozhraní je klasickou okenní aplikací, pomocí které může uživatel konfigurovat,
@@ -79,10 +79,10 @@ Tento popis je automaticky generován a aktualizován tak, aby reflektoval změn
 konfigurace daného experimentu. 
 
 Dále pod popisem experimentu najdeme tlačítka pro uložení aktuální konfigurace
-a načtení dříve vytvořené konfigurace experimentu. Při ukládání aplikace
-vytvoří okno s textovým polem pro pojmenování ukládané konfigurace. Po zvolení
-jména je experiment uložen do souboru v pevně zvoleném adresáři. Při načítání
-nějakého experimentu aplikace nabídne seznam všech dříve vytvořených
+a načtení dříve vytvořené konfigurace experimentu. Při ukládání experimentu
+aplikace vytvoří okno s textovým polem pro pojmenování ukládané konfigurace. Po
+zvolení jména je experiment uložen do souboru v pevně zvoleném adresáři. Při
+načítání nějakého experimentu aplikace nabídne seznam všech dříve vytvořených
 experimentů (jak vytvořených ve zdrojovém kódu, tak v okenní aplikaci), ze
 kterého si uživatel může podle jména vybrat (aktuální konfigurace bude bez
 možnosti obnovy přepsána).
@@ -92,7 +92,7 @@ prohlížeči souborů vybrat uložená data jedinců poslední generace libovol
 experimentu. Po načtení a zpracování dat jedinců je uživateli prezentován
 seznam jedinců seřazených podle fitness hodnot. Uživatel v tomto seznamu má
 možnost vybrat libovolného jedince pro vizualizaci. Více o vizualizacích
-je jedinců popsáno v sekci \ref{doc_23_visualization}.
+jedinců je popsáno v sekci \ref{doc_23_visualization}.
 
 V další řádce se nachází textové pole popisující cílovou cestu, kam bude
 uložena složka s daty z konfigurovaného experimentu a tlačítko pro změnu této
@@ -170,7 +170,7 @@ a mutaci jedinců v evolučním algoritmu a upravovat jejich argumenty. Výchoz�
 hodnoty odpovídají hodnotám specifikovaným ve zdrojovém kódu agentů (popřípadě
 se jedná o~hodnoty specifikované načtenou konfigurací experimentu).
 
-\subsection{Textové rozhraní - \emph{TUI.py}} \label{doc_13_TUI}
+\subsection{Textové rozhraní -- \emph{TUI.py}} \label{doc_13_TUI}
 Textové rozhraní je druhým způsobem, jakým uživatel může pracovat s naší
 platformou. Jedná se o částečně omezený přístup v porovnání s grafickým
 rozhraním, jelikož textové rozhraní nedovoluje jen za pomocí interakce s
@@ -193,16 +193,16 @@ argumentů. Těmito argumenty jsou následující:
 
 \begin{itemize}
     \item \texttt{-{}-experiment} -- argument, který obdrží textový vstup
-        specifikující jméno jednoho nebo více experimentu (oddělených mezerou),
+        specifikující jméno jednoho nebo více experimentů (oddělených mezerou),
         jehož parametry chceme načíst a spustit (pracující s modulem
         \emph{experiment\_setter} popsaného v oddíle
         \ref{imp:experimentsetter}),
     \item \texttt{-{}-experiment\_names} -- při uvedení tohoto argumentu
         program vypíše názvy všech vytvořených experimentů z modulu
         \emph{experiment\_setter} a následně se ukončí,
-    \item \texttt{-{}-batch} -- argument číselné hodnoty, specifikující
-        kolikrát se má nakonfigurovaný experiment opakovaně spustit (používané
-        pro statistické vyhodnocení výsledků experimentů),
+    \item \texttt{-{}-batch} -- argument s celočíselnou hodnotou, specifikující
+        kolikrát se má nakonfigurovaný experiment opakovaně spustit (používá
+        se pro statistické vyhodnocení výsledků experimentů),
     \item \texttt{-{}-batch\_note} -- textový argument umožňující připojit
         vlastní poznámku k~názvu složky, do které se experimenty z
         několikanásobného spuštění ukládají (argument nemá žádný efekt pro
@@ -299,7 +299,7 @@ operátorů jednotlivých agentů ani jednoduchou konfiguraci jednotlivých
 parametrů, ale díky blízkosti ke zdrojovému kódu umožňuje uživateli například
 podrobněji nahlédnout do způsobu fungování implementace agentů a provádět v
 nich změny (kvůli kompatibilitě s původními experimenty musí výchozí agenti
-zůstat bez změn -- úpravy ve vlastních kopiích agentů).
+zůstat bez změn -- úpravy lze provádět pouze ve vlastních kopiích agentů).
 
 \subsection{Spouštění experimentu} \label{doc_22_cooking}
 Když je připravená konfigurace experimentu, uživatel má možnost ji vybrat pro
@@ -328,11 +328,20 @@ python TUI.py --experiment <jmeno_experimentu> --batch 10 --no_graph
 Tímto příkazem můžeme spustit libovolný uložený experiment. Celý běh bude
 10krát opakován, kde výsledky jednotlivých nezávislých běhů budou uloženy
 společně ve výsledném adresáři (se značkami ve jméně reflektující číslo běhu)
-a~v~průběhu evolučního algoritmu nebude generován graf.
+a~v~průběhu evolučního algoritmu nebude generován graf. 
+
+Výsledky experimentů jsou ukládány ve vlastních adresářích (více běhů téhož
+experimentu se uloží do jednoho adresáře). Tyto adresáře jsou ukládány do
+předem určené složky -- \texttt{saves/experiment\_runs/}. Jména adresářů jsou
+generována automaticky a mají tvar --
+\texttt{<note>run\_<robot>\_<agent>\_<timestamp>}, kde \texttt{<note>} je text
+z volitelného argumentu \texttt{-{}-batch\_note}, \texttt{<robot>} a
+\texttt{<agent>} jsou typy robota a agenta použitých v experimentu a
+\texttt{<timestamp>} je aktuální čas v době dokončení prvního běhu experimentu.
 
 \subsection{Evaluace experimentu} \label{doc_23_seasoning}
 Evaluace experimentů se může lišit dle typu experimentu a požadavků na jejich
-výsledky. Pokud je snaha zjistit, jak dobrý je daný agent, bude~více zajímavé
+výsledky. Pokud je snaha zjistit, jak dobrý je daný agent, bude zajímavější
 sledovat průběh fitness hodnot z jednotlivých generací z většího množství
 nezávislých běhů stejného experimentu. Naopak, pokud je důležitější jeden
 nejlepší výsledek (estetická chůze čtyřnohého robota), bude nás více zajímat
@@ -345,10 +354,11 @@ program je \emph{plot\_experiment.py} a~nachází se v kořenové složce
 tohoto projektu. Tento program přijímá dva vstupní argumenty: 
 \begin{itemize}
     \item \texttt{-{}-open} -- povinný argument, po kterém uživatel specifikuje
-        cestu ke složce experimentu (běhů experimentu), který chce vykreslit,
+        cestu ke složce experimentu, který chce vykreslit,
     \item \texttt{-{}-tick\_step} -- nepovinný argument, po kterém uživatel specifikuje
         celočíselnou hodnotu reprezentující mezery (počet generací) mezi
-        vykreslenými záznamy v krabicovém grafu.
+        vykreslenými záznamy v krabicovém grafu. Pokud tento parametr není
+        zadaný, použije se jeho implicitní hodnota 10.
 \end{itemize}
 Po spuštění program vykreslí graf ze zvolených dat. Vysvětlení krabicových
 grafů proběhlo v kapitole experimentů v sekci \ref{exp1}.
@@ -359,46 +369,43 @@ této práce -- oddělený vývoj řízení a morfologie robota z experimentu
 \ref{exp2:split_evo}. 
 
 Máme tedy provedený experiment, který 5krát nezávisle opakoval běh evolučního
-algoritmu a jeho data máme uložená ve složce \texttt{saves/exp1}. Data ve
-složce mají přibližně následující tvar.
+algoritmu a jeho data máme uložená ve složce \texttt{saves/EXP2}. Data ve
+složce mají následující tvar.
 \begin{code}
-složka saves/exp1/:
+ složka saves/EXP2/:
     run1_<note>_episode_history<run1_timestamp>.npy
     run1_<note>_individual_run<run1_timestamp>_rew<reward>.save
     run1_<note>_last_popuplation<run1_timestamp>.npy
     ...
-    run5_<note>_episode_history<run2_timestamp>.npy
-    run5_<note>_individual_run<run2_timestamp>_rew<reward>.save
-    run5_<note>_last_popuplation<run2_timestamp>.npy
+    run5_<note>_episode_history<run5_timestamp>.npy
+    run5_<note>_individual_run<run5_timestamp>_rew<reward>.save
+    run5_<note>_last_popuplation<run5_timestamp>.npy
 \end{code}
 Graf z těchto dat můžeme vygenerovat spuštěním modulu
-\emph{plot\_experiment.py} s~cestou ke složce s daty experimentu.
+\emph{plot\_experiment.py} s~cestou ke složce s daty experimentu. Příklady
+vygenerovaných grafů jsou na obrázcích \ref{doc_23_seasoning_fig_show}.
 
 \begin{code}
 # 1. vykreslení grafu s výchozí hodnotou tick_step = 10
->>> python plot_experiment.py --open saves/exp1/ 
+>>> python plot_experiment.py --open saves/EXP2/ 
 
 # 2. vykreslení grafu s tick_step = 20
->>> python plot_experiment.py --open saves/exp1/ --tick_step 20
+>>> python plot_experiment.py --open saves/EXP2/ --tick_step 20
 \end{code}
 
 \begin{figure}[h!]
     \centering
-    \begin{minipage}{0.5\textwidth}
-        \centering
-        \includegraphics[width=1\textwidth]{../img/experiment2_serial_10ticks.pdf}
-    \end{minipage}%
-    \begin{minipage}{0.5\textwidth}
-        \centering
-        \includegraphics[width=1\textwidth]{../img/experiment2_serial_20ticks.pdf}
-    \end{minipage}
-    \caption{Grafy vygenerované prvním (obrázek vlevo) a druhým (obrázek vpravo) příkazem z
-    ukázky.}
+    \includegraphics[width=0.8\textwidth]{../img/experiment2_serial_10ticks.pdf}
+    \includegraphics[width=0.8\textwidth]{../img/experiment2_serial_20ticks.pdf}
+    \caption{Grafy vygenerované prvním (obrázek výše) a druhým (obrázek níže)
+    příkazem z ukázky.}
+    \label{doc_23_seasoning_fig_show}
 \end{figure}
 
 \paragraph{Vizualizace jedinců} \label{doc_23_visualization}
-Všechny experimenty vždy ukládají nejlepší vyvinuté jedince. Naše platforma
-umožňuje tato data využít k vizualizacím běhů těchto nejlepších jedinců. 
+Všechny experimenty vždy ukládají nejlepší vyvinuté jedince a celou populaci z
+poslední generace evolučního vývoje. Naše platforma umožňuje tato data využít
+ke zpětné vizualizaci fungování těchto jedinců. 
 
 Máme dva způsoby spuštění vizualizací -- pomocí GUI a TUI. Spuštění
 vizualizace pomocí obou způsobů bylo již popsáno v předchozích sekcích o
@@ -407,7 +414,7 @@ grafickém a textovém rozhraní.
 Vizualizace probíhá ve 3D grafickém prostředí knihovny \emph{MuJoCo}. Ovládací
 prvky této aplikace jsou popsány následujícím výčtem.
 
-\begin{itemize}
+\begin{itemize} \label{doc_23_seasoning_mujoco_controls}
     \item Pohyb kamery -- pravé tlačítko myši,
     \item Rotace kamery -- levé tlačítko myši,
     \item Přiblížení/oddálení kamery -- kolečko myši,
@@ -418,7 +425,7 @@ prvky této aplikace jsou popsány následujícím výčtem.
         alespoň jednu kameru, která ho následuje a jednu volnou kameru, se
         kterou může uživatel pohybovat,
     \item Vykreslování každého snímku -- klávesa \texttt{D} -- pokud je tento
-        příznak aktivní, není možné zpomalit běh simulace,
+        příznak aktivní, není možné změnit rychlost běhu simulace,
     \item Zrychlení/zpomalení běhu simulace -- klávesy \texttt{F} a \texttt{S}
         -- nejdříve je nutné vypnout příznak \emph{vykreslování každého kroku
         simulace},
@@ -443,35 +450,40 @@ posledním experimentem této práce.
         \label{doc_23_visualization_indiv_popup}
     \end{figure}
     \item Kliknutím na tlačítko \emph{Browse} je uživateli prezentován
-        souborový prohlížeč (otevírá se v pevně definované složce, kam jsou
-        ukládány experimenty), ve~kterém uživatel dojde ke složce libovolného
+        souborový prohlížeč (otevírá se v pevně definované složce --
+        \texttt{saves}), ve~kterém uživatel dojde ke složce vybraného
         experimentu. V této složce pak zvolí běh, ze kterého chce načíst data
-        poslední generaci jedinců. Načítání může chvíli trvat (průběh lze
+        poslední generace jedinců. Načítání může chvíli trvat (průběh lze
         sledovat v~animovaném indikátoru průběhu).
-    \item Následně je vyplněn seznam jedinci, kteří byli seřazeni podle jejich
-        fitness hodnoty. Jedinci jsou v seznamu prezentováni pomocí jména z
-        jejich indexu a fitness. Uživatel dále vybere jednoho z jedinců. Výběr
-        je znázorněn tmavší barvou vybraného řádku v seznamu.
+    \item Následně je vyplněn seznam jedinci, kteří jsou seřazeni podle
+        dosažených fitness hodnot. Jedinci jsou v seznamu prezentováni pomocí
+        jména, které je tvořeno z jejich indexu a fitness hodnoty. Uživatel
+        dále vybere jednoho z~jedinců. Výběr je znázorněn tmavší barvou
+        vybraného řádku v seznamu.
     \item Po výběru může uživatel spustit vizualizaci stisknutím
         tlačítka \emph{Show}. Když je systém připraven k vizualizaci jedince,
         upozorní uživatele \textbf{hláškou v textové konzoli}, kterou uživatel
         potvrdí stisknutím klávesy \texttt{ENTER} v konzoli a prostředí se hned
         spouští.
     \item V tento moment může uživatel ovládat vizualizační prostředí pomocí
-        ovládacích prvků popsaných výše.
+        ovládacích prvků popsaných výše. Simulace ve výchozím stavu začíná s
+        volnou kamerou a hned po otevření okna se simulace prostředí rychle
+        rozběhne. Doporučujeme hned po otevření vizualizačního okna stisknout
+        mezerník pro pozastavení běhu simulace, což umožní snazší nastavování
+        vizualizace. 
     \item Jakmile vizualizace skončí, je prostředí automaticky zavřeno a
-        konzole vypíše odměnu, kterou byl jedinec za tento běh hodnocen.
+        konzole vypíše hodnotu fitness, kterou jedinec za tento běh obdržel.
     \item Uživatel dále může ukončit výběr jedinců, vybrat dalšího jedince pro
-        vizualizovat, nebo úplně změnit experiment, ze kterého jedince vybírá.
+        vizualizaci, nebo úplně změnit experiment, ze kterého jedince vybírá.
 \end{enumerate}
-Potvrzování pomocí konzole při přechodech do vizualizačního prostředí je
-složitější postup, než bychom chtěli. Nicméně se jedná o uživatelsky
-nejbezpečnější způsob, jak vyřešit problém aktuální verze grafické knihovny
-vytvářející vizualizace. 
+Potvrzování pomocí konzole při přechodech do vizualizačního prostředí je postup
+vynucený limitací vizualizačního prostředí knihovny \emph{MuJoCo}. Náš přístup
+je uživatelsky nejbezpečnějším způsobem, jak vyřešit problém aktuální verze
+grafické knihovny.
 
-Zároveň se při ukončení vizualizace může v konzoli objevovat hláška
-upozorňující na chyby v~kódu grafické knihovny, což je chyba mimo naši
-platformu a~na~celkovou funkcionalitu naší platformy nemá žádný další dopad.
-Tyto chyby byly blíže popsány výše, v~kapitole o~implementaci v sekci
-\ref{imp:problems} o problémech implementace. Zároveň v této sekci byl popsán
-zdroj chyby a jednoduchý postup, jak problémy vizualizačního prostředí opravit.
+Při ukončení vizualizace se může v konzoli objevovat hláška upozorňující na
+chyby v~kódu grafické knihovny. Jedná se o chybu mimo naši platformu
+a~na~celkovou funkcionalitu naší platformy nemá žádný další dopad. Tyto chyby
+byly blíže popsány výše, v~kapitole o~implementaci v sekci \ref{imp:problems} o
+problémech implementace. Zároveň v této sekci byly popsány zdroje chyb a
+jednoduché postupy, jak problémy vizualizačního prostředí opravit.

@@ -49,7 +49,7 @@ Popis třídy implementující vlastní genetické operátorů se nachází v od
 \texttt{Experiment} modulu \emph{experiment\_setter}, sloužící k uchování
 a~předvolbě parametrů pro experimenty, usnadňující tak provádění většího
 množství experimentů. Dále si představíme moduly umožňující uživateli
-práci s knihovnou buď pomocí grafického prostředí (v sekci \ref{imp:GUI}), nebo
+práci s~knihovnou buď pomocí grafického prostředí (v sekci \ref{imp:GUI}), nebo
 pomocí příkazové řádky (v sekci \ref{imp:TUI}). Jako poslední (v sekci
 \ref{imp:problems}) zmíníme problémy, se kterými jsme se setkali při
 implementaci.
@@ -57,7 +57,7 @@ implementaci.
 \section{RoboEvo a pomocné moduly}
 V této sekci popíšeme hlavní modul \emph{RoboEvo} a jeho pomocné moduly
 \emph{gaAgents}, \emph{gaOperators} a \emph{robots}. Soubor těchto modulů tvoří
-hlavní část celého projektu, podporující celý proces provádění evolučních
+hlavní část celého projektu podporující celý proces provádění evolučních
 experimentů s roboty. Vytvořené rozdělení modulů bylo zvoleno pro zlepšení
 čitelnosti a zjednodušení rozšiřování kódu, kde nyní každý modul
 zprostředkovává velmi specifickou roli v~procesu evolučního vývoje, a tudíž je
@@ -70,8 +70,8 @@ Modul \emph{RoboEvo} je centrální modul tohoto projektu, sloužící pro spou�
 a~běh experimentů s evolučním vývojem robotů. 
 
 Každý experiment se skládá z několika nezávislých částí. Experiment může
-využívat různé typy evolučních agentů s různými genetickými operátory a může se
-snažit vyvíjet různé typy robotů. Jak bylo zmíněno výše, tyto částí jsou
+využívat různé typy evolučních agentů s různými genetickými operátory a může
+vyvíjet různé typy robotů. Jak bylo zmíněno výše, tyto částí jsou
 pro~přehlednost, čitelnost a rozšířitelnost kódu oddělené do vlastních menších
 implementací, rozšiřujících hlavní modul (jednotlivé implementace budou popsány
 v~dalších oddílech). Oddělené moduly umožňují jednoduše kombinovat různé agenty
@@ -119,7 +119,7 @@ jednotek pro paralelizaci testovacího prostředí (umožňující ohodnocení
 populace jedinců paralelně). Následně proběhne spuštění evolučního algoritmu se
 zvolenými parametry, po kterém funkce uloží data vygenerovaná evolučním
 algoritmem -- fitness hodnoty jedinců v každé generaci, celou
-populaci jedinců z poslední generace a~(volitelné) nejlepší řešení na konci
+populaci jedinců z poslední generace a~(volitelně) nejlepší řešení na konci
 experimentu. Tato data jsou uložená do složky, dostupné na cestě popsané v
 parametru \texttt{save\_dir}.
 
@@ -147,11 +147,11 @@ vlastního modulu \emph{robots}.
 
 \paragraph{Roboti a řízení robotů}
 Roboti knihovny \emph{Gymnasium} jsou popisováni pomocí XML konfiguračních
-souborů, specifikující různé vlastnosti jak samotných robotů, tak prostředí, ve
-kterém se pohybují. 
+souborů, specifikujících různé vlastnosti jak samotných robotů, tak prostředí,
+ve kterém se pohybují. 
 
 Robot vznikne spojováním jednoduchých tvarů pomocí kloubů. Tyto klouby mohou
-být různých typů (např. pantový, kulovitý), kde každý typ se liší počtem os, ve
+být různých typů (např. pantový, kulový), kde každý typ se liší počtem os, ve
 kterých spojeným částem těla povoluje pohyb (např. pantový v jedné ose).
 Kloubu dále můžeme nastavit povolený rozsah (úhel ve stupních), ve kterém se
 bude moci pohybovat. 
@@ -159,24 +159,29 @@ bude moci pohybovat.
 Následuje ukázka konfigurace pantového kloubu (\texttt{type="hinge"}) v jednom
 z~výchozích robotů. Tento kloub je pohyblivý kolem osy z (\texttt{axis="0 0
 1"}), interně pojmenován \texttt{hip\_1} s rozsahem od -30 do 30 stupňů.
-\begin{code}
+Parametr \texttt{pos="0.0 0.0 0.0"} určuje relativní pozici kloubu na těle
+robota vzhledem k rodičovskému objektu. 
+\begin{code} 
 <joint axis="0 0 1" name="hip_1" pos="0.0 0.0 0.0" range="-30 30" 
  type="hinge"/>
 \end{code}
 
-Do kloubů můžeme vložit různé aktuátory, pomocí kterého můžeme kloubem
+Do kloubů můžeme vložit různé aktuátory, pomocí kterých můžeme kloubem
 pohybovat (\emph{MuJoCo} nabízí velké množství různých aktuátorů, jejichž celý
 popis je nad rámec této práce -- více informací je možné najít v oficiální
 dokumentaci \emph{MuJoCo} \citep{modeling-mujocodocumentation}). 
 
 Většina z robotů ale využívá aktuátory jen dvou typů. Prvním je \texttt{motor}
 (umožňující vedle jiných specifikovat atribut převodu motoru (\emph{gear})) --
-aktuátor využitý výchozím robotem \emph{AntV3} popsán později v oddílu
-\ref{imp:robots.Ant}). Následuje ukázka z~XML konfigurace tohoto robota
-popisující konfiguraci aktuátor motoru. Důležitým je argument
-\texttt{joint}, který přiřazuje daný aktuátor ke zvolenému kloubu a argument
+aktuátor je využíván výchozím robotem \emph{AntV3} popsaným níže v oddílu
+\ref{imp:robots.Ant}. Atribut převodu motoru mění pomyslnou délku aktuátoru a
+tak jeho sílu (točivý moment). Následuje ukázka z~XML konfigurace tohoto robota
+popisující konfiguraci aktuátor motoru. Důležitým je argument \texttt{joint},
+který přiřazuje daný aktuátor ke zvolenému kloubu a argument
 \texttt{ctrlrange}, který udává rozsah hodnot (nastavení aktuátoru), která~jsou
-přímo mapována na povolený rozsah kloubu.
+přímo mapována na povolený rozsah kloubu. Pokud má aktuátor nastavenou hodnotu
+argumentu \texttt{ctrllimited}, tak je libovolná vstupní hodnota vždy za běhu
+omezena na povolený rozsah specifikovaný argumentem \texttt{ctrlrange}.
 \begin{code}
 <actuator>
   <motor ctrllimited="true" ctrlrange="-1.0 1.0" joint="hip_1"   
@@ -188,24 +193,21 @@ Druhým typem je \texttt{position} (abstrakce servomotoru), umožňující nasta
 reálný atribut \texttt{kp} (\emph{velocity feedback gain}), se kterým se můžeme
 potkat při nastavování PID ovladačů (\emph{proportional-integral-derivative}).
 Tento aktuátor je v práci využíván v konfiguraci vlastního robota
-\emph{SpotLike} (opět popsán později). Tento typ aktuátoru jsme využili,
+\emph{SpotLike} (opět popsán níže). Tento typ aktuátoru jsme využili,
 protože \emph{SpotLike} je již složitější robot s dvanácti stupni volnosti a
 možnost ručního naladění servomotorů byla nutná. To umožnilo robotovi stabilní
 postoj bez příliš velkých korekcí při změnách nastavení servomotorů (jinak
 vedoucích k oscilacím).
 
 Definovaný seznam aktuátorů (část v ukázce výše) poté v simulovaném prostředí
-vytváří způsob, jak robota ovládat. V pořadí, ve kterém jsme aktuátory
-definovali v XML souboru, můžeme robotovi v simulovaném prostředí posílat
-seznam hodnot odpovídající délky (počet aktuátorů). Aktuátory jsou následně
-nastavovány na specifikované hodnoty. Tedy například robot \emph{SpotLike} s
-dvanácti stupni volnosti očekává seznam dvanácti hodnot (pokud má aktuátor
-nastavenou hodnotu argumentu \texttt{ctrllimited}, tak je libovolná vstupní
-hodnota vždy za běhu omezena na povolený rozsah specifikovaný argumentem
-\texttt{ctrlrange}).
+umožňuje robota ovládat. V pořadí, ve kterém jsme aktuátory definovali v~XML
+souboru, můžeme robotovi v simulovaném prostředí poslat seznam hodnot
+odpovídající délky (podle počtu aktuátorů). Aktuátory jsou následně nastavovány
+na specifikované hodnoty. Tedy například robot \emph{SpotLike} s dvanácti
+stupni volnosti očekává seznam dvanácti hodnot.
 
 Ovládání robota je poté sekvence n-tic reálných čísel (kde n je počet
-aktuátorů), které robotovi posíláme v každém kroku simulace. Je tedy možné si
+aktuátorů), které robotovi posíláme v každém kroku simulace. Lze si tedy
 představit, jak složité je vytvořit i pro jednoduchého robota s minimálním
 počtem aktuátorů takové ovládání, které ho například rozpohybuje v určitém
 směru.
@@ -225,14 +227,14 @@ nesoucí informace o daném robotovi (identifikační hodnota \emph{MuJoCo}
 prostředí, slovník jmen částí těla robota, které mohou být použité při
 evolučním vývoji a odkaz na náhledový obrázek, zobrazující robota, pro
 \emph{GUI}). Tyto informace jsou uložené o každém robotovi voláním
-konstruktor rodičovské třídy s potřebnými parametry.
+konstruktoru rodičovské třídy s potřebnými parametry.
 
 Následuje seznam veřejných metod základní třídy
 \texttt{BaseRobot}:
 
 \begin{itemize}
     \item \texttt{create(body\_part\_mask, individual, tmp\_file = None)}
-        -- metoda,\\která na vstupu dostane argument masky částí těla
+        -- metoda,\linebreak která na vstupu dostane argument masky částí těla
         popisující, které části budou moci být měněny evolučním algoritmem
         (seznam hodnot -- buď hodnoty \texttt{False}/0 pro části těla, které se
         nemají měnit, nebo specifikování rozsahu ve formátu \texttt{tupple} --
@@ -257,7 +259,7 @@ formát pro tvorbu šablony konfiguračních souborů, kde na místo některých
 číselných hodnot v konfiguraci můžeme dosadit speciální značky, které naší
 knihovně umožní konfigurační soubor upravovat za běhu algoritmu. Toto nám
 umožní vytvářet experimenty, které vedle pohybu mohou zároveň vyvíjet i
-morfologii robotů (např. velikost specifikovaných končetin). 
+morfologii robotů (např. délku specifikovaných končetin). 
 
 Speciální značky mohou být ve tvaru např \texttt{\$L\_FRONT(0.75)\$} nebo
 \texttt{@...@}. 
@@ -273,7 +275,7 @@ hodnot za všechny značky ohraničené symbolem $\$$. Umožňuje tedy provádě
 jednoduché výpočty v konfiguračních souborech.
 
 Značky jsou při vytváření robota vyhledávány pomocí regulárních výrazů
-očekávajících značky předvedeného formátu.
+očekávajících značky výše uvedeného formátu.
 
 Pokud máme vytvořenou konfiguraci robota v XML souboru (např. soubor
 \emph{custom\_stick\_ant.xml}), můžeme robota jednoduše přidat mezi použitelné
@@ -302,7 +304,7 @@ class StickAnt(BaseRobot): # tvorba robota StickAnt
 
         # 'custom/CustomEnv-v0' označuje naše prostředí 
         # vytvořené tak, aby jednoduše podporovalo všechny základní 
-        # druhy robotů (bez robotů využívající NEAT)
+        # druhy robotů (bez robotů využívajících NEAT)
 
         # volání inicializační funkce třídy BaseRobot,
         # která drží všechny informace v jednotném formátu
@@ -319,7 +321,7 @@ class StickAnt(BaseRobot): # tvorba robota StickAnt
 \subsubsection{Implementovaní roboti}
 Knihovna obsahuje tři implementované roboty. Roboti by měli být dostatečně
 rozdílní v obtížnosti ovládání, aby se na nich mohl demonstrovat rozdíl v
-efektivitě pokročilých evolučních algoritmů.
+efektivitě různě pokročilých evolučních algoritmů.
 
 \paragraph{Robot \emph{StickAnt}} \label{imp:robots.StickAnt}
 Základním robotem je robot pojmenovaný \emph{StickAnt} (ukázka na obrázku
@@ -336,7 +338,7 @@ jednoduchých končetin, kde každá je jedním pantovým kloubem připojena na 
 
 \paragraph{Robot \emph{AntV3}} \label{imp:robots.Ant}
 Jedná se o výchozího robota knihovny \emph{Gymnasium} (ukázka na obrázku
-\ref{imp:fig:robots.AntV3})). Morfologie tohoto robota je pokročilejší než
+\ref{imp:fig:robots.AntV3}). Morfologie tohoto robota je pokročilejší než
 morfologie robota \emph{StickAnt}. Každá noha má navíc jeden pantový kloub,
 který můžeme brát jako koleno. Ovládání tohoto robota již začíná být
 složitější, kvůli tomu, že robot se může převrátit a spadnout.
@@ -354,7 +356,7 @@ Robot inspirovaný pokročilým robotem pojmenovaným \emph{Spot} od firmy
 \ref{imp:fig:robots.SpotLike}). Každou nohu ovládají tři klouby (dohromady tedy
 12 stupňů volnosti pro celého robota), což z tohoto robota dělá toho
 nejobtížnějšího na ovládání. Čtyři vysoké nohy jsou zároveň vratké, a tudíž je
-o to těžší vyvinout stabilní pohyb, který ho udrží nepadat.
+o to těžší vyvinout stabilní pohyb tak, aby~robot nepadal.
 
 \begin{figure}[!htb]
     \centering
@@ -369,9 +371,9 @@ o to těžší vyvinout stabilní pohyb, který ho udrží nepadat.
 Naše knihovna umožňuje jednoduché přidání robotů, volně dostupných v knihovně
 Gymnasium. Většina těchto robotů má ve~svém prostředí definované složitější
 cíle, kterých mají dosáhnout (např. balancování kyvadla ve vertikální poloze).
-Tato prostředí jsou často smysluplně využitelná pouze pro experimenty s vývoj
-pomocí algoritmů neuroevoluce. Několik vybraných robotů jsou jako ukázky již
-implementováni v naší knihovně -- \emph{Walker2D}, \emph{InvertedPendulum},
+Tato prostředí jsou často smysluplně využitelná pouze pro experimenty s vývojem
+pomocí algoritmů neuroevoluce. Několik vybraných robotů je na ukázku již
+implementováno v naší knihovně -- \emph{Walker2D}, \emph{InvertedPendulum},
 \emph{InvertedDoublePendulum}.
 
 \subsection{Modul \emph{gaAgents}} \label{imp:gaAgents}
@@ -389,13 +391,13 @@ dvou vektorů. První z vektorů vždy obsahuje hodnoty, pomocí kterých agent
 generuje na základě vstupu z testovacího prostředí odpovídající nastavení pro
 aktuátory robota. Druhý z vektorů obsahuje hodnoty popisující délku těch částí
 těla robota, u kterým jsme povolili jejich vývoj pomocí evolučního algoritmu.
-Pokud jsme nepovolili vývoj žádné části těla, tento vektor zůstane prázdný.
+Pokud jsme nepovolili vývoj žádné části těla, druhý vektor zůstane prázdný.
 
 \paragraph{Třída agenta}
 Hlavní třídou tohoto modulu, tvořící šablonu pro všechny další definované
 agenty, je třída \texttt{BaseAgent}. Všechny třídy popisující agenty mají
 povinnost odvozovat od této třídy základního agenta. Součástí této třídy je
-několik abstraktních metod (metody, které odvozená třída má povinnost
+několik abstraktních metod (metody, které odvozená třída musí povinně
 implementovat, aby byla použitelná). Výčet abstraktních metod agenta:
 
 \begin{enumerate}[a)]
@@ -418,10 +420,10 @@ implementovat, aby byla použitelná). Výčet abstraktních metod agenta:
                 metoda s parametrem populace jedinců (označující skupinu
                 rodičů), na které provede křížení genotypů a vrátí vytvořenou
                 skupinu potomků,
-            \item \texttt{mutation(population)} -- genetický operátor -- metoda
-                do které jako parametr vstoupí skupina jedinců (potomků
-                křížení), na kterých provede mutaci genotypu a vrátí
-                zmutované potomky,
+            \item \texttt{mutation(population)} -- genetický operátor --
+                metoda, do které jako parametr vstoupí skupina jedinců (potomků
+                křížení), na kterých provede mutaci genotypu a vrátí zmutované
+                potomky,
             \item \texttt{switch\_evo\_phase()} -- metoda využívána z hlavního
                 modulu, který řídí evoluční algoritmus, sloužící pro vyhlášení
                 změny typu evolučního vývoje (přechod mezi vývojem řízení a
@@ -436,7 +438,7 @@ implementovat, aby byla použitelná). Výčet abstraktních metod agenta:
 
 Využití abstraktních metod se pro tuto implementaci hodí, protože tímto
 způsobem můžeme v experimentech jednoduše zaměňovat typy využívaných
-agentů a měnit tak průběh evolučního vývoje. 
+agentů a měnit tak algoritmy evolučního vývoje. 
 
 \paragraph{Vlastní agent}
 Uživatel může jednoduše přidávat vlastní agenty, vytvořením třídy odvozené
@@ -458,11 +460,11 @@ pro experimenty:
 \label{imp:gaAgents.stepcyclehalfagent}
 \label{imp:gaAgents.TFSagent}
 \begin{itemize}
-    \item \textbf{\emph{StepCycleHalfAgent}} -- agent, jehož genotyp je vektor předem
-        zvolené délky pro polovinu aktuátorů robota, kde hodnoty v genotypu přímo
-        popisují hodnoty nastavení aktuátorů. Tato nastavení jsou periodicky
-        opakována v periodě zvolené délky vždy pro polovinu aktuátorů a pro
-        druhou polovinu jsou symetricky přenesena a nastavena na opačné
+    \item \textbf{\emph{StepCycleHalfAgent}} -- agent, jehož genotyp je vektor
+        předem zvolené délky pro polovinu aktuátorů robota, kde hodnoty v
+        genotypu přímo popisují hodnoty nastavení aktuátorů. Tato nastavení
+        jsou periodicky opakována v periodě zvolené délky vždy pro polovinu
+        aktuátorů a pro druhou polovinu jsou symetricky nastavena na opačné
         hodnoty (vynásobením hodnoty minus jedničkou -- všechny aktuátory mají
         povolený rozsah hodnot od $-1$ do $1$).
 
@@ -475,23 +477,22 @@ pro experimenty:
         parametry sinusové funkce pro každý aktuátor robota (amplituda,
         frekvence, posun v ose $x$ a posun v ose $y$). Nastavení aktuátorů je
         pak vygenerované výpočtem sinus funkce pro každý aktuátor v daném
-        simulačním kroku (z celočíselného parametru\texttt{step} funkce
+        simulačním kroku (z celočíselného parametru \texttt{step} funkce
         \texttt{get\_action}), podle následující rovnice:
         \begin{equation}
             \text{nastavení aktuátoru} = f(step) = A\cdot\sin(\frac{2\pi\cdot step}{T} + \delta_x) + \delta_y
             \label{sinefunc}
         \end{equation}
-        kde $T$ je perioda sinus funkce, $A$ je amplituda funkce a $\delta_x$ a
+        kde $T$ je perioda funkce, $A$ je amplituda funkce a $\delta_x$ a
         $\delta_y$ jsou její posuny. Hodnota parametru \texttt{step} může být
         pro plynulejší přechody mezi nastaveními aktuátorů dělena na menší
         hodnoty.
 
-    \item \textbf{\emph{SineFuncHalfAgent}} -- agent, podobný jako
-        \emph{SineFuncFullAgent}, který má parametry sinusových funkcí pouze pro
-        polovinu aktuátorů. Druhou polovinu generuje opět přenesením opačných
-        hodnot z první poloviny. Pro výpočet hodnoty nastavení aktuátorů
-        využívá stejné funkce, jako \emph{SineFuncFullAgent} (funkce
-        (\ref{sinefunc})).
+    \item \textbf{\emph{SineFuncHalfAgent}} -- agent podobný agentovi
+        \emph{SineFuncFullAgent}, který má parametry sinusových funkcí pouze
+        pro polovinu aktuátorů. Druhou polovinu generuje jako opačné hodnoty z
+        první poloviny. Pro výpočet hodnoty nastavení aktuátorů využívá stejné
+        funkce, jako \emph{SineFuncFullAgent} (funkce (\ref{sinefunc})).
 
     \item \textbf{\emph{TFSAgent}} -- složitější agent než \emph{SineFuncFullAgent},
         využívající genotyp popisující zkrácenou Fourierovu transformaci pro
@@ -515,14 +516,14 @@ pro experimenty:
         \citep{McIntyre_neat-python}.
 \end{itemize}
 
-Kromě zcela náhodného agenta a agenta využívajícího NEAT, se agenti snaží pro
-urychlení evolučního vývoje předpokládat, že vhodné řešení bude v podobě
-nějakého periodického pohybu a generují tedy výstupy pro nastavení aktuátorů
-podle nějakých periodických funkcí. 
+Kromě agenta využívajícího NEAT, agenti pro urychlení evolučního vývoje
+předpokládají, že vhodné řešení bude v podobě nějakého periodického pohybu a
+generují tedy výstupy pro nastavení aktuátorů podle nějakých periodických
+funkcí, nebo jejich výstupy jsou periodicky opakovány. 
 
 \subsection{Modul gaOperators} \label{imp:gaOperators}
-Modul \emph{gaOperators} slouží pro usnadnění tvorby evolučních algoritmů
-implementací řady nejpoužívanějších genetických operátorů použitelných v
+Modul \emph{gaOperators} slouží pro usnadnění tvorby evolučních algoritmů.
+Implementuje řadu nejpoužívanějších genetických operátorů použitelných v
 metodách agentů (popsaných v předešlé sekci \ref{imp:gaAgents}). 
 
 Seznam implementovaných operátorů (podrobný popis operátorů v sekci
@@ -533,8 +534,8 @@ Seznam implementovaných operátorů (podrobný popis operátorů v sekci
         hodnoty. Vyžaduje, aby~všechny hodnoty \texttt{fitness\_values} byly
         nezáporné,
     \item \texttt{tournament\_selection(pop, fitness\_values, k)} --
-        implementace \emph{turnajové selekce}, s argumenty populace
-        jedinců, jejich fitness hodnoty a hodnotu $k$ určující velikost turnaje,
+        implementace \emph{turnajové selekce}, s argumenty populace jedinců,
+        jejich fitness hodnoty a hodnota $k$ určující velikost turnaje,
     \item \texttt{tournament\_prob\_selection(pop, fitness\_values, prob, k)}
         -- implementace pokročilé \emph{turnajové selekce}, kde umístění
         jedince v turnaji mezi $k$~náhodně vybranými jedinci určuje jeho
@@ -542,18 +543,18 @@ Seznam implementovaných operátorů (podrobný popis operátorů v sekci
         \begin{equation}
             p(X) = prob\cdot(1-prob)^{(X-1)}
         \end{equation}
-        kde $X=1,...,k$ je pozice, na které se daný jedince umístil v turnaji a $prob$
-        je vstupní parametr funkce, určující pravděpodobnost na zvolení
+        kde $X=1,...,k$ je pozice, na které se daný jedince umístil v turnaji a
+        $prob$ je vstupní parametr funkce, určující pravděpodobnost zvolení
         prvního. Toto rozdělení pravděpodobností je normalizováno tak, aby pro
-        každou volbu $k$ se sečetlo na jedničku. Následně je vektor
-        pravděpodobností využit při náhodném výběru jednoho z jedinců v
+        každou volbu $k$ byl součet pravděpodobností roven $1$. Následně je
+        vektor pravděpodobností využit při náhodném výběru jednoho z jedinců v
         turnaji, 
     \item \texttt{crossover\_uniform(pop, agent)} -- implementace základního
         operátoru uniformního křížení, popsaného v sekci \ref{Evoluční
         algoritmy - operátory}, s argumenty populace jedinců a odkazem na
         zvoleného agenta, který pro metody udržuje další potřebné informace
-        (např. sílu mutace jedinců, příznak označující povolení vývoje
-        morfologie),
+        (např. pravděpodobnost mutace jedinců, nebo příznak označující povolení
+        vývoje morfologie),
     \item \texttt{crossover\_single\_point(pop, agent)} -- implementace
         operátoru jednobodového křížení, popsaného v sekci \ref{Evoluční
         algoritmy - operátory},
@@ -624,7 +625,7 @@ def exp10_TFS_spotlike(self, run=True):
 Tato třída výrazně usnadňuje spouštění experimentů pro vstupní prostředí. Navíc
 díky dalším metodám (pro kontrolu správného výběru experimentu a pro výpis
 všech vytvořených experimentů) uživatel může pracovat s experimenty,
-aniž~by měl potřebu znát obsah této třídy.
+aniž~by musel znát obsah této třídy.
 
 \section{Grafické rozhraní} \label{imp:GUI}
 Pro nastavování a spouštění experimentů může uživatel využít jednoduché
@@ -647,7 +648,8 @@ vložené do rozložení~(\emph{layout}). Tato rozložení ale mohou být jednod
 uložená v seznamech, díky schopnosti Pythonu pracovat se seznamy
 heterogenních dat.
 
-Naše grafická aplikace je rozdělená do několika sekcí:
+Naše grafická aplikace je rozdělená do několika sekcí, které odpovídají
+záložkám v grafickém rozhraní:
 
 \begin{itemize}
     \item \emph{Main} -- přehled informací o nastavovaném experimentu a
@@ -738,7 +740,7 @@ hlásí a řeší problémy, které mohli při zadávání argumentů nastat.
 Absolutní většina implementace se vyvíjela podle plánu. Ale u stále aktivně
 vyvíjeného modulu \emph{MuJoCo} jsme narazili na několik problémů. Tyto
 problémy \textbf{neovlivňují} možnosti vytváření ani provádění experimentů.
-Problémy zasahují pouze do práce a zacházení s vizualizačním prostředí.
+Problémy zasahují pouze do práce a zacházení s vizualizačním prostředím.
 
 V této sekci popíšeme problémy, se kterými jsme se setkali, kde je potká
 uživatel a co to pro něj znamená. Pro problémy zároveň prezentujeme jednoduchou
@@ -757,46 +759,48 @@ vizualizace okamžitě začíná a uživatel má větší šanci si průběhu vi
 všimnout a včas ho začít ovládat.
 
 \paragraph{Okno vizualizace -- překreslování nápovědy}
-Druhý problém je čistě vizuální, ale pořád vhodný zmínit. Při vykreslování
-vizualizačního okna si uživatel může zvolit, zda chce vykreslovat i průhledná
+Druhý problém je čistě vizuální, ale stojí za zmínku. Při vykreslování
+vizualizačního okna si uživatel může zvolit, zda chce vykreslovat průhledné
 okno nápovědy a okno s informacemi ohledně rychlosti a času vykreslování. Tato
-okna jsou v každém cyklu smazána a vykreslena znova. Pokud ale uživatel
-simulaci zastaví, vykreslování stále běží (aby uživatel mohl pohybovat kamerou,
-měnit nastavení atd.). V ten moment se přestanou okna nápovědy mazat, ale jsou
-stále vykreslována dál v~nekonečném cyklu, dokud se simulace opět nerozběhne.
+okna jsou v každém cyklu smazána a vykreslena znova. Uživatel má možnost běh
+simulace pozastavit. V moment kdy je simulace zastavená, průhledná okna se
+kvůli chybě ve zdrojovém kódu vizualizační knihovny přestanou mazat z
+obrazovky. Vykreslování nových oken ale stále probíhá a nová okna jsou
+opakovaně vykreslována pod oknem nápovědy a nad informačním oknem.
 
 \paragraph{Ukončení vizualizace -- čištění \emph{glfw} zdrojů}
 Poslední a hlavní problém nastává při ukončení vizualizace po doběhnutí
 simulace. I při korektním ukončení prostředí vizualizace, knihovna
 \emph{MuJoCo} hlásí varování a interní chyby. Tyto chyby jsou způsobeny snahou
-grafického modulu \emph{glfw} o uvolňování zdrojů vizualizačního.
+grafického modulu \emph{glfw} o uvolňování zdrojů vizualizačního prostředí.
 
 Uživatel se s tímto problémem setká při ukončování okna vizualizace, které do
 konzole zahlásí upozornění na chyby v kódu s popisem chyby a místem, kde se
-nachází. Tato upozornění bohužel nejsme schopni od uživatele skrýt. Na samotnou
-funkcionalitu celé platformy nemají žádný vliv.
+nachází. Tato upozornění bohužel nejsme schopni skrýt, ale na funkčnost celé
+platformy nemají žádný další vliv.
 
 \subsection{Problémy a řešení}
 Pro problémy jsme byli schopni najít velmi jednoduché opravy. Díky tomu,
 že~\emph{MuJoCo} je open source knihovna, úprava na naší straně by byla možná.
-V této práci jsme se ale rozhodli nechat všechny knihovny v jejich výchozím
+V~této práci jsme se ale rozhodli nechat všechny knihovny v jejich výchozím
 stavu tak, jak je uživatel dostane z balíčkovacích manažerů. Tím zachováme
-cenou vlastnost platformy, a to jednoduchost instalace (informace o instalaci
+cennou vlastnost platformy, a to jednoduchost instalace (informace o instalaci
 prostředí pro platformu v uživatelské dokumentaci v sekci \ref{doc_11_spust}).
 
 \paragraph{Návrh opravy}
-Všechny opravy můžeme vyřešit v jediném souboru modulu \emph{Gymnasium}.
-V \emph{conda} nainstalovaných balíčcích můžeme najít modul \emph{Gymnasium} s
-knihovnou \emph{MuJoCo}. Hledáme soubor \emph{mujoco\_rendering.py} v adresáři
-\emph{MuJoCo} modulu na následující cestě. 
+Opravu problémů s překreslováním nápovědy a vypisováním chybových hlášek z
+vizualizace můžeme vyřešit v jediném souboru modulu \emph{Gymnasium}. V
+\emph{conda} nainstalovaných balíčcích můžeme najít modul \emph{Gymnasium}
+s~knihovnou \emph{MuJoCo}. Hledáme soubor \emph{mujoco\_rendering.py} v
+adresáři \emph{MuJoCo} modulu na následující cestě. 
 \begin{code}
 # příklad cesty na Linuxovém systému
 # <conda> = miniconda3
 ~/<conda>/envs/roboEvo/lib/<python_packages>/gymnasium/envs/mujoco
 \end{code}
 
-\paragraph{Oprava druhého problému}
-Druhý problém lze vyřešit kopií jediného řádku. Nacházíme se ve
+\paragraph{Oprava problému s nápovědou při zastavení simulace}
+Tento problém lze vyřešit kopií jediného řádku. Nacházíme se ve
 zmíněném skriptu v metodě \texttt{render} třídy \texttt{WindowViewer}. Metoda
 končí práci vyčištěním \emph{překrytí} před začátkem dalšího cyklu pomocí
 metody \texttt{self.\_overlays.clear()}. O pár řádků výše, při zastavení
@@ -818,19 +822,19 @@ začátek \texttt{update} metody definované uvnitř \texttt{render} metody.
 ...
 \end{code}
 
-\paragraph{Oprava třetího problému}
-Řešení třetího problému je jednoduché. Chyba nastane v metodě
-\texttt{free} třídy \texttt{WindowViewer} na řádku 330. Myslím si, že zde
-nastane chyba, protože odkaz na \texttt{self.window} již nemusí platit, což
-testuje podmínka hned nad tímto řádkem. Stačí tedy tento řádek posunout o jeden
-tabulátor dál tak, aby byl součástí bloku podmínky.
+\paragraph{Oprava chybové hlášky při ukončení vizualizace}
+Řešení tohoto problému je jednoduché. Chyba nastane v metodě \texttt{free}
+třídy \texttt{WindowViewer} na řádku 330. Myslím si, že zde nastane chyba,
+protože odkaz na \texttt{self.window} již nemusí platit, což testuje podmínka
+hned nad tímto řádkem. Stačí tedy tento řádek posunout o jeden tabulátor dál
+tak, aby byl součástí bloku podmínky.
 
 \begin{code}
 326.  def free(self):
 327.      if self.window:
 328.          if glfw.get_current_context() == self.window:
 329.              glfw.make_context_current(None)
-330.      +++ glfw.destroy_window(self.window)
+330.      >>> glfw.destroy_window(self.window)
 331.      self.window = None
 \end{code}
 

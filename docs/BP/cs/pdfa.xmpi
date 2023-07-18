@@ -65,10 +65,10 @@
    <dc:title><rdf:Alt><rdf:li xml:lang="x-default">Evoluce robotů v simulovaném fyzikálním prostředí</rdf:li></rdf:Alt></dc:title>
    <dc:creator><rdf:Seq><rdf:li>Marek Bečvář</rdf:li></rdf:Seq></dc:creator>
    <dc:publisher><rdf:Bag><rdf:li>Univerzita Karlova</rdf:li></rdf:Bag></dc:publisher>
-   <dc:description><rdf:Alt><rdf:li xml:lang="x-default">Abstrakt práce</rdf:li></rdf:Alt></dc:description>
-   <dc:subject><rdf:Bag><rdf:li>klíčová slova</rdf:li>
-     <rdf:li>další taková</rdf:li>
-     <rdf:li>ještě jiná</rdf:li></rdf:Bag></dc:subject>
+   <dc:description><rdf:Alt><rdf:li xml:lang="x-default">Práce představuje systém pro tvorbu a vyhodnocování experimentů s evolučním vývojem robotů ve 3D simulovaném fyzikálním prostředí knihovny MuJoCo. Experimenty umožňují vývoj řízení i morfologie robotů za užití libovolné, uživatelem definované hodnotící funkce. Platforma klade důraz na dostupnost, čitelnost a rozšiřitelnost implementace. Systém nabízí jednoduché grafické rozhraní umožňující podrobnou konfiguraci experimentů a textové rozhraní vhodné pro provádění rozsáhlých experimentů se statistickým vyhodnocením. Práce implementuje několik robotů různých složitostí a řadu evolučních algoritmů s nejznámějšími genetickými operátory. Architektura systému umožňuje při tvorbě experimentů vytvářet libovolné kombinace těchto prvků. Práce společně s dokumentací pro uživatele dává jednoduchý návod, jak stávající implementaci rozšiřovat.</rdf:li></rdf:Alt></dc:description>
+   <dc:subject><rdf:Bag><rdf:li>evoluční algoritmus</rdf:li>
+     <rdf:li>robot</rdf:li>
+     <rdf:li>simulace</rdf:li></rdf:Bag></dc:subject>
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:prism="http://prismstandard.org/namespaces/basic/2.2/"> 
   </rdf:Description> 
@@ -80,15 +80,15 @@
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmp="http://ns.adobe.com/xap/1.0/"> 
    <xmp:CreatorTool>LaTeX with hyperref</xmp:CreatorTool> 
-   <xmp:ModifyDate>2023-07-16T16:10:04+02:00</xmp:ModifyDate> 
-   <xmp:CreateDate>2023-07-16T16:10:04+02:00</xmp:CreateDate> 
-   <xmp:MetadataDate>2023-07-16T16:10:04+02:00</xmp:MetadataDate> 
+   <xmp:ModifyDate>2023-07-17T23:40:43+02:00</xmp:ModifyDate> 
+   <xmp:CreateDate>2023-07-17T23:40:43+02:00</xmp:CreateDate> 
+   <xmp:MetadataDate>2023-07-17T23:40:43+02:00</xmp:MetadataDate> 
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmpRights = "http://ns.adobe.com/xap/1.0/rights/"> 
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/"> 
    <xmpMM:DocumentID>uuid:E471EDA9-0143-B4EC-2929-27CBFE26697B</xmpMM:DocumentID> 
-   <xmpMM:InstanceID>uuid:6E74462B-B9DA-5697-84AE-AF3CD2743BC5</xmpMM:InstanceID> 
+   <xmpMM:InstanceID>uuid:54EEB601-BE14-AABD-FA6D-8D6A21BD5718</xmpMM:InstanceID> 
   </rdf:Description> 
  </rdf:RDF> 
 </x:xmpmeta> 

@@ -2,6 +2,17 @@
 
 \Author{Marek Bečvář}
 \Title{Evoluce robotů v simulovaném fyzikálním prostředí}
-\Keywords{klíčová slova\sep další taková\sep ještě jiná}
-\Subject{Abstrakt práce}
+\Keywords{evoluční algoritmus\sep robot\sep simulace}
+\Subject{Práce představuje systém pro tvorbu a vyhodnocování experimentů s evolučním
+vývojem robotů ve 3D simulovaném fyzikálním prostředí knihovny MuJoCo.
+Experimenty umožňují vývoj řízení i morfologie robotů za užití libovolné,
+uživatelem definované hodnotící funkce. Platforma klade důraz na dostupnost,
+čitelnost a rozšiřitelnost implementace. Systém nabízí jednoduché grafické
+rozhraní umožňující podrobnou konfiguraci experimentů a textové rozhraní
+vhodné pro provádění rozsáhlých experimentů se statistickým vyhodnocením. Práce
+implementuje několik robotů různých složitostí a řadu evolučních algoritmů s
+nejznámějšími genetickými operátory. Architektura systému umožňuje při
+tvorbě experimentů vytvářet libovolné kombinace těchto prvků. Práce společně s
+dokumentací pro uživatele dává jednoduchý návod, jak stávající implementaci
+rozšiřovat.}
 \Publisher{Univerzita Karlova}

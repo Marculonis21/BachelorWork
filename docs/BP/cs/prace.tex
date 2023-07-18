@@ -96,13 +96,16 @@
 % Nepovinné poděkování (vedoucímu práce, konzultantovi, tomu, kdo
 % zapůjčil software, literaturu apod.)
 \def\Podekovani{%
-Poděkování.
+Rád bych tímto poděkoval panu RNDr. Františku Mrázovi, CSc. za výborné vedení a
+aktivní přístup při pravidelných konzultacích, které výrazně přispěly
+ke~kvalitě této práce. Zároveň bych chtěl poděkovat mé rodině za nekončící
+podporu.
 }
 
 % Abstrakt (doporučený rozsah cca 80-200 slov; nejedná se o zadání práce)
 \def\Abstrakt{%
-Práce představuje systém pro tvorbu a vyhodnocení experimentů s~evolučním
-vývojem robotů ve 3D simulovaném fyzikálním prostředí knihovny \linebreak\emph{MuJoCo}.
+Práce představuje systém pro tvorbu a vyhodnocování experimentů s~evolučním
+vývojem robotů ve 3D simulovaném fyzikálním prostředí knihovny \emph{MuJoCo}.
 Experimenty umožňují vývoj řízení i morfologie robotů za užití libovolné,
 uživatelem definované hodnotící funkce. Platforma klade důraz na dostupnost,
 čitelnost a rozšiřitelnost implementace. Systém nabízí jednoduché grafické
@@ -110,33 +113,33 @@ rozhraní umožňující podrobnou konfiguraci experimentů a~textové rozhraní
 vhodné pro provádění rozsáhlých experimentů se statistickým vyhodnocením. Práce
 implementuje několik robotů různých složitostí a řadu evolučních algoritmů s
 nejznámějšími genetickými operátory. Architektura systému umožňuje při
-tvorbě experimentů vytvářet libovolné kombinace těchto prvků. Práce společně
-s~dokumentací pro uživatele vytváří jednoduchý návod, jak stávající
-implementaci rozšiřovat.
+tvorbě experimentů vytvářet libovolné kombinace těchto prvků. Práce společně s
+dokumentací pro uživatele dává jednoduchý návod, jak stávající implementaci
+rozšiřovat.
 }
 \def\AbstraktEN{%
-This work introduces a system for configuring and evaluating experiments with
-evolutionary algorithms in 3D simulated physical environments of the
-\emph{MuJoCo} library. Experiments allow the development of the control and
-morphology of robots while using arbitrary user-defined fitness functions. The
-implementation was designed to be as accessible, understandable, and extendable
-as possible. The system offers a simple graphical user interface allowing a
-granular configuration of experiments and a text-based user interface which is
+This work introduces a system for designing and evaluating experiments with
+evolutionary algorithms in 3D-simulated physical environments of the MuJoCo
+library. Experiments allow to develop the control and morphology of robots
+while using arbitrary user-defined fitness functions. The implementation was
+designed to be as accessible, understandable, and extendable as possible. The
+system offers a simple graphical user interface allowing a detailed
+configuration of experiments and a text-based user interface which is
 convenient for running large amounts of experiments for statistical analysis.
-The work implements a few robots of increasing difficulties, examples of
-different evolutionary algorithms, and a selection of well-known genetic
-operators. While creating experiments, the architecture of this system allows
-the creation of different combinations of all elements. This work and the user
+The work implements several robots of different complexity, examples of various
+evolutionary algorithms, and a selection of well-known genetic operators.
+During experiment design, the architecture of this system allows the combining
+of implemented operators and tools arbitrarily. This work and the user
 documentation give simple instructions on how to alter and extend the
 implementation.
 }
 
 % 3 až 5 klíčových slov (doporučeno), každé uzavřeno ve složených závorkách
 \def\KlicovaSlova{%
-evoluční algoritmy, roboti, simulace, tvorba experimentů
+    {evoluční algoritmus}, {robot}, {simulace}
 }
 \def\KlicovaSlovaEN{%
-evolutionary algorithms, robots, simulation, experiment configuration
+    {evolutionary algorithm}, {robot}, {simulation}
 }
 
 %% Balíček hyperref, kterým jdou vyrábět klikací odkazy v PDF,

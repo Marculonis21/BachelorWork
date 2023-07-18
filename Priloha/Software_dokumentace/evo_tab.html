@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>evo_tab module &mdash; RoboEvo 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="run_window module" href="run_window.html" />
+    <link rel="prev" title="agent_tab module" href="agent_tab.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RoboEvo
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="main_modules.html">RoboEvo</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="input_interfaces.html">Input Interfaces</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="TUI.html">TUI module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="GUI.html">GUI module</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="main_tab.html">main_tab module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="robot_tab.html">robot_tab module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="agent_tab.html">agent_tab module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">evo_tab module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#evo_tab.ga_operators"><code class="docutils literal notranslate"><span class="pre">ga_operators</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="run_window.html">run_window module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="GUI.html#GUI.make_window"><code class="docutils literal notranslate"><span class="pre">make_window()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="experiments.html">Experiments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RoboEvo</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="input_interfaces.html">Input Interfaces</a></li>
+          <li class="breadcrumb-item"><a href="GUI.html">GUI module</a></li>
+      <li class="breadcrumb-item active">evo_tab module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/evo_tab.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-evo_tab">
+<span id="evo-tab-module"></span><h1>evo_tab module<a class="headerlink" href="#module-evo_tab" title="Permalink to this heading"></a></h1>
+<p>Evolution Config tab</p>
+<p>Evolution config is the last tab. In this tab the user can see and configure
+parameters which are used during the evolutionary algorithm run. User can
+select the type of evolution they want to run as well as initial size of the
+population for evolutionary algorithm and wanted amount of generations for the
+algorithm (see also <a class="reference internal" href="gaAgents.html#module-gaAgents" title="gaAgents"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gaAgents</span></code></a>).</p>
+<p>Then there are three frames for the three genetic operators - Selection,
+Crossover and Mutation. In these parts of the tab, user can configure which
+method will be used as the genetic operator (automatic operator finding in
+<a class="reference internal" href="gaOperators.html#module-gaOperators" title="gaOperators"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gaOperators</span></code></a>), as well as all parameters of those operators.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="evo_tab.ga_operators">
+<span class="sig-prename descclassname"><span class="pre">evo_tab.</span></span><span class="sig-name descname"><span class="pre">ga_operators</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'crossover':</span> <span class="pre">{'crossover_single_point':</span> <span class="pre">(&lt;function</span> <span class="pre">Operators.crossover_single_point&gt;,</span> <span class="pre">[],</span> <span class="pre">None),</span> <span class="pre">'crossover_uniform':</span> <span class="pre">(&lt;function</span> <span class="pre">Operators.crossover_uniform&gt;,</span> <span class="pre">[],</span> <span class="pre">None)},</span> <span class="pre">'mutation':</span> <span class="pre">{'uniform_mutation':</span> <span class="pre">(&lt;function</span> <span class="pre">Operators.uniform_mutation&gt;,</span> <span class="pre">[],</span> <span class="pre">None),</span> <span class="pre">'uniform_shift_mutation':</span> <span class="pre">(&lt;function</span> <span class="pre">Operators.uniform_shift_mutation&gt;,</span> <span class="pre">['max_shift_percentage'],</span> <span class="pre">(0.05,))},</span> <span class="pre">'selection':</span> <span class="pre">{'roulette_selection':</span> <span class="pre">(&lt;function</span> <span class="pre">Operators.roulette_selection&gt;,</span> <span class="pre">[],</span> <span class="pre">None),</span> <span class="pre">'tournament_prob_selection':</span> <span class="pre">(&lt;function</span> <span class="pre">Operators.tournament_prob_selection&gt;,</span> <span class="pre">['probability',</span> <span class="pre">'k'],</span> <span class="pre">(0.9,</span> <span class="pre">5)),</span> <span class="pre">'tournament_selection':</span> <span class="pre">(&lt;function</span> <span class="pre">Operators.tournament_selection&gt;,</span> <span class="pre">['k'],</span> <span class="pre">(5,))}}</span></em><a class="headerlink" href="#evo_tab.ga_operators" title="Permalink to this definition"></a></dt>
+<dd><p>Dictionary of type <code class="docutils literal notranslate"><span class="pre">[operator</span> <span class="pre">type,</span> <span class="pre">dict[operator</span> <span class="pre">name,</span> <span class="pre">(operator</span> <span class="pre">function,</span> <span class="pre">operator</span> <span class="pre">args*)]]</span></code>.</p>
+<p>It contains all recognised implemented genetic operators inside the
+<a class="reference internal" href="gaOperators.html#gaOperators.Operators" title="gaOperators.Operators"><code class="xref py py-class docutils literal notranslate"><span class="pre">gaOperators.Operators</span></code></a>, which were collected by the
+<a class="reference internal" href="gaOperators.html#gaOperators.Operators._ops_dir" title="gaOperators.Operators._ops_dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">gaOperators.Operators._ops_dir()</span></code></a>.</p>
+</dd></dl>
+
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="_images/GUI_evo_tab.jpg"><img alt="_images/GUI_evo_tab.jpg" src="_images/GUI_evo_tab.jpg" style="width: 480.0px; height: 360.0px;" /></a>
+<figcaption>
+<p><span class="caption-text">Evolution config tab</span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="agent_tab.html" class="btn btn-neutral float-left" title="agent_tab module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="run_window.html" class="btn btn-neutral float-right" title="run_window module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Marek Bečvář.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

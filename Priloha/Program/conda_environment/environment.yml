@@ -1,0 +1,15 @@
+name: roboEvo
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - matplotlib=3.6.2
+  - mscorefonts
+  - gymnasium-mujoco=0.28.1
+  - numpy=1.22.3
+  - dask=2022.01.0
+  - pysimplegui=4.60.4
+  - pip
+  - pip:
+    - neat-python==0.92

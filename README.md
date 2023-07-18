@@ -1,22 +1,13 @@
-*Marek Bečvář*
+*Repozitář bakalářské práce - MFF CUNI 2023 - Marek Bečvář*
+## Bakalářská práce: Evoluce robotů v simulovaném fyzikálním prostředí
 
-# Semestral Work
+Tento repozitář je úložištěm projektu, který vznikl při vypracování ročníkového
+projektu v letním semestru 2022 a navazující bakalářské práce, dokončené v
+letním semestru 2023 (obhajoba plánována v podzimním termínu - září 2023).
+Vedoucí ročníkového projektu a bakalářské práce - **RNDr. František Mráz, CSc.**
 
-Semestral work in the summer semester 2021/22 MFF-CUNI.
-Work done under supervision of *RNDr. František Mrázek, CSc.*.
+Součástí repozitáře jsou všechny zdrojové kódy, dokumentace a text práce.
+Historie repozitáře popisuje historii práce na tomto projektu.
 
-### TASKS
-- [x] Try working with the mujoco environment in gym
-- [x] Genetic algorithm working in mujoco
-- [x] Play around with fitness functions
-- [x] Adjust the TAB mode camera angle (multiple camera modes)
-- [x] Try [DASK](https://dask.org/) library for multiprocessing
-- [x] Modular GA agents
-- [x] Try different genome types (interpolation, sinus functions)
-- [x] Graph dependency of variables on possible fitness (time/genom size)
-- [x] Graphs from collected data
-- [x] Try adjusting ant model
-- [x] New models - 3/... legged ant?, Spot-like robot
-- [x] Set up batch run possibility
-- [x] Stats collecting from batch runs - csv/...?
-- [x] School Gitlab migrating (low)
+Složka [Priloha](./Priloha) byla použita jako příloha elektronické verze práce
+při odevzdání do studijního informačního systému.

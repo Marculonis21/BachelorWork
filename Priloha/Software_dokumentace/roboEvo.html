@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>roboEvo module &mdash; RoboEvo 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="robots module" href="robots.html" />
+    <link rel="prev" title="RoboEvo" href="main_modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RoboEvo
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="main_modules.html">RoboEvo</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">roboEvo module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#roboEvo._simulation_run"><code class="docutils literal notranslate"><span class="pre">_simulation_run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#roboEvo.render_run"><code class="docutils literal notranslate"><span class="pre">render_run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#roboEvo._run_evolution"><code class="docutils literal notranslate"><span class="pre">_run_evolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#roboEvo.run_experiment"><code class="docutils literal notranslate"><span class="pre">run_experiment()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="robots.html">robots module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gaAgents.html">gaAgents module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gaOperators.html">gaOperators module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="input_interfaces.html">Input Interfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="experiments.html">Experiments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RoboEvo</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="main_modules.html">RoboEvo</a></li>
+      <li class="breadcrumb-item active">roboEvo module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/roboEvo.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-roboEvo">
+<span id="roboevo-module"></span><h1>roboEvo module<a class="headerlink" href="#module-roboEvo" title="Permalink to this heading"></a></h1>
+<p>Central module of the library used for running evolutionary algorithm.</p>
+<p>This module is the central part of the library with which all the user interfaces
+communicate and it is then used for starting and running experiments with
+evolutionary algorithms.</p>
+<p>Usage example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">roboEvo</span>
+<span class="o">...</span>
+<span class="n">params</span> <span class="o">=</span> <span class="c1"># GET EXPERIMENT PARAMETERS</span>
+<span class="n">roboEvo</span><span class="o">.</span><span class="n">run_experiment</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl>
+<dt>Special global variables:</dt><dd><p>This module works with a few global variables used for communication
+between GUI and running experiments to enable drawing progress graphs.</p>
+<dl class="simple">
+<dt>Variables:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">GUI_GEN_NUMBER<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(<em>int</em>) : Number of generations that EA has finished.</p>
+</dd>
+<dt class="field-even">GUI_PREVIEW<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<em>bool</em>) : Flag raised when GUI wants to run a preview of best individual so far.</p>
+</dd>
+<dt class="field-odd">GUI_ABORT<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(<em>bool</em>) : Flag raised when GUI wants to abort EA.</p>
+</dd>
+<dt class="field-even">EPISODE_HISTORY<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<em>list[list[float]]</em>) : List of fitness values of all generations through the EA runtime. Saved at the end of the experiment and used for GUI graph drawing.</p>
+</dd>
+<dt class="field-odd">LAST_POP<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(<em>list</em>) : Copy of all individuals from the last generation. Saved at the end of the experiment.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="roboEvo._simulation_run">
+<span class="sig-prename descclassname"><span class="pre">roboEvo.</span></span><span class="sig-name descname"><span class="pre">_simulation_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseAgent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">individual</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#roboEvo._simulation_run" title="Permalink to this definition"></a></dt>
+<dd><p>Performs run in simulated environment.</p>
+<p>This function performs a single run in the simulated environment of a
+selected individual in specifie environment - used for evaluating and
+rendering individuals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>env</strong> (<em>Env</em>) – Selected Farama Gymnasium environment.</p></li>
+<li><p><strong>agent</strong> (<a class="reference internal" href="gaAgents.html#gaAgents.BaseAgent" title="gaAgents.BaseAgent"><em>BaseAgent</em></a>) – Selected agent type.</p></li>
+<li><p><strong>individual</strong> – Genotype of an individual from EA.</p></li>
+<li><p><strong>render</strong> (<em>bool</em>) – Optional flag, set to True if rendering of the run is desired.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Reward of the individual from the environment.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="roboEvo.render_run">
+<span class="sig-prename descclassname"><span class="pre">roboEvo.</span></span><span class="sig-name descname"><span class="pre">render_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseAgent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseRobot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">individual</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#roboEvo.render_run" title="Permalink to this definition"></a></dt>
+<dd><p>Function for rendering the simulation run.</p>
+<p>Specialized function used when rendering of the simulation run is desired.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>agent</strong> (<a class="reference internal" href="gaAgents.html#gaAgents.BaseAgent" title="gaAgents.BaseAgent"><em>BaseAgent</em></a>) – Selected agent type.</p></li>
+<li><p><strong>robot</strong> (<a class="reference internal" href="robots.html#robots.BaseRobot" title="robots.BaseRobot"><em>BaseRobot</em></a>) – Selected robot type.</p></li>
+<li><p><strong>individual</strong> – Genotype of an individual from EA.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Reward of the individual from the simulation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#roboEvo._simulation_run" title="roboEvo._simulation_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">_simulation_run()</span></code></a> : Function used for running the simulation.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="roboEvo._run_evolution">
+<span class="sig-prename descclassname"><span class="pre">roboEvo.</span></span><span class="sig-name descname"><span class="pre">_run_evolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ExperimentParams</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_population</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#roboEvo._run_evolution" title="Permalink to this definition"></a></dt>
+<dd><p>Function for setting up and running evolutionary algorithm.</p>
+<p>This function takes parameters from selected experiment and runs the
+evolution with parameters described by the experiment parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<a class="reference internal" href="experiment_params.html#experiment_params.ExperimentParams" title="experiment_params.ExperimentParams"><em>ExperimentParams</em></a>) – Class of multiple experiment parameters used in experiments.</p></li>
+<li><p><strong>client</strong> (<em>Client</em>) – Client from Dask library, used for running evaluations in paralel.</p></li>
+<li><p><strong>load_population</strong> (<em>list</em>) – Optional population parameter to be loaded in instead of creating entirely new population. Used with morphology evolution.</p></li>
+<li><p><strong>gui</strong> (<em>bool</em>) – Flag showing that module was started through GUI.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em>) – Debug flag. Used for testing features.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple of <cite>best_individual</cite> genome and environment used to run evaluation of the best individual.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[<cite>best_individual</cite>, Env]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="roboEvo.run_experiment">
+<span class="sig-prename descclassname"><span class="pre">roboEvo.</span></span><span class="sig-name descname"><span class="pre">run_experiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ExperimentParams</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#roboEvo.run_experiment" title="Permalink to this definition"></a></dt>
+<dd><p>Main input function of the module.</p>
+<p>This function acts as a main input function from which both of the input
+interfaces start their experiments. It can also be used by the user who
+would possibly like to use this module connected to his own library.</p>
+<p>This function takes experiment parameters and then takes care of starting
+the correct evolutionary algorithm and saving all of the data from the
+algorithm progress.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<a class="reference internal" href="experiment_params.html#experiment_params.ExperimentParams" title="experiment_params.ExperimentParams"><em>ExperimentParams</em></a>) – Parameters of the selected experiment.</p></li>
+<li><p><strong>gui</strong> (<em>bool</em>) – Flag showing if the method was called from the GUI.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em>) – Optional debug flag, used for debugging and testing.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="main_modules.html" class="btn btn-neutral float-left" title="RoboEvo" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="robots.html" class="btn btn-neutral float-right" title="robots module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Marek Bečvář.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

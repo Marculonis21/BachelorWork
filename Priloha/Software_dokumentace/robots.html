@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>robots module &mdash; RoboEvo 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="gaAgents module" href="gaAgents.html" />
+    <link rel="prev" title="roboEvo module" href="roboEvo.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RoboEvo
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="main_modules.html">RoboEvo</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="roboEvo.html">roboEvo module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">robots module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#robots.BaseRobot"><code class="docutils literal notranslate"><span class="pre">BaseRobot</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#robots.BaseRobot.description"><code class="docutils literal notranslate"><span class="pre">BaseRobot.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#robots.BaseRobot.create"><code class="docutils literal notranslate"><span class="pre">BaseRobot.create()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#robots.BaseRobot.create_default"><code class="docutils literal notranslate"><span class="pre">BaseRobot.create_default()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#robots.BaseRobot.__collect_body_parts"><code class="docutils literal notranslate"><span class="pre">BaseRobot.__collect_body_parts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#robots.BaseRobot.body_part_names"><code class="docutils literal notranslate"><span class="pre">BaseRobot.body_part_names</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#body-parts-symbols">Body parts symbols</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#variable-symbols">Variable symbols</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#arithmetic-symbols">Arithmetic symbols</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gaAgents.html">gaAgents module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gaOperators.html">gaOperators module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="input_interfaces.html">Input Interfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="experiments.html">Experiments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RoboEvo</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="main_modules.html">RoboEvo</a></li>
+      <li class="breadcrumb-item active">robots module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/robots.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-robots">
+<span id="robots-module"></span><h1>robots module<a class="headerlink" href="#module-robots" title="Permalink to this heading"></a></h1>
+<p>Module for robots</p>
+<p>Module that stores base robot abstract class <a class="reference internal" href="#robots.BaseRobot" title="robots.BaseRobot"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRobot</span></code></a> from which all
+the other agent classes must to inherit.</p>
+<p>This class is implemented in such a way that adding new robots is as easy as
+possible.</p>
+<dl class="simple">
+<dt>For creating new robot user simply needs:</dt><dd><ul class="simple">
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">source_file</span></code> - Path to the robot XML config file.</p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">picture_path</span></code> - Path to a picture of robot/placeholder.</p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">environment_id</span></code> - ID of Farama environment to be used (env used for custom robots <code class="docutils literal notranslate"><span class="pre">&quot;custom/CustomEnv-v0&quot;</span></code>)</p></li>
+</ul>
+</dd>
+<dt>Default implemented robots:</dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Custom robot/env</dt><dd><ul class="simple">
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">StickAnt</span></code></p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">AntV3</span></code></p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">SpotLike</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Farama NEAT robots</dt><dd><ul class="simple">
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Walker2D</span></code></p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">InvertedPendulum</span></code></p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">InvertedDoublePendulum</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="robots.BaseRobot">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">robots.</span></span><span class="sig-name descname"><span class="pre">BaseRobot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">picture_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#robots.BaseRobot" title="Permalink to this definition"></a></dt>
+<dd><p>Base robot abstract class.</p>
+<p>This is the base class for all robots from which they must inherit and call
+its <code class="xref py py-func docutils literal notranslate"><span class="pre">__init__()</span></code> constructor with parameters described above (<code class="xref py py-attr docutils literal notranslate"><span class="pre">source_file</span></code>,
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">picture_path</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">environment_id</span></code>).</p>
+<p>The <code class="xref py py-func docutils literal notranslate"><span class="pre">__init__()</span></code> stores all needed information and parses the robot’s XML
+config file for possible changable body parts.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Body parts are specified inside robot’s XML config file with
+specialised symbols <code class="docutils literal notranslate"><span class="pre">$...$</span></code> and <code class="docutils literal notranslate"><span class="pre">&#64;...&#64;</span></code>. More about those symbols
+in <a class="reference internal" href="#body-parts-symbols"><span class="std std-ref">Body parts symbols</span></a>.</p>
+</div>
+<p>Every robot class stores following variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_file</strong> (<em>str</em><em>, </em><em>Optional</em>) – Path to robot’s XML source file (or None for NEAT only robots)</p></li>
+<li><p><strong>picture_path</strong> (<em>str</em>) – Path to a picture of the robot or a placeholder.</p></li>
+<li><p><strong>environment_id</strong> (<em>str</em>) – ID of environment (example: <code class="docutils literal notranslate"><span class="pre">&quot;custom/CustomEnv-v0&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;Walker2d-v4&quot;</span></code>)</p></li>
+<li><p><strong>body_parts</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>) – Dictionary of found body parts in XML (= parsed variable symbols)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="robots.BaseRobot.description">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#robots.BaseRobot.description" title="Permalink to this definition"></a></dt>
+<dd><p>Robot description.</p>
+<p>Informative property used in GUI robot selection, presenting
+information on robot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Informative text.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="robots.BaseRobot.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_part_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">individual</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">([],</span> <span class="pre">[])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#robots.BaseRobot.create" title="Permalink to this definition"></a></dt>
+<dd><p>Creates/writes XML file (in place) - robot specific XML string with
+changed body part variables.</p>
+<p>Robot’s XML source file may include special symbols which we parse
+and evaluate (symbols for body parts <code class="docutils literal notranslate"><span class="pre">$...$</span></code>, symbols for arithmetic
+evaluation <code class="docutils literal notranslate"><span class="pre">&#64;...&#64;</span></code>). This method gets body part mask intended to show
+which body parts can be changed and which should stay at default
+values, individual (possibly empty for <em>default</em> robots) and possibly
+file (if one is already created for this purpose - reuse) to which is
+the parsed XML config going to be written.</p>
+<p>Method uses specific regular expressions to find special symbols.
+Method also uses <code class="xref py py-attr docutils literal notranslate"><span class="pre">body_parts</span></code> dictionary created on init by
+<a class="reference internal" href="#robots.BaseRobot.__collect_body_parts" title="robots.BaseRobot.__collect_body_parts"><code class="xref py py-func docutils literal notranslate"><span class="pre">__collect_body_parts()</span></code></a> method (also using robot’s XML).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>body_part_mask</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>float</em><em>]</em><em>|</em><em>False</em><em>]</em>) – Body part mask
+including for each body part either range of allowed values or
+False.</p></li>
+<li><p><strong>individual</strong> (<em>Tuple</em><em>[</em><em>List</em><em>[</em><em>...</em><em>]</em><em>,</em><em>List</em><em>[</em><em>...</em><em>]</em><em>]</em>) – Individual from EA -
+containing actions in first item of tuple and adjustmetns for
+body part lengths in second item.</p></li>
+<li><p><strong>tmp_file</strong> (<em>TemporaryFileWrapper</em><em>[</em><em>str</em><em>]</em><em>|</em><em>None</em>) – Parameter used when
+reusing already created temporary files for this purpose.
+Parsed XML config is rewritten inside of the passed file (and
+still returned).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns temporary file with parsed XML config (or
+none for robots without source file - robots for NEAT)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>temporary file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="robots.BaseRobot.create_default">
+<span class="sig-name descname"><span class="pre">create_default</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#robots.BaseRobot.create_default" title="Permalink to this definition"></a></dt>
+<dd><p>Method which uses the <a class="reference internal" href="#robots.BaseRobot.create" title="robots.BaseRobot.create"><code class="xref py py-func docutils literal notranslate"><span class="pre">create()</span></code></a> method to create default of
+selected robot with default body part lengths (if any are included).
+Used when initialising <a class="reference internal" href="gaAgents.html#gaAgents.BaseAgent" title="gaAgents.BaseAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">gaAgents.BaseAgent</span></code></a> to created simple
+test environment to get the input and observation sizes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="robots.BaseRobot.__collect_body_parts">
+<span class="sig-name descname"><span class="pre">__collect_body_parts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#robots.BaseRobot.__collect_body_parts" title="Permalink to this definition"></a></dt>
+<dd><p>Uses regular expressions to parse names and default lengths of all
+changable body parts from XML source file.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="robots.BaseRobot.body_part_names">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">body_part_names</span></span><a class="headerlink" href="#robots.BaseRobot.body_part_names" title="Permalink to this definition"></a></dt>
+<dd><p>Property for listing found changable body parts - used in GUI for body
+part unlocking.</p>
+</dd></dl>
+
+</dd></dl>
+
+<section id="body-parts-symbols">
+<span id="id1"></span><h2>Body parts symbols<a class="headerlink" href="#body-parts-symbols" title="Permalink to this heading"></a></h2>
+<blockquote>
+<div><p>Robot’s changable body parts are configured inside its XML config file.</p>
+<dl class="simple">
+<dt>We can use two types of symbols:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">$...$</span></code> - creates variable with name and default value inside XML
+file which can be found by our parser and changed during algorithm
+runtime.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&#64;...&#64;</span></code> - creates a field which can have arithmetic operations that
+are going to be evaluated after all <code class="docutils literal notranslate"><span class="pre">$...$</span></code> variables were
+assigned their values.</p></li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<section id="variable-symbols">
+<h3>Variable symbols<a class="headerlink" href="#variable-symbols" title="Permalink to this heading"></a></h3>
+<blockquote>
+<div><p>Variable symbol have specified format which they must use to be correctly
+recognized (parses uses exhaustive regular expressions to find symbols).</p>
+<dl class="simple">
+<dt>The correct format is as follows <code class="docutils literal notranslate"><span class="pre">$&lt;variable_name&gt;(&lt;default_length&gt;)$</span></code>, where</dt><dd><ol class="arabic simple">
+<li><p>&lt;variable_name&gt; - have to include at least one character and it can include lower and upper case letters, numbers and underscore (‘_’) (= characters from regex group [A-Za-z0-9_]).</p></li>
+<li><p>&lt;default_length&gt; - have to include a value - positive/negative float</p></li>
+</ol>
+</dd>
+</dl>
+<p>The variable’s name inside our program will use the specified name from the
+XML file.</p>
+<p>A single variable can be used multiple times inside the XML file. Then it
+must have the same format at all places, but only the first encounter of
+the symbol will create actual variable inside our program. The other ones
+are used only during value assignment.</p>
+</div></blockquote>
+</section>
+<section id="arithmetic-symbols">
+<h3>Arithmetic symbols<a class="headerlink" href="#arithmetic-symbols" title="Permalink to this heading"></a></h3>
+<blockquote>
+<div><p>Arithmetic symbols are similarly to variables searched for by regular
+expressions. For the possible scope of uses the definition is really weak
+so the correctness of operations used inside the symbol is up to the user
+to check.</p>
+<p>The arithmetic expression inside the symbol is evaluated with python’s
+<code class="docutils literal notranslate"><span class="pre">eval()</span></code> method (<a class="reference external" href="https://docs.python.org/3/library/functions.html#eval">Eval documentation</a>)
+and the evaluation always occurs after all defined variables were assigned
+(even if they are not used inside any expression).</p>
+<dl class="simple">
+<dt>Usage examples:</dt><dd><ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&#64;10+2&#64;</span></code> - in this case text inside XML file at this place will be evaluated to 12 (basic and not really useful example of usage).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&#64;-1.8-$THIGH_Z(-0.8)$&#64;</span></code> - in this case, first the variable <code class="xref py py-attr docutils literal notranslate"><span class="pre">THIGH_Z</span></code> is assigned its value (let’s say default -0.8) and then the arithmetic expression is evaluated with result -1 (example from <em>spot_like.xml</em> config file)</p></li>
+</ol>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="roboEvo.html" class="btn btn-neutral float-left" title="roboEvo module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gaAgents.html" class="btn btn-neutral float-right" title="gaAgents module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Marek Bečvář.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

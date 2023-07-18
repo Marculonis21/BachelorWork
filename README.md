@@ -10,4 +10,6 @@ Součástí repozitáře jsou všechny zdrojové kódy, dokumentace a text prác
 Historie repozitáře popisuje historii práce na tomto projektu.
 
 Složka [Priloha](./Priloha) byla použita jako příloha elektronické verze práce
-při odevzdání do studijního informačního systému.
+při odevzdání do studijního informačního systému. Příloha obsahuje celý text
+bakalářské práce, softwarovou dokumentaci ve formě webových stránek a samotný
+program.

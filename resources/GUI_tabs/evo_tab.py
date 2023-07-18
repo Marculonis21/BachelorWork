@@ -32,7 +32,7 @@ It contains all recognised implemented genetic operators inside the
 :func:`gaOperators.Operators._ops_dir`.
 """
 
-DEFAULT_FONT = ("Arial", 14)
+DEFAULT_FONT = ("Arial", 15)
 
 def single_value_option(key, text, tooltip, default):
     text = [sg.Text(text, tooltip=tooltip)]

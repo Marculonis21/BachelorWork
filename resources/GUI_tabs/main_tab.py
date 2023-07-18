@@ -21,7 +21,7 @@ import resources.GUI_tabs.run_window as run_window
 
 experiments = Experiments()
 
-DEFAULT_FONT = ("Arial", 14)
+DEFAULT_FONT = ("Arial", 15)
 
 def tab():
     frame_text = [[sg.Text("", size=(58, None), pad=(10,10), key="-MAIN_SETTINGS_OVERVIEW-")]]

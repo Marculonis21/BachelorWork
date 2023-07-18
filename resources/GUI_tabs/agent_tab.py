@@ -17,7 +17,7 @@ import resources.GUI_tabs.evo_tab as evo_tab
 import roboEvo
 from typing import Dict
 
-DEFAULT_FONT = ("Arial", 14)
+DEFAULT_FONT = ("Arial", 15)
 
 agents : Dict[str, roboEvo.gaAgents.BaseAgent]
 """

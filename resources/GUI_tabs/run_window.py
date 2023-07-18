@@ -18,7 +18,7 @@ import PySimpleGUI as sg
 
 import numpy as np
 
-DEFAULT_FONT = ("Arial", 14)
+DEFAULT_FONT = ("Arial", 15)
 
 figure = None
 figure_aggregate = None

@@ -33,7 +33,7 @@ import resources.GUI_tabs.agent_tab as agent_tab
 import resources.GUI_tabs.run_window as run_window
 import resources.GUI_tabs.evo_tab as evo_tab
 
-DEFAULT_FONT = ("Arial", 14)
+DEFAULT_FONT = ("Arial", 15)
 
 def make_window():
     """

@@ -17,7 +17,7 @@ import PySimpleGUI as sg
 from PIL import Image, ImageTk
 import numpy as np
 
-DEFAULT_FONT = ("Arial", 14)
+DEFAULT_FONT = ("Arial", 15)
 
 robots : 'dict[str, roboEvo.robots.BaseRobot]'
 """

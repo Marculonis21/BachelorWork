@@ -41,10 +41,13 @@ import lzma
 from enum import Enum
 
 import neat
+from neat import StatisticsReporter, reporting
 import re
 import tempfile
 import copy
 import os
+import time
+import sys
 
 import resources.agents.gaOperators as gaOperators
 Operators = gaOperators.Operators
@@ -856,9 +859,9 @@ class NEATAgent(BaseAgent):
         super(NEATAgent, self).__init__(robot, body_part_mask, evo_type, gui)
 
         self.config_source_file = ""
-        # with open("resources/agents/config_neat.txt") as file:
-        #     lines = file.readlines()
-        #     self.config_source_file= "".join(lines)
+        with open("resources/agents/config_neat.txt") as file:
+            lines = file.readlines()
+            self.config_source_file= "".join(lines)
 
         raw_arguments = re.findall(r'\$[A-Za-z0-9_]+\([+-]?[0-9]*[.]?[0-9]+\)\$', self.config_source_file)
         for arg in raw_arguments:
@@ -869,6 +872,9 @@ class NEATAgent(BaseAgent):
             if name == "NET_NUM_INPUTS":
                 self.arguments[name] = self.observation_size
 
+        self.TIME_LIMIT = 500
+        self.experiment_params = None
+
     @property
     def description(self):
         return "NEATAgent\n\
@@ -876,107 +882,228 @@ Agent for experiments with neuroevolutionay algorithms. This implementation uses
 neat-python library. User is exposed to most of the parameters which are \
 available through the NEAT configuration file."
 
-    def evo_override(self, experiment_params):
+    @staticmethod
+    def render_run(agent, robot, individual, config):
+        # getting env for testing winner
+        file = robot.create(agent.body_part_mask)
+        env = None
+        if file == None:
+            env = gym.make(id=robot.environment_id,
+                           max_episode_steps=agent.TIME_LIMIT,
+                           render_mode="human")
+        else:
+            env = gym.make(id=robot.environment_id,
+                           xml_file=file.name,
+                           reset_noise_scale=0.0,
+                           disable_env_checker=True,
+                           max_episode_steps=agent.TIME_LIMIT,
+                           render_mode="human")
+            file.close()
+
+        net = neat.nn.FeedForwardNetwork.create(individual, config) 
+
+        print("PREPARED FOR RENDERING... Press ENTER to start")
+        input()
+        run_reward = NEATAgent._custom_eval(env, net, True)
+
+        return run_reward
+
+    @staticmethod
+    def _custom_eval(env, net, render=False):
+        """ Method for custom evaluation of neat-created nets in selected 
+        environments.
+        """
+
+        steps = -1
+        individual_reward = 0
+        terminated = False
+        truncated = False
+
+        obs = env.reset()
+        obs = obs[0]
+        while True:
+            steps += 1
+
+            action = net.activate(obs)
+
+            obs, reward, terminated, truncated, _ = env.step(action)
+
+            individual_reward += reward
+
+            if render:
+                env.render()
+
+            if terminated or truncated:
+                break
+
+        if render:
+            env.reset()
+            env.close()
+
+        return individual_reward
+
+    def _eval_genomes(self, genomes, config): 
+        """ Method for neat lib evaluator 
+
+        Creating eval method for neat lib - running selected custom eval 
+        envs.
+        """
         from dask.distributed import Client
-        from gymnasium.wrappers.time_limit import TimeLimit
-        TIME_LIMIT = 10000
 
-        def custom_eval(env, net, render=False):
-            """ Method for custom evaluation of neat-created nets in selected 
-            environments.
-            """
+        client = Client(n_workers=1,threads_per_worker=1,scheduler_port=0)
 
-            steps = -1
-            individual_reward = 0
-            terminated = False
-            truncated = False
+        robot = self.experiment_params.robot
+        agent = self.experiment_params.agent
 
-            obs = env.reset()
-            obs = obs[0]
-            while True:
-                steps += 1
+        file = robot.create(agent.body_part_mask)
+        env = None
+        if file == None:
+            env = gym.make(id=robot.environment_id,
+                            max_episode_steps=self.TIME_LIMIT,
+                            render_mode=None)
+        else:
+            env = gym.make(id=robot.environment_id,
+                            xml_file=file.name,
+                            reset_noise_scale=0.0,
+                            disable_env_checker=True,
+                            max_episode_steps=self.TIME_LIMIT,
+                            render_mode=None)
+                
+            file.close()
 
-                action = net.activate(obs)
+        futures = []
+        for _, genome in genomes:
+            net = neat.nn.FeedForwardNetwork.create(genome, config) 
+            futures.append(client.submit(NEATAgent._custom_eval, env, net))
 
-                obs, reward, terminated, truncated, _ = env.step(action)
+        fitness_values = client.gather(futures)
 
-                individual_reward += reward
+        for i, (_, genome) in enumerate(genomes):
+            genome.fitness = fitness_values[i]
 
-                if render:
-                    env.render()
+        client.close()
 
-                if terminated or truncated:
-                    break
+    def evolution_override(self, experiment_params, gui):
+        """
+        NEAT-python evolution works in different steps than our normal
+        evolution algorithm so for this we needed a custom process to run the
+        evolution and save all the data
+        """
 
-            return individual_reward
+        import roboEvo
+        import matplotlib.pyplot as plt
 
-        def eval_genomes(genomes, config): 
-            """ Method for neat lib evaluator 
-
-            Creating eval method for neat lib - running selected custom eval 
-            envs.
-            """
-
-            client = Client(n_workers=1,threads_per_worker=1,scheduler_port=0)
-
-            robot = experiment_params.robot
-            agent = experiment_params.agent
-
-            file = robot.create(agent.body_part_mask)
-            env = None
-            if file == None:
-                env = gym.make(id=robot.environment_id,
-                               max_episode_steps=TIME_LIMIT,
-                               render_mode=None)
-            else:
-                env = gym.make(id=robot.environment_id,
-                               xml_file=file.name,
-                               reset_noise_scale=0.0,
-                               disable_env_checker=True,
-                               max_episode_steps=TIME_LIMIT,
-                               render_mode=None)
-                    
-                file.close()
-
-            futures = []
-            for _, genome in genomes:
-                net = neat.nn.FeedForwardNetwork.create(genome, config) 
-                futures.append(client.submit(custom_eval, env, net))
-
-            fitness_values = client.gather(futures)
-
-            for i, (_, genome) in enumerate(genomes):
-                genome.fitness = fitness_values[i]
-
-            client.close()
-
+        self.experiment_params = experiment_params
         population = self.generate_population(experiment_params.population_size)
-        winner = population.run(eval_genomes, experiment_params.generation_count)
+        
+        class CustomGraphReporter(reporting.BaseReporter):
+            """
+            CUSTOM neat-python reporter
 
+            Works only at the end of each generation - used for drawing graph
+            and the very saving last population.
+            """
+
+            def __init__(self, agent):
+                roboEvo.EPISODE_HISTORY = {}
+                self.iteration = 0
+                self.last_population = []
+                self.agent = agent
+
+            def end_generation(self, config, population, species_set):
+                roboEvo.GUI_GEN_NUMBER += 1 # get global iteration counter 
+                self.iteration += 1
+                if self.iteration == experiment_params.generation_count:
+                    self.last_population = []
+                    print("Saving last population...")
+                    for key in population:
+                        genome = population[key]
+                        self.last_population.append(genome)
+
+                for sid in sorted(species_set.species):
+                    s = species_set.species[sid]
+                    f = 0 if s.fitness is None else s.fitness
+
+                    # save episode history for gui
+                    if sid in roboEvo.EPISODE_HISTORY:
+                        roboEvo.EPISODE_HISTORY[sid].append(f)
+                    else:
+                        roboEvo.EPISODE_HISTORY[sid] = [f]
+
+                # handle aborts
+                if roboEvo.GUI_ABORT:
+                    sys.exit()
+
+                if not self.agent.gui:
+                    if experiment_params.show_graph:
+                        plt.cla()
+                        plt.title('Training - Fitness of species')
+                        plt.ylabel('Species Fitness')
+                        for sid in sorted(species_set.species):
+                            plt.plot(roboEvo.EPISODE_HISTORY[sid])
+                            plt.tight_layout()
+                            plt.pause(0.1)
+
+        # adding reporters to population
+        custom_reporter = CustomGraphReporter(self)
+        population.add_reporter(custom_reporter)
+        stats = StatisticsReporter()
+        population.add_reporter(stats)
+
+        # running evolution
+        winner = population.run(self._eval_genomes, experiment_params.generation_count)
+
+        # getting env for testing winner
         file = experiment_params.robot.create(experiment_params.agent.body_part_mask)
         env = None
         if file == None:
             env = gym.make(id=experiment_params.robot.environment_id,
-                           render_mode="human")
+                           max_episode_steps=self.TIME_LIMIT,
+                           render_mode="human" if experiment_params.show_best else None)
         else:
             env = gym.make(id=experiment_params.robot.environment_id,
                            xml_file=file.name,
                            reset_noise_scale=0.0,
                            disable_env_checker=True,
-                           max_episode_steps=TIME_LIMIT,
-                           render_mode="human")
+                           max_episode_steps=self.TIME_LIMIT,
+                           render_mode="human" if experiment_params.show_best else None)
             file.close()
 
         net = neat.nn.FeedForwardNetwork.create(winner, self.config) 
-        print("READY FOR RENDER ...")
-        input()
-        print(custom_eval(env, net, True))
 
-    def get_action(self, net, obs):
-        return net.activate(obs)
+        if experiment_params.show_best: 
+            print("PREPARED FOR RENDERING... Press ENTER to start")
+            input()
+
+        best_reward = NEATAgent._custom_eval(env, net, experiment_params.show_best)
+        print("Best individual reward:", best_reward)
+
+        # SAVING all data
+        print("Saving data...")
+        current_time = time.time()
+
+        if experiment_params.note != "":
+             experiment_params.note = experiment_params.note + "_"
+
+        if self.gui:
+            folder_name = f"/{experiment_params.note}run_{type(experiment_params.robot).__name__}_{type(experiment_params.agent).__name__}_{current_time}"
+            experiment_params.save_dir = experiment_params.save_dir+folder_name
+
+        # File saving
+        if not os.path.exists(experiment_params.save_dir):
+            os.makedirs(experiment_params.save_dir)
+
+        with lzma.open(experiment_params.save_dir + f"/{experiment_params.note}individual_run{current_time}_rew{best_reward}.save", "wb") as save_file:
+            pickle.dump((self, experiment_params.robot, winner, self.config), save_file)
+
+        with lzma.open(experiment_params.save_dir + f"/{experiment_params.note}last_population{current_time}.npy", "wb") as save_file:
+            pickle.dump((custom_reporter.last_population, self.config), save_file)
+
+        # using official statistics reporter for saving species fitness through evolution
+        # https://neat-python.readthedocs.io/en/latest/module_summaries.html?highlight=statistic#statistics.StatisticsReporter.get_fitness_stat
+        stats.save_species_fitness(filename=experiment_params.save_dir + f"/{experiment_params.note}genome_fitness{current_time}.csv")
 
     def generate_population(self, population_size):
-
         def key_to_regex(key):
             regex = key.replace("$", "\$")
             regex = regex.replace("(", "\(")
@@ -1017,6 +1144,16 @@ available through the NEAT configuration file."
         pop.add_reporter(neat.StdOutReporter(show_species_detail=True))
 
         return pop
+
+    @staticmethod
+    def load_override(path):
+        with lzma.open(path, "rb") as save_file:
+             agent, robot, individual, config = pickle.load(save_file)
+
+        return agent, robot, individual, config
+
+    def get_action(self, individual, step):
+        return
 
     @selection_deco
     def selection(self, population, fitness_values):

@@ -7,15 +7,17 @@ import argparse
 import os
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--open", default=False, const=True, nargs='?', type=str, help="Open saved history")
+parser.add_argument("--open", default=False, const=True, nargs='?', type=str, help="Open saved history (currently not supported for NEAT experiments)")
 parser.add_argument("--tick_step", default=10, nargs='?', type=int, help="Step in x ticks")
 
 if __name__ == "__main__":
     args = parser.parse_args([] if "__file__" not in globals() else None)
 
     if not args.open:
-        print("Set --open to select file to for plotting")
+        print("Set --open argument to experiment folder for plotting (currently not supported for NEAT experiments)")
         quit()
+    if "NEAT" in args.open:
+        print("Unknown format - NEAT fitness data")
 
     episode_history_list = [x for x in os.listdir(args.open) if "episode_history" in x]
 

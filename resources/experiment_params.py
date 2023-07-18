@@ -30,7 +30,7 @@ class ExperimentParams:
                  generation_count=150,
                  show_best=False,
                  save_best=True,
-                 save_dir='./saves/individuals',
+                 save_dir='./saves/experiment_runs/',
                  show_graph=True,
                  note=""):
         self.robot               = robot

@@ -129,7 +129,6 @@ def render_run(agent : gaAgents.BaseAgent, robot : robots.BaseRobot, individual)
         print("PREPARED FOR RENDERING... Press ENTER to start")
         input()
         run_reward = _simulation_run(env, agent, individual, render=True)
-
     finally:
         file.close()
         os.unlink(file.name)
@@ -157,11 +156,12 @@ def _run_evolution(params : ExperimentParams, client : Client, load_population=[
 
     population = params.agent.generate_population(params.population_size)
 
-    # for serial conrol + body evolution
+    # for serial conrol + body evolution ONLY
     if load_population != []:
-        # reassign actions from the previous loaded gen - keep only newly generated body values
+        # reassign actions from the loaded population - keep only NEWLY GENERATED BODY VALUES
         for i in range(len(population)):
             population[i][0] = load_population[i][0] 
+    # PROOF of concept: working population loading
 
     robot_source_files = []
     environments = []
@@ -195,7 +195,8 @@ def _run_evolution(params : ExperimentParams, client : Client, load_population=[
         GUI_GEN_NUMBER = generations
 
         if GUI_PREVIEW: # GUI FORCED PREVIEW
-            render_run(params.agent, params.robot, best_individual)
+            run_reward = render_run(params.agent, params.robot, best_individual)
+            print("Run reward:", run_reward)
             GUI_PREVIEW = False
 
         # Get fitness values
@@ -316,7 +317,7 @@ def run_experiment(params : ExperimentParams, gui=False, debug=False):
     _params = copy.deepcopy(params)
     
     if isinstance(_params.agent, gaAgents.NEATAgent): # override EA with NEAT
-        _params.agent.evo_override(_params)
+        _params.agent.evolution_override(_params, EPISODE_HISTORY)
         return
 
     # Start threading client - use a bit less cpu threads than MAX! 
@@ -339,18 +340,27 @@ def run_experiment(params : ExperimentParams, gui=False, debug=False):
     if _params.show_best: best_reward = render_run(_params.agent, _params.robot, best_individual)
     else:                 best_reward = _simulation_run(best_individual_env, _params.agent, best_individual)
 
+    print("Saving data...")
+    current_time = time.time()
+
+    if _params.note != "":
+        _params.note = _params.note + "_"
+
+    if gui:
+        folder_name = f"/{_params.note}run_{type(_params.robot).__name__}_{type(_params.agent).__name__}_{current_time}"
+        _params.save_dir = _params.save_dir+folder_name
+
     # File saving
     if not os.path.exists(_params.save_dir):
         os.makedirs(_params.save_dir)
 
-    current_time = time.time()
     if _params.save_best:
-        gaAgents.BaseAgent.save(_params.agent, _params.robot, best_individual, _params.save_dir + f"/{_params.note}_individual_run{current_time}_rew{best_reward}.save")
+        gaAgents.BaseAgent.save(_params.agent, _params.robot, best_individual, _params.save_dir + f"/{_params.note}individual_run{current_time}_rew{best_reward}.save")
 
     episode_history = np.array(EPISODE_HISTORY)
     last_population = np.array(LAST_POP, dtype=object)
-    np.save(_params.save_dir + f"/{_params.note}_episode_history{current_time}", episode_history)
-    np.save(_params.save_dir + f"/{_params.note}_last_population{current_time}", last_population)
+    np.save(_params.save_dir + f"/{_params.note}episode_history{current_time}", episode_history)
+    np.save(_params.save_dir + f"/{_params.note}last_population{current_time}", last_population)
 
 if __name__ == "__main__":
     pass

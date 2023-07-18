@@ -32,7 +32,7 @@ It contains all recognised implemented genetic operators inside the
 :func:`gaOperators.Operators._ops_dir`.
 """
 
-DEFAULT_FONT = ("Arial", 15)
+DEFAULT_FONT = ("Arial", 14)
 
 def single_value_option(key, text, tooltip, default):
     text = [sg.Text(text, tooltip=tooltip)]
@@ -101,10 +101,18 @@ def set_evo_ops(agent_selected, window):
     window["-OP_MUTATION_TYPE-"].update(value=agent_gen_ops["mutation"])
     set_operator(agent_gen_ops["mutation"], window)
 
+    window["-INDIV_MUT_PROB-"].update(agent_tab.agents[agent_selected].individual_mutation_prob)
+    window["-ACT_MUT_PROB-"].update(agent_tab.agents[agent_selected].action_mutation_prob)
+    window["-BODY_MUT_PROB-"].update(agent_tab.agents[agent_selected].body_mutation_prob)
+
 def handle_argument_inputs(window, values, key):
     out = ""
+    dot = False
     for s in values[key]:
-        if s in '1234567890.':
+        if s in '1234567890':
+            out += s
+        if s == '.' and not dot:
+            dot = True
             out += s
     window[key].update(out)
 
@@ -138,7 +146,7 @@ def events(window, event, values):
     if event == "-EVO_TYPE_SELECT-":
         window[event].widget.select_clear()
         agent = agent_tab.agents[values["-AGENT_SELECT-"]]
-        agent.evo_type = values[event]
+        agent.evo_type = evo_types[values[event]]
         robot = robot_tab.robots[values["-ROBOT_SELECT-"]]
         agent_tab.reload_agents(window, robot, agent)
         window.refresh()
@@ -148,11 +156,10 @@ def events(window, event, values):
         window[event].widget.select_clear()
         window.refresh()
 
-    if "|" in event or \
+    if event.count("|") == 2 or \
        "-POP_SIZE-" == event or \
        "-GEN_COUNT-" == event or \
        "-INDIV_MUT_PROB-" == event or \
        "-ACT_MUT_PROB-" == event or \
        "-BODY_MUT_PROB-" == event:
         handle_argument_inputs(window,values,event)
-        pass

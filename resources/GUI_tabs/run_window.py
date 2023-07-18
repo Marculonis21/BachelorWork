@@ -18,7 +18,7 @@ import PySimpleGUI as sg
 
 import numpy as np
 
-DEFAULT_FONT = ("Arial", 15)
+DEFAULT_FONT = ("Arial", 14)
 
 figure = None
 figure_aggregate = None
@@ -46,7 +46,11 @@ def draw_chart(window):
     plt.title('Training')
     plt.xlabel('Episode')
     plt.ylabel('Fitness')
-    if len(roboEvo.EPISODE_HISTORY) > 0:
+    if isinstance(roboEvo.EPISODE_HISTORY, dict):
+        for key in roboEvo.EPISODE_HISTORY:
+            plt.plot(roboEvo.EPISODE_HISTORY[key], label=f"Species {key}")
+
+    elif len(roboEvo.EPISODE_HISTORY) > 0:
         plt.plot(np.mean(roboEvo.EPISODE_HISTORY, axis=1), label='Mean')
         plt.plot(np.min( roboEvo.EPISODE_HISTORY, axis=1), label='Min')
         plt.plot(np.max( roboEvo.EPISODE_HISTORY, axis=1), label='Max')
@@ -63,7 +67,11 @@ def update_chart(window):
     plt.title('Training')
     plt.xlabel('Episode')
     plt.ylabel('Fitness')
-    if len(roboEvo.EPISODE_HISTORY) > 0:
+    if isinstance(roboEvo.EPISODE_HISTORY, dict):
+        for key in roboEvo.EPISODE_HISTORY:
+            plt.plot(roboEvo.EPISODE_HISTORY[key], label=f"Species {key}")
+
+    elif len(roboEvo.EPISODE_HISTORY) > 0:
         plt.plot(np.mean(roboEvo.EPISODE_HISTORY, axis=1), label='Mean')
         plt.plot(np.min( roboEvo.EPISODE_HISTORY, axis=1), label='Min')
         plt.plot(np.max( roboEvo.EPISODE_HISTORY, axis=1), label='Max')
@@ -83,6 +91,8 @@ def get_params(values, robot_tab, agent_tab):
         if values["-AGENT_SELECT-"] in str(key):
             arg_name = key.split("|").pop()
             arg_value = values[key]
+
+            arg_value = 0.0 if arg_value in ["", "-", ".", "-."] else float(arg_value)
 
             if arg_name.endswith("_min"):
                 arg_name = arg_name.rstrip("_min")
@@ -137,7 +147,7 @@ def get_params(values, robot_tab, agent_tab):
     save_best = values["-SAVE_BEST-"]
     save_dir = values["Browse"]
     if save_dir == '':
-        save_dir = "./saves/individuals/"
+        save_dir = "saves/experiment_runs/"
 
     # returning experiment parameters
     params = roboEvo.ExperimentParams(robot, 

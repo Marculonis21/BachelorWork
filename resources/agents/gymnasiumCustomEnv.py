@@ -30,6 +30,8 @@ class CustomEnv(MujocoEnv, utils.EzPickle):
 
         self._reset_noise_scale = reset_noise_scale
 
+        self.step_count = 0
+
         # _obs = self._get_obs()
         observation_space = Box(
             low=-np.inf, high=np.inf, shape=(1,), dtype=np.float64)
@@ -58,6 +60,7 @@ class CustomEnv(MujocoEnv, utils.EzPickle):
         return done
 
     def step(self, action):
+        self.step_count += 1
         self.do_simulation(action, self.frame_skip)
         xy_position_after = self.get_body_com("torso")[:2].copy()
 
@@ -80,7 +83,16 @@ class CustomEnv(MujocoEnv, utils.EzPickle):
         if self.render_mode == "human":
             self.render()
 
-        return observation, 0, done, False, info
+        """
+        Proper observation could be sent back, but NEAT agents would be
+        problematic, because this env serves many differnet custom agents -
+        observation_space is not fully defined at init.
+        
+        NEAT agents still don't work well with this env, because of the only
+        observation - int from 0 to 500 (but they don't throw exceptions).
+        """
+        # return observation, 0, done, False, info
+        return np.array([self.step_count]), 0, done, False, info
 
     def _get_obs(self):
         position = self.data.qpos.flat.copy()
@@ -103,7 +115,10 @@ class CustomEnv(MujocoEnv, utils.EzPickle):
 
         observation = self._get_obs()
 
-        return observation
+        self.step_count = 0
+
+        # return observation
+        return np.array([self.step_count])
 
 from gymnasium.envs.registration import register
 register(

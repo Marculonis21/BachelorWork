@@ -33,7 +33,7 @@ import resources.GUI_tabs.agent_tab as agent_tab
 import resources.GUI_tabs.run_window as run_window
 import resources.GUI_tabs.evo_tab as evo_tab
 
-DEFAULT_FONT = ("Arial", 15)
+DEFAULT_FONT = ("Arial", 14)
 
 def make_window():
     """
@@ -86,8 +86,9 @@ if __name__ == "__main__":
     # Starting experiment window
     window = run_window.window()
             
+    params = run_window.get_params(window_values, robot_tab, agent_tab)
     def start_run():
-        roboEvo.run_experiment(run_window.get_params(window_values, robot_tab, agent_tab), gui=True)
+        roboEvo.run_experiment(params, gui=True)
 
     working_thread = threading.Thread(target=start_run, daemon=True)
     working_thread.start()
@@ -99,6 +100,7 @@ if __name__ == "__main__":
             event, values = window.read(timeout=2500)
         else:
             window["-EXIT-"].update(button_color="green")
+            window["-RUN_PREVIEW-"].update(disabled=True)
             event, values = window.read()
             break
 
@@ -112,8 +114,14 @@ if __name__ == "__main__":
 
         run_window.update_chart(window)
 
+        window["-RUN_PREVIEW-"].update(disabled=isinstance(params.agent, roboEvo.gaAgents.NEATAgent))
+
         window["-GENNUM-"].update(str(roboEvo.GUI_GEN_NUMBER))
-        if len(roboEvo.EPISODE_HISTORY) > 0:
+        if isinstance(roboEvo.EPISODE_HISTORY, dict):
+            window["-MEANFIT-"].update("NEAT - disabled")
+            window["-MINFIT-"].update("NEAT - disabled")
+            window["-MAXFIT-"].update("NEAT - disabled")
+        elif len(roboEvo.EPISODE_HISTORY) > 0:
             mean = np.mean(roboEvo.EPISODE_HISTORY[-1])
             min  = np.min(roboEvo.EPISODE_HISTORY[-1])
             max  = np.max(roboEvo.EPISODE_HISTORY[-1])

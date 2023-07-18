@@ -17,7 +17,7 @@ import PySimpleGUI as sg
 from PIL import Image, ImageTk
 import numpy as np
 
-DEFAULT_FONT = ("Arial", 15)
+DEFAULT_FONT = ("Arial", 14)
 
 robots : 'dict[str, roboEvo.robots.BaseRobot]'
 """
@@ -86,6 +86,42 @@ def set_robot(robot_selected, window, agent=None):
     agent_tab.reload_agents(window, robot, agent)
 
 def popup_robot_parts(robot_selected, agents, agent_selected, window, values):
+
+    def handle_argument_inputs(window, values, key):
+        out = ""
+        dot = False
+        for s in values[key]:
+            if s == '-' and out == "":
+                out += '-'
+            if s in '1234567890':
+                out += s
+            if s == '.' and not dot:
+                dot = True
+                out += s
+        window[key].update(out)
+        values[key] = out
+
+    def handle_range_inputs(window, values, key):
+        main_key = key[:-4]
+        edit = key[-4:]
+        if edit == "_min":
+            min = values[f"{main_key}_min"]
+            max = values[f"{main_key}_max"]
+            min = 0 if min in ["", "-", ".", "-."] else float(min)
+            max = 0 if max in ["", "-", ".", "-."] else float(max)
+
+            if min > max:
+                window[f"{main_key}_max"].update(min)
+
+        if edit == "_max":
+            min = values[f"{main_key}_min"]
+            max = values[f"{main_key}_max"]
+            min = 0 if min in ["", "-", ".", "-."] else float(min)
+            max = 0 if max in ["", "-", ".", "-."] else float(max)
+
+            if max < min:
+                window[f"{main_key}_min"].update(max)
+
     robot = robots[robot_selected]
     agent = agents[agent_selected]
     body_parts = np.array(list(robot.body_parts.keys()))
@@ -132,6 +168,10 @@ def popup_robot_parts(robot_selected, agents, agent_selected, window, values):
             popup[f"{bp}_min"].update(disabled = not unlocked_mask[index])
             popup[f"{bp}_max"].update(disabled = not unlocked_mask[index])
 
+        if "_min" in event or "_max" in event:
+            handle_argument_inputs(popup, popup_values, event)
+            handle_range_inputs(popup, popup_values, event)
+
         out_popup_values = popup_values
 
         popup.refresh()
@@ -144,7 +184,10 @@ def popup_robot_parts(robot_selected, agents, agent_selected, window, values):
         if unlocked_mask[i]:
             min = out_popup_values[f"{bp}_min"]
             max = out_popup_values[f"{bp}_max"]
-            body_part_mask.append((float(min),float(max)))
+            min = 0.0 if min in ["", "-", ".", "-."] else float(min)
+            max = 0.0 if max in ["", "-", ".", "-."] else float(max)
+
+            body_part_mask.append((min, max))
         else:
             body_part_mask.append(False)
 

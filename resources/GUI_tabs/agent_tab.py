@@ -17,7 +17,7 @@ import resources.GUI_tabs.evo_tab as evo_tab
 import roboEvo
 from typing import Dict
 
-DEFAULT_FONT = ("Arial", 15)
+DEFAULT_FONT = ("Arial", 14)
 
 agents : Dict[str, roboEvo.gaAgents.BaseAgent]
 """
@@ -84,7 +84,7 @@ def reset_agent_arguments(agent_name, window):
         if isinstance(agent.arguments[arg], dict):
             window[f"{agent_name}|{arg}_min"].update(agent.arguments[arg]["MIN"])
             window[f"{agent_name}|{arg}_max"].update(agent.arguments[arg]["MAX"])
-
+        else:
             window[f"{agent_name}|{arg}"].update(agent.arguments[arg])
 
 def get_agent_gen_ops(agent_name):
@@ -116,7 +116,7 @@ Dictionary of agent arguments corresponding to each agent. Used when selecting
 different agent from the selection menu to show the correct arguments for
 current agent and to hide all other ones.
 
-This dictionary is filled automatically from the :attr: dictionary.
+This dictionary is filled automatically from the :attr:`agents` dictionary.
 """
 
 agents_gen_ops_default = {agent : get_agent_gen_ops(agent) for agent in agent_names}
@@ -130,10 +130,11 @@ def reload_agents(window, robot, agent):
                                               gui=True)
 
         if agent.__class__.__name__ == name:
-            reset_agent_arguments(name, window)
             if not isinstance(agent, roboEvo.gaAgents.NEATAgent):
                 evo_tab.set_evo_ops(name, window)
-        reset_agent_arguments("NEATAgent", window)
+            reset_agent_arguments(name, window)
+
+    reset_agent_arguments("NEATAgent", window)
 
 
 def tab():
@@ -187,15 +188,45 @@ def expand_description(text):
 
 def handle_argument_inputs(window, values, key):
     out = ""
+    dot = False
     for s in values[key]:
-        if s in '1234567890.':
+        if s == "-" and out == "":
+            out += "-"
+        if s in '1234567890':
+            out += s
+        if s == '.' and not dot:
+            dot = True
             out += s
     window[key].update(out)
+    values[key] = out
+
+def handle_range_inputs(window, values, key):
+    main_key = key[:-4]
+    edit = key[-4:]
+    if edit == "_min":
+        min = values[f"{main_key}_min"]
+        max = values[f"{main_key}_max"]
+        min = 0 if min in ["", "-", ".", "-."] else float(min)
+        max = 0 if max in ["", "-", ".", "-."] else float(max)
+
+        if min > max:
+            window[f"{main_key}_max"].update(min)
+
+    if edit == "_max":
+        min = values[f"{main_key}_min"]
+        max = values[f"{main_key}_max"]
+        min = 0 if min in ["", "-", ".", "-."] else float(min)
+        max = 0 if max in ["", "-", ".", "-."] else float(max)
+
+        if max < min:
+            window[f"{main_key}_min"].update(max)
 
 def events(window, event, values):
     # '|' splits agent arguments
     if '|' in event: 
         handle_argument_inputs(window, values, event)
+        if "_min" in event or "_max" in event:
+            handle_range_inputs(window, values, event)
 
     if event == "-AGENT_SELECT-":
         set_agent(values["-AGENT_SELECT-"], window)

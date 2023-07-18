@@ -13,6 +13,7 @@ import PySimpleGUI as sg
 
 import os
 import numpy as np
+from resources.GUI_tabs.agent_tab import reload_agents
 
 import roboEvo
 from experiment_setter import Experiments
@@ -20,7 +21,7 @@ import resources.GUI_tabs.run_window as run_window
 
 experiments = Experiments()
 
-DEFAULT_FONT = ("Arial", 15)
+DEFAULT_FONT = ("Arial", 14)
 
 def tab():
     frame_text = [[sg.Text("", size=(58, None), pad=(10,10), key="-MAIN_SETTINGS_OVERVIEW-")]]
@@ -32,9 +33,9 @@ def tab():
                sg.Button("Save experiment", pad=((5,0),None), key="-SAVE_EXPERIMENT-"), 
                sg.Button("Load experiment", pad=((2,10),None), key="-LOAD_EXPERIMENT-")]
 
-    save_dir = [sg.Text("Save directory:", pad=((10,0),30)), sg.Text("./saves/individuals/", size=(40,None), key="-SAVE_DIR_TEXT-"), 
+    save_dir = [sg.Text("Save directory:", pad=((10,0),30)), sg.Text("./saves/experiment_runs/", size=(40,None), key="-SAVE_DIR_TEXT-"), 
                 sg.Push(), 
-                sg.FolderBrowse("Browse", size=(6,None), initial_folder="./saves/individuals", pad=((0,10),None), target="-SAVE_DIR_TEXT-")]
+                sg.FolderBrowse("Browse", size=(6,None), initial_folder="./saves/", pad=((0,10),None), target="-SAVE_DIR_TEXT-")]
 
     start = [sg.Push(), sg.Button("Start", size=(5,1), pad=(10,5), key="-START-")]
 
@@ -56,30 +57,71 @@ def popup_view_individual():
         """
         parent_dir = os.path.dirname(file_path)
 
-        last_population = np.load(file_path, allow_pickle=True)
-
         run_timestamp = file_path[file_path.find("population")+10:file_path.find(".npy")]
         best_individual_path = [x for x in os.listdir(parent_dir) if  run_timestamp in x and x.endswith(".save")][0]
 
-        agent, robot, _ = roboEvo.gaAgents.BaseAgent.load(parent_dir+"/"+best_individual_path)
-
         individual_items = []
+        agent = None
+        robot = None
+        last_populationn = None
+        if "NEAT" in parent_dir:
+            import lzma
+            import pickle
+            config = None
+            with lzma.open(file_path, "rb") as load_file:
+                last_population, config = pickle.load(load_file)
 
-        # evaluation
-        for index, individual in enumerate(last_population):
-            popup["PBAR"].update(current_count=100*index//len(last_population))
-            file = robot.create(agent.body_part_mask, individual)
-            file.close()
-            env = roboEvo.gym.make(id=robot.environment_id,
-                                   xml_file=file.name,
-                                   reset_noise_scale=0.0,
-                                   disable_env_checker=True,
-                                   render_mode=None)
-            env = roboEvo.TimeLimit(env, max_episode_steps=500)
+            agent, robot, _, _ = roboEvo.gaAgents.NEATAgent.load_override(parent_dir+"/"+best_individual_path)
 
-            run_reward = roboEvo._simulation_run(env, agent, individual)
+            # evaluation
+            for index, individual in enumerate(last_population):
+                if popup.read(1) == (None,None):
+                    break
 
-            individual_items.append((index, run_reward, individual))
+                popup["PBAR"].update(current_count=100*index//len(last_population))
+
+                file = robot.create(agent.body_part_mask)
+                env = None
+                if file == None:
+                    env = roboEvo.gym.make(id=robot.environment_id,
+                                    max_episode_steps=agent.TIME_LIMIT,
+                                    render_mode=None)
+                else:
+                    env = roboEvo.gym.make(id=robot.environment_id,
+                                    xml_file=file.name,
+                                    reset_noise_scale=0.0,
+                                    disable_env_checker=True,
+                                    max_episode_steps=agent.TIME_LIMIT,
+                                    render_mode=None)
+
+                net = roboEvo.gaAgents.neat.nn.FeedForwardNetwork.create(individual, config) 
+                run_reward = roboEvo.gaAgents.NEATAgent._custom_eval(env, net, False)
+
+                individual_items.append((index, run_reward, individual, config))
+
+        else:
+            last_population = np.load(file_path, allow_pickle=True)
+
+            agent, robot, _ = roboEvo.gaAgents.BaseAgent.load(parent_dir+"/"+best_individual_path)
+
+            # evaluation
+            for index, individual in enumerate(last_population):
+                if popup.read(1) == (None,None):
+                    break
+
+                popup["PBAR"].update(current_count=100*index//len(last_population))
+                file = robot.create(agent.body_part_mask, individual)
+                file.close()
+                env = roboEvo.gym.make(id=robot.environment_id,
+                                    xml_file=file.name,
+                                    reset_noise_scale=0.0,
+                                    disable_env_checker=True,
+                                    render_mode=None)
+                env = roboEvo.TimeLimit(env, max_episode_steps=500)
+
+                run_reward = roboEvo._simulation_run(env, agent, individual)
+
+                individual_items.append((index, run_reward, individual))
 
         individual_items = sorted(individual_items, key=lambda x: x[1], reverse=True)
         return individual_items, agent, robot
@@ -88,7 +130,7 @@ def popup_view_individual():
 
     save_dir = [sg.Text("Selected file: ", pad=((10,0),30)), sg.Text("", size=(40,None), key="DIR"),
                 sg.Push(), 
-                sg.FileBrowse("Browse", size=(6,None), initial_folder="./saves/", pad=((0,10),None), file_types=((("Last popuulation data","*last_population*")),), target="DIR")]
+                sg.FileBrowse("Browse", size=(6,None), initial_folder="./saves/", pad=((0,10),None), file_types=((("Last population data","*last_population*")),), target="DIR")]
 
     progress_bar = [sg.ProgressBar(100, orientation='h', expand_x=True, size=(10,20), key="PBAR", visible=False)]
     indiv_list = [sg.Listbox([], select_mode=sg.SELECT_MODE_SINGLE, size=(None, 20), expand_x=True, pad=(10,5), key="SELECTION_LISTBOX", disabled=True)]
@@ -107,7 +149,8 @@ def popup_view_individual():
     robot = None
     sorted_items = []
     last_browse = ""
-    popup = sg.Window("Experiment name", layout, font=DEFAULT_FONT, keep_on_top=True, modal=True)
+    closed = False
+    popup = sg.Window("Experiment name", layout, font=DEFAULT_FONT, keep_on_top=True)
     while True:
         event, values = popup.read(1)
 
@@ -120,13 +163,20 @@ def popup_view_individual():
         if last_browse != values["Browse"]:
             popup["PBAR"].update(visible=True)
             popup["PBAR"].update(current_count=0)
+            popup["Browse"].update(disabled=True)
+            popup["SHOW"].update(disabled=True)
 
             sorted_items, agent, robot = load_individuals(values["Browse"], popup)
+            # check if popup wasn't close when loading - inside load tests too
+            if popup.read(1) == (None,None):
+                break
 
             item_texts = [f"Individual {x[0]} - Reward: {x[1]}" for x in sorted_items]
             popup["SELECTION_LISTBOX"].update(values=item_texts, disabled=False)
 
             popup["PBAR"].update(visible=False)
+            popup["Browse"].update(disabled=False)
+            popup["SHOW"].update(disabled=False)
             last_browse = values["Browse"]
 
         if event == "SHOW" and values["Browse"] != "" and agent != None and robot != None: # if indiv selected -> play
@@ -134,9 +184,18 @@ def popup_view_individual():
             
             # test for no selected item in listbox
             if selected_index == set(): continue 
+            selected_index = selected_index[0]
 
-            individual = sorted_items[selected_index[0]][2]
-            run_reward = roboEvo.render_run(agent, robot, individual)
+            individual = sorted_items[selected_index][2]
+
+            # RUN evaluation environment with rendering - NEAT for neat and normal for others
+            run_reward = 0
+            if len(sorted_items[selected_index]) == 4: # NEAT FLAG
+                config = sorted_items[selected_index][3]
+                run_reward = roboEvo.gaAgents.NEATAgent.render_run(agent, robot, individual, config)
+            else:
+                run_reward = roboEvo.render_run(agent, robot, individual)
+
             print("Run reward:", run_reward)
 
         popup.refresh()
@@ -205,7 +264,10 @@ def set_overview_text(window, values, robot_tab, agent_tab):
     for i, part in enumerate(_robot.body_parts):
         if i == 0:
             TEXT += "    - Body parts for GA:\n"
-        TEXT += "        - {} ... {}\n".format(part, _agent.orig_body_part_mask[i] if _agent.orig_body_part_mask[i] else "locked")
+        try:
+            TEXT += "        - {} ... {}\n".format(part, _agent.orig_body_part_mask[i] if _agent.orig_body_part_mask[i] else "locked")
+        except IndexError:
+            reload_agents(window, _robot, None)
 
     TEXT += "\n"
 
@@ -248,10 +310,9 @@ def events(window, event, values, robot_tab, agent_tab, evo_tab):
 
             window["-ROBOT_SELECT-"].update(robot_name)
             window["-AGENT_SELECT-"].update(agent_name)
-            window["-EVO_TYPE_SELECT-"].update(experiment_params.agent.evo_type)
+            window["-EVO_TYPE_SELECT-"].update(experiment_params.agent.evo_type.name)
             robot_tab.set_robot(robot_name, window, experiment_params.agent)
             agent_tab.set_agent(agent_name, window)
-            agent_tab.agents[agent_name] = experiment_params.agent
 
             if experiment_params.agent.gui:
                 selection_f, selection_p = experiment_params.agent.genetic_operators['selection']
@@ -267,6 +328,9 @@ def events(window, event, values, robot_tab, agent_tab, evo_tab):
 
             window['-POP_SIZE-'].update(experiment_params.population_size)
             window['-GEN_COUNT-'].update(experiment_params.generation_count)
+            if isinstance(experiment_params.agent, roboEvo.gaAgents.NEATAgent):
+                experiment_params.agent.arguments["POP_SIZE"] = experiment_params.population_size
+                experiment_params.agent.arguments["GEN_COUNT"] = experiment_params.generation_count
 
             window["-INDIV_MUT_PROB-"].update(experiment_params.agent.individual_mutation_prob)
             window["-ACT_MUT_PROB-"].update(experiment_params.agent.action_mutation_prob)
@@ -276,5 +340,8 @@ def events(window, event, values, robot_tab, agent_tab, evo_tab):
             window['-SHOW_BEST-'].update(experiment_params.show_best)
 
             window['-SAVE_DIR_TEXT-'].update(experiment_params.save_dir)
+
+            agent_tab.agents[agent_name] = experiment_params.agent
+            agent_tab.reset_agent_arguments(agent_name, window)
 
             set_overview_text(window, values, robot_tab, agent_tab)

@@ -8,6 +8,7 @@ robots module
    :no-undoc-members:
 
 .. _body_parts_symbols:
+
 Body parts symbols
 ~~~~~~~~~~~~~~~~~~
     Robot's changable body parts are configured inside its XML config file.
@@ -26,8 +27,9 @@ Variable symbols
     recognized (parses uses exhaustive regular expressions to find symbols).
     
     The correct format is as follows ``$<variable_name>(<default_length>)$``, where
-        #. <variable_name> - have to include at least one character and it can include lower and upper case letters, numbers and underscore ('_') (= characters from group [A-Za-z0-9_]).
+        #. <variable_name> - have to include at least one character and it can include lower and upper case letters, numbers and underscore ('_') (= characters from regex group [A-Za-z0-9\_]).
         #. <default_length> - have to include a value - positive/negative float
+
     The variable's name inside our program will use the specified name from the
     XML file. 
 

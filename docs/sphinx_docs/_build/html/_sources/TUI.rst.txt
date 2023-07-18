@@ -17,7 +17,7 @@ List of possible arguments:
       folder, where batch results are going to be saved,
     * ``--no_graph`` - flag argument, when selected the evolutionary algorithm
       disables progress graph drawing,
-    * ``--open`` - argument taking best individual file (*.save) from previous
+    * ``--open`` - argument taking best individual file (``.save``) from previous
       experiment for visualization.
 
 Usage examples:

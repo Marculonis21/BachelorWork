@@ -1111,7 +1111,7 @@ available through the NEAT configuration file."
 
             return regex
 
-        tmp_file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_")
+        tmp_file = tempfile.NamedTemporaryFile(mode="w",suffix=".xml",prefix="GArobot_", delete=False)
         raw_text = copy.deepcopy(self.config_source_file)
         first_free_line_idx = raw_text.split("\n").index('')
         text = "".join([x+"\n" for x in raw_text.split("\n")[first_free_line_idx+1:]])
@@ -1132,6 +1132,7 @@ available through the NEAT configuration file."
         tmp_file.truncate()
         tmp_file.write(text)
         tmp_file.flush()
+        tmp_file.close()
 
         self.config = neat.Config(neat.DefaultGenome, 
                                   neat.DefaultReproduction,
@@ -1139,6 +1140,7 @@ available through the NEAT configuration file."
                                   neat.DefaultStagnation,
                                   tmp_file.name)
         tmp_file.close()
+        os.unlink(tmp_file.name)
 
         pop = neat.Population(self.config)
         pop.add_reporter(neat.StdOutReporter(show_species_detail=True))

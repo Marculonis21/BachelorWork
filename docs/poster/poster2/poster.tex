@@ -1,0 +1,297 @@
+
+% POSTER EXAMPLE
+%
+% This is an example of a relatively sane poster. The box structure (and the
+% narrative in general) is what I would expect, but it is completely
+% non-mandatory; you may include whatever you want. Preferably, erase the
+% existing box structure after you read it, and start from scratch.
+%
+% The main communication requirements for the poster that should be satisfied
+% are as such:
+%
+% - At the defense, it should help you talk for around 10 minutes about your
+%   thesis, and convince the committee that you did something interesting and
+%   sufficiently complicated. Prepare pictures that explain your main results.
+%
+% - It should quickly communicate the main idea of your thesis to a random
+%   educated by-walker. Ideally, a moderately-witted MFF graduate who has never
+%   heard about your thesis before should be able to get the main "rough idea"
+%   in less than 1 minute by just looking at the poster.
+
+% modify the fontscale parameter to make everything slighly bigger or smaller.
+\documentclass[portrait,a0paper,fontscale=0.25]{baposter}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% FONT CHOICES
+% Posters do not need to be PDF/A; you can choose any relatable font from the
+% TeX font catalogue without much risk. Sans-serif fonts are suggested for the
+% posters; see https://tug.org/FontCatalogue/sansseriffonts.html
+\usepackage[sfdefault]{Fira Sans}
+% \usepackage[default]{droidsans}
+%\usepackage[math]{iwona}
+%\usepackage[defaultfam]{montserrat}
+%\usepackage{cmbright}
+%\usepackage{yfonts}\renewcommand{\familydefault}{\frakdefault}
+
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{amssymb,amsmath}
+\usepackage{enumitem}
+\usepackage[export]{adjustbox} %allows using valign with \includegraphics
+
+\renewcommand{\arraystretch}{1.5}
+
+\usetikzlibrary{positioning}
+
+% A WORD ABOUT COLORS
+%
+% This template is prepared with a relatively neutral gray background that
+% gives decent box borders (with white and darker gray), does not clash with
+% many colors (except for violet-brown and other mushroomish colors, perhaps)
+% and gives a lot of space for highlighting stuff.
+%
+% Generally, other color variations are good too; there are no strict rules on
+% the colors. Good choices include:
+%
+% - white backgrounds and differentiation of box headers by color (see
+%   headerFontColor)
+%
+% - various slightly tinted backgrounds (try red!10 instead of black!3)
+% 
+% - dark backgrounds
+%
+% Keep in mind:
+% - The normal "informative" text and figures should be DARK on LIGHT
+%   background, not the other way around.
+%
+% - If you want a dark background, soften (darken) the box backgrounds a bit so
+%   that they do not "shine" too much from the poster. Use \color{white} for
+%   the heading, and switch the UK/MFF logos to white (see contents of logos/).
+%
+% - Do not mix too many color hues together. Most hues have their widely
+%   accepted meaning (green: good result, red: problem, blue: information,
+%   yellow: highlighter, brown: serious problem, violet: something really
+%   weird/interesting/magic, depending on the shade).
+
+\begin{document}
+
+\color{black!80} % default font color
+\begin{poster}{grid=false,
+	eyecatcher=true,
+	background=plain,
+	bgColorOne=black!3, % background color
+	columns=2,
+	headerborder=none,
+	textborder=none,
+	headershape=rectangle,
+	headershade=plain,
+	boxshade=plain,
+	boxColorOne=white,
+	headershade=plain,
+	headerColorOne=black!15, % box header background color
+	headerFontColor=black,
+	}%
+	{\includegraphics[height=7em]{logos/mff-black.pdf}}
+    {Evoluce robotů v simulovaném\vspace*{4px} fyzikálním prostředí}
+	{\vspace{1ex} Marek Bečvář}
+	{\includegraphics[height=7em]{logos/uk-red.pdf}}
+
+
+%
+% LEFT COLUMN
+%
+
+\begin{posterbox}[column=0,name=uvod]{Úvod}
+    \begin{itemize}[leftmargin=*]
+    \item přírodou inspirovanými evolučními algoritmy lze řešit optimalizační
+        úlohy
+    \item mají množství parametrů a nastavení, se kterými je potřeba najednou
+        při experimentech pracovat
+
+\end{itemize}
+% Pro řešení různorodých problémů se nám může hodit využívat metod evolučních
+% algoritmů. Jedná se o přírodou inspirované optimalizační algoritmy, které
+% napodobováním přírodních procesů hledají nejlepší řešení pro zadané cíle.
+
+% Práce s těmito algoritmy ale může být velmi složitá kvůli velkému množství
+% parametrů a nastavení, se kterými je potřeba najednou při experimentech
+% pracovat.
+
+% \begin{center}\begin{tikzpicture}[ultra thick, inner sep=1ex]
+% \node[rectangle, rounded corners=1ex, draw=red!80!black, color=red!80!black, font=\huge\bfseries, rotate=21] {Problem!};
+% \end{tikzpicture}\end{center}
+\end{posterbox}
+
+\begin{posterbox}[column=0, name=goals, below=uvod, headerColorOne=cyan!60, boxColorOne=cyan!20]{Cíle práce}
+\textbf{Hlavní cíl:} platforma pro experimenty s evolučními algoritmy, dostupná
+pro uživatele různých úrovní specializace. Evoluční algoritmy v projektu
+vyvíjí roboty v simulovaném prostředí.
+\\\\
+\textbf{Vedlejší cíl:} experimentálně ověřit hypotézu, že pro
+vývoj složitějších robotů (více stupňů volnosti) potřebujeme složitější
+evoluční algoritmy.
+\end{posterbox}
+
+\begin{posterbox}[column=0, name=something1, below=goals]{Využité technologie}
+\begin{itemize}[leftmargin=*]
+    \item pro přehlednost a rozšiřitelnost Python
+    \item pro lepší čitelnost a rozšiřitelnost, vlastní implementace
+        nejpoužívanějších základních bloků evolučních algoritmů
+    \item simulované fyzikální prostředí \emph{MuJoCo}, knihovna
+        \emph{Gymnasium} (dříve \emph{OpenAI Gym})
+    \item grafické rozhraní implementováno pomocí knihovny \linebreak \emph{PySimpleGUI}
+\end{itemize}
+
+\end{posterbox}
+
+\begin{posterbox}[column=0, name=newsomething2, below=something1]{Platforma}
+\begin{itemize}[leftmargin=*]
+    \item knihovna pro snadné experimentování s~evolučními algoritmy umožňující
+        podrobnou, interaktivní konfiguraci \linebreak experimentů v grafickém rozhraní, a
+        zároveň spouštění a~statistické vyhodnocování většího množství
+        experimentů v textovém rozhraní
+    \item pro maximální efektivitu je běh evolučních algoritmů \linebreak paralelizován,
+        využívající moderních CPU
+
+    \item Pro různé typy využití:
+    \vspace{-4px}
+    \begin{enumerate}
+        \item Pro začátečníky: grafické rozhraní
+\begin{center}
+\includegraphics[width=0.7\linewidth]{../../BP/img/GUI_robot_tab_spot.jpg}
+\end{center}
+        \item Pro mírně pokročilé: knihovna pro tvorbu vlastních experimentů a
+            jejich statistické vyhodnocování
+        \item Pro pokročilé: možnost rozšiřovat o nové evoluční algoritmy, nové
+            genetické operátory a roboty
+    \end{enumerate}
+\end{itemize}
+\end{posterbox}
+
+% \begin{posterbox}[column=0, name=goals, below=uvod, headerColorOne=cyan!60, boxColorOne=cyan!20]{Cíle práce}
+
+% \end{poster}
+
+% \begin{posterbox}[column=0, name=something2, below=something1, headerColorOne=yellow!80!orange!95!black, boxColorOne=yellow!33]{Golden rule of posters}
+% For each $p \in P$ where $P$ is a set of posters:
+% $$ \textsc{Success}(p) = \frac{\textsc{Clarity}(p)}{\textsc{TimeToViewerAttention}(p)} $$
+% \end{posterbox}
+
+%
+% FOOTER
+%
+
+\begin{posterbox}[column=0, span=2, name=footer, below=newsomething2,
+	textborder=none, headerborder=none, boxheaderheight=0pt,
+	boxColorOne=black!3]{}
+\small
+Děkuji tímto panu RNDr. Františku Mrázovi, CSc. za vedení a rady při
+vypracování této práce.
+\end{posterbox}
+
+%
+% RIGHT COLUMN
+%
+% It is usually best to fill most of the poster with your results and
+% conclusions. Again, use simple annotated pictures wherever possible. Plots
+% with measurements are perfect, tables are also good.
+%
+
+% \begin{posterbox}[column=1, name=result1]{Platforma}
+% \begin{center}
+% \vspace{5px}
+% \includegraphics[width=0.9\linewidth]{../../BP/img/BP_imp_graph.pdf}
+% \end{center}
+
+% Prací vznikla platforma pro snadné experimentování s~evolučními algoritmy
+% umožňující podrobnou, interaktivní konfiguraci experimentů v grafickém
+% rozhraní, a zároveň spouštění a statistické vyhodnocování většího množství
+% experimentů v textovém rozhraní. 
+
+% Pro maximální efektivitu je běh evolučních algoritmů paralelizován, využívající
+% moderních CPU.
+
+% Přehledná implementace a dokumentace modulů umožňuje uživateli projekt
+% jednoduše rozšiřovat (nové typy evolučních algoritmů, nové příklady robotů).
+
+% \end{posterbox}
+
+\begin{posterbox}[column=1, name=result1]{Ověření hypotézy}
+
+    \textbf{Úloha:} Vývoj chůze robotů s nohama
+        \begin{itemize}[leftmargin=*]
+            \item Jednodušší algoritmus: každý kloub řízen podle sinusoidy
+            \item Složitější algoritmus: každý kloub řízen složením několika
+            sinusoid (zkrácená Fourierova řada)
+            \item Výsledky: jednodušší úlohu řeší oba algoritmy, složitější úlohu
+                (robot SpotLike z ukázky GUI) pouze složitější algoritmus 
+        \end{itemize}
+    
+        % REPRODUKOVATELNOST Výsledků
+
+\begin{minipage}{0.5\linewidth}
+    \centering
+    \includegraphics[width=1\linewidth]{./img/Sine_10.pdf}
+\end{minipage}%
+\begin{minipage}{0.5\linewidth}
+    \centering
+    \includegraphics[width=1\linewidth]{./img/TFS_10.pdf}
+\end{minipage}
+\begin{center}
+    \vspace{-25px}
+    \scriptsize{Kvalita řešení s robotem SpotLike -- jednoduchý algoritmus
+    vlevo, složitější vpravo.}
+
+\end{center}
+\footnotesize{Grafy popisují rozdělení hodnot fitness v populaci jedinců z pěti
+náhodně inicializovaných opakování experimentu. Červené značky v posledním
+sloupci označují fitness nejlepšího jedince z každého běhu experimentu.}
+
+\end{posterbox}
+
+\begin{posterbox}[column=1, name=conclusion, below=result1, bottomaligned=newsomething2]{Závěr}
+% \begin{posterbox}[column=1, name=conclusion, below=result1, bottomaligned=something1]{Závěr}
+
+\begin{itemize}[leftmargin=*]
+    \item demonstrace, že lepší kódování úlohy umožňuje řešení složitějších
+        problémů
+    \item platforma pro provádění reprodukovatelných experimentů v OS Windows i
+        Linux
+    \item přehledná, funkční a stabilní; využití pomocí GUI nebo TUI
+    \item dává nástroje pro vizualizaci řešení a statistické vyhodnocení
+    \item evoluční vývoj ovládání, morfologie robotů a kombinovaný vývoj
+\end{itemize}
+
+\begin{center}
+    
+    \begin{minipage}{0.38\linewidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{../../BP/img/crop_exp2_para_top1.jpg}
+    \end{minipage}%
+    \begin{minipage}{0.38\linewidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{../../BP/img/crop_exp2_para_side1.jpg}
+    \end{minipage}
+
+    \vspace{5px}
+    \scriptsize{Výsledek současného vývoje řízení a morfologie robota
+        AntV3. \vspace{2px}\linebreak Výsledný robot má tři dlouhé (odrazové) nohy a jednu kratší (sloužící jako
+kormidlo).}
+\end{center}
+
+
+\vspace{-10px}
+\begin{center}
+    \hspace{100px}
+    \includegraphics[width=0.3\linewidth]{../../BP/img/QRGitlab.png}
+
+    \vspace{-57px} % vspace
+    \hspace{-110px} % hspace
+    Celý projekt dostupný v \\ \hspace{-100px}Gitlab repozitáři:
+\end{center}
+\end{posterbox}
+
+\end{poster}
+\end{document}
